@@ -31,9 +31,9 @@ class Config:
     MAIL_PORT = 587
     MAIL_USE_TLS = True
     MAIL_USE_SSL = False  # TLS is enough
-    MAIL_USERNAME = "jeysalas05@gmail.com"
-    MAIL_PASSWORD = "dvwj yvbl kqxu rbya"  # your Gmail app password
-    MAIL_DEFAULT_SENDER = "jeysalas05@gmail.com"
+    MAIL_USERNAME = "petsona.helpcare@gmail.com"
+    MAIL_PASSWORD = "snhy xbob xbda jvep"  # your Gmail app password
+    MAIL_DEFAULT_SENDER = "petsona.helpcare@gmail.com"
 
     @staticmethod
     def init_app(app):
