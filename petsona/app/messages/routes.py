@@ -453,6 +453,24 @@ def start_chat(user_id):
     return redirect(url_for('messages.conversation', conversation_id=conversation.id))
 
 
+@bp.route('/support', methods=['GET'])
+@login_required
+def support():
+    """Redirect the logged-in user to chat with the admin support account."""
+    admin_user = User.query.filter_by(role='admin').order_by(User.id).first()
+
+    if not admin_user:
+        flash('Support is unavailable right now. Please try again later.', 'warning')
+        return redirect(url_for('messages.inbox'))
+
+    if admin_user.id == current_user.id:
+        # If the current user is the only admin, fall back to inbox.
+        flash('Support is unavailable for this account.', 'warning')
+        return redirect(url_for('messages.inbox'))
+
+    return redirect(url_for('messages.start_chat', user_id=admin_user.id))
+
+
 @bp.route('/api/unread-count', methods=['GET'])
 @login_required
 def get_unread_count_api():

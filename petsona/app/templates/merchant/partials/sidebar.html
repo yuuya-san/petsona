@@ -63,6 +63,13 @@
           </a>
         </li>
 
+        <li class="nav-item">
+          <a href="{{ url_for('messages.support') }}" class="nav-link {% if request.endpoint == 'messages.support' %}active{% endif %}">
+            <i class="nav-icon fas fa-headset"></i>
+            <p>Support</p>
+          </a>
+        </li>
+
       </ul>
     </nav>
   </div>
