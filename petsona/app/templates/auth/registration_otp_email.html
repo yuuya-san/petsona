@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Petsona - Two-Factor Authentication Enabled</title>
+    <title>Petsona - Verify Your Email</title>
     <style>
         * {
             margin: 0;
@@ -67,108 +67,97 @@
         .message {
             font-size: 15px;
             color: #4b5563;
-            margin-bottom: 20px;
+            margin-bottom: 32px;
             line-height: 1.8;
         }
-        .success-badge {
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            padding: 16px;
-            border-radius: 8px;
-            margin: 24px 0;
+        .otp-section {
             text-align: center;
-            color: #047857;
-            font-weight: 600;
-            font-size: 14px;
+            margin: 40px 0;
         }
-        .warning-box {
+        .otp-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .otp-code {
+            display: inline-block;
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: #ffffff;
+            padding: 24px 40px;
+            border-radius: 12px;
+            font-size: 32px;
+            font-weight: 700;
+            font-family: 'Monaco', 'Courier New', monospace;
+            letter-spacing: 8px;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+            word-spacing: 8px;
+        }
+        .expiry-box {
+            background: #f0f4ff;
+            border: 1px solid #e0e7ff;
+            border-left: 4px solid #7c3aed;
+            padding: 16px;
+            border-radius: 6px;
+            margin: 32px 0;
+            font-size: 14px;
+            color: #4b5563;
+        }
+        .expiry-box strong {
+            color: #1f2937;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .expiry-box .time-remaining {
+            color: #7c3aed;
+            font-weight: 600;
+        }
+        .instructions {
             background: #fef3c7;
             border: 1px solid #fcd34d;
             border-left: 4px solid #f59e0b;
             padding: 16px;
-            margin: 24px 0;
             border-radius: 6px;
+            margin: 24px 0;
             font-size: 14px;
             color: #92400e;
+            line-height: 1.6;
         }
-        .warning-box strong {
+        .instructions strong {
             display: block;
             margin-bottom: 8px;
             color: #1f2937;
         }
-        .codes-section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1f2937;
-            margin: 32px 0 16px 0;
-        }
-        .codes-container {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 16px 0 24px 0;
-        }
-        .code-item {
-            font-family: 'Monaco', 'Courier New', monospace;
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-align: center;
-            color: #7c3aed;
-            word-spacing: 4px;
-        }
-        .code-item:hover {
-            background: #f3f4f6;
-            border-color: #7c3aed;
-        }
-        .instructions {
-            background: #f0f4ff;
-            border-left: 4px solid #7c3aed;
-            padding: 16px;
-            border-radius: 6px;
-            margin: 24px 0;
-        }
-        .instructions-title {
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
         .instructions ul {
-            margin: 0;
-            padding-left: 20px;
-            list-style-position: inside;
+            margin: 8px 0 0 20px;
+            padding: 0;
         }
         .instructions li {
-            margin: 8px 0;
-            color: #4b5563;
-            font-size: 14px;
-            line-height: 1.6;
+            margin: 6px 0;
         }
-        .info-box {
-            background: #f3f4f6;
-            border-left: 4px solid #7c3aed;
+        .copy-section {
+            background: #f9fafb;
             padding: 16px;
             border-radius: 6px;
             margin: 24px 0;
-            font-size: 14px;
-            color: #4b5563;
+            text-align: center;
         }
-        .info-box strong {
-            color: #1f2937;
-        }
-        .copy-instruction {
-            font-size: 13px;
+        .copy-label {
+            font-size: 12px;
             color: #6b7280;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .copy-code {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: #7c3aed;
+            letter-spacing: 2px;
+            word-spacing: 2px;
         }
         .footer {
             background: #f9fafb;
@@ -217,8 +206,10 @@
             .greeting {
                 font-size: 16px;
             }
-            .codes-section-title {
-                margin-top: 24px;
+            .otp-code {
+                font-size: 28px;
+                padding: 20px 32px;
+                letter-spacing: 6px;
             }
             .footer {
                 padding: 24px 20px;
@@ -235,49 +226,43 @@
                     <img src="cid:petsona_logo" alt="Petsona">
                 </div>
                 <h1>Petsona</h1>
-                <div class="header-subtitle">Account Security</div>
+                <div class="header-subtitle">Verify Your Email Address</div>
             </div>
 
             <!-- Content -->
             <div class="content">
-                <p class="greeting">Hello {{ user.first_name or 'Petsona Member' }},</p>
+                <p class="greeting">Welcome to Petsona!</p>
 
                 <p class="message">
-                    Congratulations! Two-factor authentication (2FA) has been successfully enabled on your Petsona account. This adds an extra layer of security to protect your account from unauthorized access.
+                    Thank you for signing up! To complete your registration and secure your account, please verify your email address using the one-time code below.
                 </p>
 
-                <div class="success-badge">
-                    ✓ Two-Factor Authentication Activated
+                <div class="otp-section">
+                    <span class="otp-label">Your Verification Code</span>
+                    <div class="otp-code">{{ otp }}</div>
                 </div>
 
-                <div class="warning-box">
-                    <strong>⚠️ Important: Save Your Backup Codes</strong>
-                    These 10 backup codes are your lifeline if you lose access to your authenticator app. Store them in a secure location immediately. Do not share them with anyone.
-                </div>
-
-                <div class="codes-section-title">Your Backup Codes</div>
-                <div class="codes-container">
-                    {% for code in backup_codes %}
-                    <div class="code-item">{{ code }}</div>
-                    {% endfor %}
+                <div class="expiry-box">
+                    <strong>⏰ Time Limit</strong>
+                    This code will expire in <span class="time-remaining">10 minutes</span>. If you don't verify your email within this timeframe, you'll need to request a new code.
                 </div>
 
                 <div class="instructions">
-                    <div class="instructions-title">📋 How to Use Your Backup Codes</div>
+                    <strong>🔒 Security Reminder</strong>
                     <ul>
-                        <li><strong>Store Securely:</strong> Keep these codes in a password manager, safe deposit box, or encrypted storage</li>
-                        <li><strong>Lost Your App?</strong> Use one backup code when prompted for your 2FA code to regain access</li>
-                        <li><strong>One-Time Use:</strong> Each code can only be used once, then it's marked as consumed</li>
-                        <li><strong>Regenerate Anytime:</strong> Log in to your account settings to generate new codes after use</li>
+                        <li>Never share this code with anyone</li>
+                        <li>Petsona staff will never ask for your verification code</li>
+                        <li>If you didn't create a Petsona account, you can safely ignore this email</li>
                     </ul>
                 </div>
 
-                <div class="info-box">
-                    <strong>What's Next?</strong> Your authenticator app is now linked to your Petsona account. You'll need to enter a code from it each time you sign in. Keep your phone secure and don't lose access to your authenticator app.
+                <div class="copy-section">
+                    <span class="copy-label">Or copy and paste this code:</span>
+                    <div class="copy-code">{{ otp }}</div>
                 </div>
 
-                <p class="copy-instruction">
-                    <strong>💡 Tip:</strong> Consider backing up your authenticator app settings as well, in case you need to restore it. Check your authenticator app's backup options.
+                <p class="message" style="font-size: 14px; color: #6b7280; margin-top: 32px;">
+                    <strong>Didn't request this?</strong> If you didn't sign up for a Petsona account, please disregard this email. Your email address may have been entered by mistake.
                 </p>
             </div>
 
@@ -292,8 +277,7 @@
                 </p>
                 <div class="divider"></div>
                 <p class="footer-links">
-                    This is an automated security email. Please do not reply.<br>
-                    If you didn't enable 2FA, please contact support immediately.<br>
+                    This is an automated verification email. Please do not reply.<br>
                     © 2026 Petsona. All rights reserved.
                 </p>
             </div>

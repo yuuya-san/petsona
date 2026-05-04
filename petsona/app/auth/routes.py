@@ -3,20 +3,20 @@ from app.models.species import Species
 from app.models.breed import Breed
 from app.models import BackupCode
 
-from flask import g, render_template, redirect, url_for, flash, request, current_app, session
+from flask import g, render_template, redirect, url_for, flash, request, current_app, session # pyright: ignore[reportMissingImports]
 from flask_login import login_user, logout_user, login_required, current_user # pyright: ignore[reportMissingImports]
 from . import bp
 from .forms import RegisterForm, LoginForm, ForgotPasswordForm, ResetPasswordForm
 from ..models import User, AuditLog
 from ..extensions import db, oauth
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer # pyright: ignore[reportMissingImports]
 import random
 from datetime import datetime, timedelta
 from ..extensions import limiter
-from .emails import send_password_reset_email, send_backup_codes_email
+from .emails import send_password_reset_email, send_backup_codes_email, send_registration_otp_email
 from app.utils.audit import log_event, user_snapshot
 from sqlalchemy import func # pyright: ignore[reportMissingImports]
-import pyotp
+import pyotp # pyright: ignore[reportMissingImports]
 import secrets
 import pytz
 
@@ -128,13 +128,8 @@ def register():
         # Generate OTP
         otp = str(random.randint(100000, 999999))
         session['registration_otp'] = otp
-        # Send OTP email
-        from .emails import send_email
-        html = f"""
-        <p>Your OTP code for registration is: <b>{otp}</b></p>
-        <p>This code will expire in 10 minutes.</p>
-        """
-        send_email('Your Registration OTP', [email], html)
+        # Send OTP email using professional template
+        send_registration_otp_email(email, otp)
         return redirect(url_for('auth.verify_otp'))
     # Flash form validation errors
     for field, errors in form.errors.items():
@@ -143,7 +138,7 @@ def register():
     return render_template('auth/register.html', form=form)
 
 # OTP Verification Form
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm # pyright: ignore[reportMissingImports]
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, Length
 
@@ -184,7 +179,6 @@ def verify_otp():
             flash('Invalid OTP. Please try again.', 'danger')
     return render_template('auth/verify_otp.html', form=form)
 
-# Resend OTP route for registration
 @bp.route('/resend-otp', methods=['GET'])
 @limiter.limit("5 per minute")
 def resend_otp():
@@ -194,13 +188,8 @@ def resend_otp():
         return redirect(url_for('auth.register'))
     otp = str(random.randint(100000, 999999))
     session['registration_otp'] = otp
-    from .emails import send_email
-    html = f"""
-    <p>Your OTP code for registration is: <b>{otp}</b></p>
-    <p>This code will expire in 10 minutes.</p>
-    """
-    send_email('Your Registration OTP', [reg['email']], html)
-    flash('A new OTP has been sent to your email.', 'info')
+    send_registration_otp_email(reg['email'], otp)
+    flash('A new verification code has been sent to your email.', 'info')
     return redirect(url_for('auth.verify_otp'))
 
 @bp.route("/login/google")
