@@ -457,8 +457,8 @@
         </div>
 
         <!-- Content Section -->
-        <div class="p-5 md:p-6 flex flex-col flex-1 space-y-4">
-          <div class="flex items-center gap-2">
+          <div class="p-5 md:p-6 flex flex-col flex-1 space-y-6">
+            <div class="flex items-center gap-2">
             <i class="{{ species.display_icon }} text-purple-600 text-xl"></i>
             <h3 class="text-lg md:text-xl font-bold text-gray-900 line-clamp-1">{{ species.name }}</h3>
           </div>
@@ -475,19 +475,9 @@
             </div>
           </div>
 
-          <!-- Badge -->
-          {% if species.beginner_friendly %}
-            <span class="inline-block badge-green rounded-full px-3 py-1 text-xs font-semibold w-fit">
-              <i class="fas fa-seedling mr-1"></i>Beginner Friendly
-            </span>
-          {% endif %}
-
-          <!-- Description -->
-          <p class="text-gray-600 text-sm line-clamp-2 flex-1">{{ species.description or 'Discover this amazing species' }}</p>
-
           <!-- Button -->
           <a href="{{ url_for('user.view_species', id=species.id) }}" 
-             class="btn-glass rounded-xl px-4 py-3 font-semibold text-sm text-center w-full mt-auto">
+             class="btn-glass rounded-xl px-4 py-3 pt-4 font-semibold text-sm text-center w-full mt-6">
             <span class="inline-flex items-center justify-center gap-2 w-full">
               <i class="fas fa-book"></i>Explore
             </span>
@@ -602,12 +592,9 @@
             </div>
           </div>
 
-          <!-- Description -->
-          <p class="text-gray-600 text-sm line-clamp-2 flex-1">{{ breed.summary or breed.temperament or 'Learn more about this breed' }}</p>
-
           <!-- Button -->
           <a href="{{ url_for('user.view_species', id=breed.species_id) }}" 
-             class="btn-glass rounded-xl px-4 py-3 font-semibold text-sm text-center w-full mt-auto">
+             class="btn-glass rounded-xl px-4 py-3 font-semibold text-sm text-center w-full mt-6">
             <span class="inline-flex items-center justify-center gap-2 w-full">
               <i class="fas fa-book"></i>Learn More
             </span>

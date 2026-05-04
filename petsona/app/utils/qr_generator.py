@@ -35,6 +35,22 @@ class QRCodeGenerator:
         # Create directory if it doesn't exist
         os.makedirs(self.upload_dir, exist_ok=True)
     
+    def _normalize_status(self, booking_status: Optional[str]) -> str:
+        """Normalize booking status for display in QR data."""
+        if not booking_status:
+            return 'Unknown'
+
+        normalized = booking_status.strip().lower()
+        status_map = {
+            'pending': 'Pending',
+            'confirmed': 'Confirmed',
+            'completed': 'Completed',
+            'cancelled': 'Cancelled',
+            'rejected': 'Rejected',
+            'no-show': 'No-show',
+        }
+        return status_map.get(normalized, booking_status.title())
+
     def generate_booking_qr(self, booking_id: int, booking_number: str, booking_status: str,
                            confirmation_code: str, merchant_name: str,
                            appointment_date: str, appointment_time: str) -> Optional[str]:
@@ -58,7 +74,7 @@ class QRCodeGenerator:
             qr_data = {
                 'booking_number': booking_number,
                 'booking_id': booking_id,
-                'booking_status' : booking_status,
+                'booking_status': self._normalize_status(booking_status),
                 'confirmation_code': confirmation_code,
                 'merchant': merchant_name,
                 'date': appointment_date,
