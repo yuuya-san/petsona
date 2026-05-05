@@ -876,7 +876,7 @@
           document.getElementById('manualKeyValue').textContent = formattedSecret;
           currentTwoFactorSecret = secret;
         } catch (innerError) {
-          console.error('QR Code generation error:', innerError);
+          
           container.innerHTML = '<p style="color: #ff4757; text-align: center; padding: 30px;">⚠️ Failed to generate QR code. Please use manual entry below.</p>';
           document.getElementById('manualEntrySection').style.display = 'block';
           showFlashMessage('QR code generation failed. Please manually enter the code instead.', 'warning');
@@ -884,7 +884,7 @@
       }, 100);
       
     } catch (error) {
-      console.error('QR Code setup error:', error);
+      
       container.innerHTML = '<p style="color: #ff4757; text-align: center; padding: 30px;">⚠️ QR code unavailable. Use manual entry.</p>';
       document.getElementById('manualEntrySection').style.display = 'block';
       showFlashMessage('Error generating QR code. Please use manual entry.', 'error');
@@ -915,7 +915,7 @@
       }
 
       const data = await response.json();
-      console.log('2FA Setup Generated:', data); // Debug log
+      
       
       // Generate QR code
       generateQRCode(data.totp_uri, data.secret);
@@ -927,7 +927,7 @@
       document.getElementById('defaultFooter').style.display = 'none';
       
     } catch (error) {
-      console.error('Enable 2FA error:', error);
+      
       showFlashMessage('Error: ' + error.message, 'error');
       this.disabled = false;
       this.innerHTML = '<i class="fas fa-lock mr-2"></i>Enable Two-Factor Authentication';
@@ -980,7 +980,7 @@
 
       if (response.ok) {
         showFlashMessage('✓ 2FA enabled successfully! Save your backup codes in a secure location.', 'success');
-        console.log('2FA enabled successfully. Backup codes:', data.backup_codes);
+        
         
         // Show enabled state with backup codes
         document.getElementById('twoFactorSetupState').style.display = 'none';
@@ -1000,7 +1000,7 @@
         confirmBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Verify & Enable';
       }
     } catch (error) {
-      console.error('Confirm setup error:', error);
+      
       showFlashMessage('Error: ' + error.message, 'error');
       this.disabled = false;
       this.innerHTML = '<i class="fas fa-check mr-2"></i>Verify & Enable';
@@ -1038,7 +1038,7 @@
 
       if (response.ok) {
         showFlashMessage('✓ 2FA has been disabled', 'success');
-        console.log('2FA disabled successfully');
+        
         
         // Close the confirmation modal
         if (typeof $ !== 'undefined') {
@@ -1059,7 +1059,7 @@
         confirmBtn.innerHTML = '<i class="fas fa-trash-alt mr-2"></i>Yes, Disable 2FA';
       }
     } catch (error) {
-      console.error('Disable 2FA error:', error);
+      
       showFlashMessage('Error: ' + error.message, 'error');
       this.disabled = false;
       this.innerHTML = '<i class="fas fa-trash-alt mr-2"></i>Yes, Disable 2FA';
@@ -1088,10 +1088,9 @@
             return response.json();
           })
           .then(data => {
-            console.log('2FA Status Response (RAW):', data);
-            console.log('is_2fa_enabled value:', data.is_2fa_enabled);
-            console.log('is_2fa_enabled type:', typeof data.is_2fa_enabled);
-            console.log('has_totp_secret value:', data.has_totp_secret);
+            
+            
+            
             
             // Check if 2FA is enabled - support multiple type conversions
             const is2faEnabledValue = data.is_2fa_enabled;
@@ -1102,14 +1101,13 @@
               is2faEnabled = true;
             }
             
-            console.log('Final is2faEnabled determination:', is2faEnabled);
             
             if (is2faEnabled) {
-              console.log('✓ 2FA is ENABLED - showing disable state');
+              
               document.getElementById('twoFactorDisabledState').style.display = 'none';
               document.getElementById('twoFactorEnabledState').style.display = 'block';
             } else {
-              console.log('✗ 2FA is DISABLED - showing enable state');
+              
               document.getElementById('twoFactorDisabledState').style.display = 'block';
               document.getElementById('twoFactorEnabledState').style.display = 'none';
             }
@@ -1118,7 +1116,7 @@
             document.getElementById('defaultFooter').style.display = 'flex';
           })
           .catch(error => {
-            console.error('Error checking 2FA status:', error);
+            
             showFlashMessage('Error loading 2FA status: ' + error.message, 'error');
             // Default to disabled state on error
             document.getElementById('twoFactorDisabledState').style.display = 'block';

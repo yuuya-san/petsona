@@ -43,7 +43,6 @@ class MessagingApp {
 
     this.socket.on('connect', () => {
       this.isSocketConnected = true;
-      console.log('Socket connected');
     });
 
     this.socket.on('new_message', (data) => {
@@ -64,11 +63,9 @@ class MessagingApp {
 
     this.socket.on('disconnect', (reason) => {
       this.isSocketConnected = false;
-      console.log('Socket disconnected:', reason);
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
     });
   }
 
@@ -287,7 +284,6 @@ class MessagingApp {
 
     chatMessages.appendChild(messageEl);
     this.scrollToBottom();
-    console.log('💭 Optimistic message added to DOM:', tempMessageId);
 
     // Create abort controller with 30 second timeout for message send
     const abortController = new AbortController();
@@ -311,7 +307,6 @@ class MessagingApp {
         if (!messageEl) return;
 
         if (data.success) {
-          console.log('✅ Message confirmed by server:', data.message.id);
           // Update message with server data
           messageEl.setAttribute('data-message-id', data.message.id);
           const timeEl = messageEl.querySelector('.message-time');
@@ -330,7 +325,6 @@ class MessagingApp {
             this.scheduleMediaParse(messageEl);
           }
         } else {
-          console.error('❌ Server rejected message:', data.error);
           messageEl.classList.add('failed-message');
           const timeEl = messageEl.querySelector('.message-time');
           if (timeEl) {
@@ -341,7 +335,6 @@ class MessagingApp {
       })
       .catch((err) => {
         clearTimeout(timeoutId);
-        console.error('❌ Send error:', err.message);
         
         const messageEl = document.querySelector(`[data-message-id="${tempMessageId}"]`);
         if (messageEl) {
@@ -366,14 +359,12 @@ class MessagingApp {
   }
 
   retryMessage(tempMessageId) {
-    console.log('🔄 Retrying message:', tempMessageId);
     const messageEl = document.querySelector(`[data-message-id="${tempMessageId}"]`);
     if (!messageEl) return;
 
     const textEl = messageEl.querySelector('.message-text');
     const content = textEl ? textEl.textContent.trim() : '';
     if (!content) {
-      console.error('❌ No content to retry');
       return;
     }
 
@@ -435,7 +426,6 @@ class MessagingApp {
     const uploads = [];
 
     if (window.pendingPhotoFile) {
-      console.log('📷 Uploading photo:', window.pendingPhotoFile.name);
       const formData = new FormData();
       formData.append('file', window.pendingPhotoFile);
       formData.append('type', 'photo');
@@ -443,7 +433,6 @@ class MessagingApp {
     }
 
     if (window.pendingFileObject) {
-      console.log('📄 Uploading file:', window.pendingFileObject.name);
       const formData = new FormData();
       formData.append('file', window.pendingFileObject);
       formData.append('type', 'file');
@@ -451,27 +440,22 @@ class MessagingApp {
     }
 
     if (uploads.length === 0) {
-      console.log('✅ No files to upload, sending text only');
       this.sendTextMessageWithButton(textContent, sendBtn);
       return;
     }
 
-    console.log(`⏳ Uploading ${uploads.length} file(s)...`);
 
     Promise.all(uploads)
       .then((results) => {
-        console.log('✅ All files uploaded');
         let finalContent = textContent;
         results.forEach((file) => {
           if (file.filename) {
             finalContent += `\n[${file.filename}](${file.url})`;
           }
         });
-        console.log('📨 Sending message with attachments');
         this.sendTextMessageWithButton(finalContent, sendBtn);
       })
       .catch((err) => {
-        console.error('❌ Upload error:', err);
         this.isSending = false;
         sendBtn.disabled = false;
         
@@ -541,7 +525,6 @@ class MessagingApp {
           location.reload();
         }
       })
-      .catch((err) => console.error('Block error:', err));
   }
 
   unblockUser(conversationId) {
@@ -556,7 +539,6 @@ class MessagingApp {
           location.reload();
         }
       })
-      .catch((err) => console.error('Unblock error:', err));
   }
 
   archiveConversation(conversationId) {
@@ -571,7 +553,6 @@ class MessagingApp {
           setTimeout(() => (location.href = '/messages'), 500);
         }
       })
-      .catch((err) => console.error('Archive error:', err));
   }
 
   unarchiveConversation(conversationId) {
@@ -585,7 +566,6 @@ class MessagingApp {
           this.showNotification('Conversation restored', 'success');
         }
       })
-      .catch((err) => console.error('Unarchive error:', err));
   }
 
   deleteMessage(messageId) {
@@ -603,7 +583,6 @@ class MessagingApp {
           this.showNotification('Message deleted', 'success');
         }
       })
-      .catch((err) => console.error('Delete error:', err));
   }
 
   // ==================== TYPING INDICATORS ====================

@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
-from werkzeug.utils import secure_filename
-from flask import (
+from werkzeug.utils import secure_filename # pyright: ignore[reportMissingImports]
+from flask import ( # pyright: ignore[reportMissingImports]
     render_template, request, redirect,
     url_for, flash, abort, current_app
 )

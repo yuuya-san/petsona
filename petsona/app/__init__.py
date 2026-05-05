@@ -90,7 +90,6 @@ def create_app(config_class: type = Config):
             # Format: "Apr 27, 2026 2:30 PM PHT"
             return dt.strftime('%b %d, %Y %I:%M %p')
         except Exception as e:
-            print(f"[ERROR] Failed to format datetime: {e}")
             return str(iso_datetime_str)[:10] if iso_datetime_str else 'N/A'
     
     app.jinja_env.filters['format_ph_datetime'] = format_ph_datetime
@@ -112,12 +111,9 @@ def create_app(config_class: type = Config):
         try:
             ensure_database_exists()
             create_tables(db)
-            print("✅ Database tables verified/created successfully")
         except Exception as e:
             import logging
             logging.error(f"❌ Database initialization error: {str(e)}")
-            print(f"⚠️ WARNING: Database connection failed. Make sure MySQL is running.")
-            print(f"   Error: {str(e)}")
 
     # AUTH BLUEPRINT
     from .auth import bp as auth_bp

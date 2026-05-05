@@ -697,7 +697,7 @@
 </style>
 
 <script>
-  console.log('✅ Script starting...');
+  
   
   // ==================== INPUT FIELD LENGTH LIMITS DOCUMENTATION ====================
   // This form enforces the following input limits to prevent data overflow:
@@ -729,24 +729,22 @@
 
   // Wait for page to fully load
   window.addEventListener('load', function() {
-    console.log('✅ Page loaded, initializing map in 500ms...');
+    
     setTimeout(function() {
-      console.log('✅ Checking map container...');
+      
       const container = document.getElementById('storeMap');
-      console.log('Map container:', container);
-      console.log('Container size:', container?.offsetWidth, 'x', container?.offsetHeight);
-      console.log('Leaflet available?', typeof L !== 'undefined');
+      
       
       if (typeof L !== 'undefined' && container) {
         startMap();
       } else {
-        console.error('❌ Leaflet or container not ready');
+        
       }
     }, 500);
   });
 
   function startMap() {
-    console.log('🌍 Creating map...');
+    
     
     try {
       // Create the map with minimal options
@@ -756,7 +754,7 @@
         attributionControl: true
       });
 
-      console.log('✅ Map instance created');
+      
 
       // Add OpenStreetMap tiles
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -765,14 +763,14 @@
         minZoom: 1
       }).addTo(map);
 
-      console.log('✅ Tiles added');
+      
 
       // Create marker
       const marker = L.marker([14.5995, 120.9842], {
         draggable: true
       }).addTo(map).bindPopup('Your Location');
 
-      console.log('✅ Marker added');
+      
 
       // Update coordinates when dragging
       marker.on('dragend', function() {
@@ -805,19 +803,18 @@
       // Force map to resize
       setTimeout(() => {
         map.invalidateSize(true);
-        console.log('✅ Map resized');
+        
       }, 100);
 
-      console.log('✅✅✅ MAP READY!!!');
+      
 
     } catch(err) {
-      console.error('❌ MAP ERROR:', err.message);
-      console.error(err);
+      
+      
     }
   }
 
   function updateCoords(lat, lng, shouldUpdateAddress = false) {
-    console.log('📍 Updating coords:', lat, lng);
     document.getElementById('latitude').value = lat.toFixed(6);
     document.getElementById('longitude').value = lng.toFixed(6);
     document.getElementById('coordsDisplay').textContent = `📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
@@ -845,28 +842,24 @@
           const address = data.address || 'Location selected on map';
           addressField.value = address;
           document.getElementById('addressDisplay').textContent = address;
-          console.log('✅ Address loaded:', address);
         } else {
           addressField.value = 'Location selected on map';
           document.getElementById('addressDisplay').textContent = 'Location selected on map';
-          console.warn('⚠️ Could not load address:', data.error);
         }
         validateForm();
       })
       .catch(error => {
-        console.error('❌ Geocoding error:', error);
         addressField.value = 'Location selected on map';
         document.getElementById('addressDisplay').textContent = 'Location selected on map';
         validateForm();
       });
     }
     
-    console.log('✅ Coordinates saved:', lat, lng);
   }
 
   function searchLocation(query, map, marker) {
-    console.log('🔍 Searching for location:', query);
-    console.log('ℹ️ Location search requires clicking on the map. Please click on the map to place your location marker.');
+    
+    
     // Note: Address search via Nominatim is disabled due to CORS restrictions
     // Users can simply click on the map to place their location marker
   }
@@ -892,7 +885,6 @@
       const field = document.querySelector(`[name="${fieldName}"]`);
       if (field) {
         field.setAttribute('maxlength', maxLength);
-        console.log(`✅ Applied maxlength=${maxLength} to ${fieldName}`);
       }
     });
     
@@ -900,7 +892,6 @@
     const phoneInput = document.getElementById('contact_phone_input');
     if (phoneInput) {
       phoneInput.setAttribute('maxlength', '10');
-      console.log('✅ Applied maxlength=10 to contact_phone_input');
     }
     
     // Apply maxlength to all textarea fields
@@ -909,14 +900,12 @@
       textarea.setAttribute('maxlength', maxLen);
       // Add character counter
       setupCharacterCounter(textarea, maxLen);
-      console.log(`✅ Applied maxlength=${maxLen} to textarea: ${textarea.name}`);
     });
     
     // Apply limits to price inputs (max 10 digits before decimal, 2 after)
     document.querySelectorAll('input[name^="price_"]').forEach(input => {
       input.setAttribute('maxlength', '10');
       input.setAttribute('pattern', '[0-9]*(\\.?[0-9]{1,2})?');
-      console.log('✅ Applied limits to price input');
     });
     
     // Add character counters to long text fields
@@ -1049,7 +1038,6 @@
 
       resetLocationPath();
     } catch (error) {
-      console.error('Error loading regions:', error);
       resetLocationPath();
     }
   }
@@ -1145,7 +1133,6 @@
       syncLocationFallbacks();
       validateForm();
     } catch (error) {
-      console.error('Error loading provinces:', error);
       provinceSelect.innerHTML = '<option value="">Error loading provinces</option>';
       provinceSelect.disabled = true;
       toggleSkipProvinceButton(true);
@@ -1183,7 +1170,6 @@
       syncLocationFallbacks();
       validateForm();
     } catch (error) {
-      console.error('Error loading cities:', error);
       citySelect.innerHTML = '<option value="">Error loading cities</option>';
       citySelect.disabled = true;
     }
@@ -1214,7 +1200,6 @@
       });
       barangaySelect.disabled = false;
     } catch (error) {
-      console.error('Error loading barangays:', error);
       barangaySelect.innerHTML = '<option value="">Error loading barangays</option>';
       barangaySelect.disabled = true;
     }
@@ -1750,7 +1735,6 @@
     }
 
     document.getElementById('service_pricing_json').value = JSON.stringify(pricing);
-    console.log('💾 Pricing saved:', JSON.parse(document.getElementById('service_pricing_json').value));
   }
 
   // ==================== LIVE VALIDATION ====================
@@ -1812,7 +1796,6 @@
     }
     errorEl.innerHTML = `<i class="fas fa-exclamation-circle flex-shrink-0"></i><span>${message}</span>`;
     errorEl.style.display = 'block';
-    console.log(`⚠️ Error in ${fieldName}: ${message}`);
   }
 
   function clearFieldError(fieldName) {
@@ -2005,7 +1988,6 @@
     if (agreeCheckbox) {
       agreeCheckbox.addEventListener('change', function() {
         updateSubmitButtonState();
-        console.log('Agreement checkbox:', this.checked ? '✅ Checked' : '❌ Unchecked');
       });
     }
 
@@ -2124,11 +2106,9 @@
     const agreeCheckbox = document.getElementById('agree_terms');
     
     if (!form || !submitBtn || !agreeCheckbox) {
-      console.error('❌ Form, submit button, or agreement checkbox not found');
       return;
     }
     
-    console.log('🔧 Form validation initialized');
     
     // Start with submit button DISABLED and refresh state after DOM updates
     updateSubmitButtonState();
@@ -2160,13 +2140,10 @@
 
     if (canSubmit) {
       submitBtn.removeAttribute('disabled');
-      console.log('✅ Submit button enabled');
     } else {
       if (agreeChecked) {
-        console.warn('🔒 Submit disabled even though agreement is checked. Blocking field:');
         checkAllFields(false);
       } else {
-        console.log('🔒 Submit button disabled - required fields incomplete or agreement unchecked');
       }
     }
   }
@@ -2178,7 +2155,6 @@
     const agreeCheckbox = document.getElementById('agree_terms');
     
     if (!submitBtn) {
-      console.warn('⚠️ Submit button not found');
       return;
     }
     
@@ -2268,13 +2244,11 @@
       return logAndReturn(debugInfo, silent); 
     }
 
-    console.log('✅✅✅ ALL FIELDS VALID - FORM READY TO SUBMIT ✅✅✅');
     return true;
   }
 
   function logAndReturn(debugInfo, silent = false) {
     if (debugInfo.length > 0 && !silent) {
-      console.log('BLOCKING ISSUE:', debugInfo[0]);
     }
     return false;
   }
@@ -2308,7 +2282,6 @@
       submitBtn.disabled = true;
       submitBtn.style.opacity = '0.7';
       submitBtn.innerHTML = '<i class="fas fa-spinner animate-spin mr-2"></i>Submitting...';
-      console.log('📤 Form submitted with data preserved');
       
       // Allow form to submit
       return true;
@@ -2389,7 +2362,6 @@
       // Show file name
       nameSpan.textContent = file.name + ' (' + (file.size / 1024).toFixed(2) + ' KB)';
       previewDiv.classList.remove('hidden');
-      console.log('✅ File selected:', file.name);
     } else {
       previewDiv.classList.add('hidden');
     }
@@ -2431,7 +2403,6 @@
         logoName.textContent = file.name;
         logoSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
         previewDiv.classList.remove('hidden');
-        console.log('✅ Logo selected:', file.name);
       };
       reader.readAsDataURL(file);
     } else {
@@ -2535,7 +2506,6 @@
     
     // Re-validate form
     setTimeout(validateForm, 50);
-    console.log('✅ File cleared:', inputId);
   }
 
   function removePhoto(index) {

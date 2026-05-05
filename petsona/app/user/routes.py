@@ -232,16 +232,12 @@ def get_nearby_merchants():
         service_filter = data.get('service', '').lower()
         sort_by = data.get('sort_by', 'distance')
         
-        print(f"[DEBUG] Nearby merchants request: lat={user_lat}, lon={user_lon}, dist={max_distance}, search={search_query}, service={service_filter}")
-        
         # Get all approved merchants with coordinates
         merchants = Merchant.query.filter(
             Merchant.application_status == 'approved',
             Merchant.latitude.isnot(None),
             Merchant.longitude.isnot(None)
         ).all()
-        
-        print(f"[DEBUG] Found {len(merchants)} approved merchants with coordinates")
         
         nearby_list = []
         from datetime import datetime
@@ -374,8 +370,6 @@ def get_nearby_merchants():
             }
             nearby_list.append(merchant_data)
         
-        print(f"[DEBUG] After filtering: {len(nearby_list)} merchants within {max_distance}km")
-        
         # Sort results
         if sort_by == 'distance':
             nearby_list.sort(key=lambda x: x['distance'])
@@ -391,7 +385,6 @@ def get_nearby_merchants():
         })
         
     except Exception as e:
-        print(f"[ERROR] get_nearby_merchants: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({
@@ -470,7 +463,6 @@ def reverse_geocode():
             'locationText': 'Your Location'
         }), 200
     except Exception as e:
-        print(f"[ERROR] reverse_geocode: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({

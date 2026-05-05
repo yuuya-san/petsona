@@ -11,7 +11,7 @@ from app.extensions import limiter, csrf
 from app.models import User, AuditLog, Merchant
 from app.models.notification import Notification
 from app import db
-from sqlalchemy import func
+from sqlalchemy import func # pyright: ignore[reportMissingImports]
 import random
 from app.auth.emails import send_temp_credentials
 from app.utils.audit import log_event, user_snapshot
@@ -603,7 +603,6 @@ def reject_merchant(merchant_id):
         return jsonify({'success': True, 'message': 'Merchant rejected successfully'})
     except Exception as e:
         db.session.rollback()
-        print(f"Error rejecting merchant: {str(e)}")
         flash(f'Error rejecting merchant: {str(e)}', 'danger')
         return jsonify({'success': False, 'message': str(e)}), 500
 

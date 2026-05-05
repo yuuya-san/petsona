@@ -1,6 +1,6 @@
 """Routes for messaging functionality."""
-from flask import render_template, redirect, url_for, flash, request, current_app, jsonify
-from flask_login import login_required, current_user
+from flask import render_template, redirect, url_for, flash, request, current_app, jsonify # pyright: ignore[reportMissingImports]
+from flask_login import login_required, current_user # pyright: ignore[reportMissingImports]
 from . import bp
 from .forms import SendMessageForm, ReportMessageForm, BlockUserForm
 from app.models import User
@@ -529,7 +529,7 @@ def upload_file(conversation_id):
         # ==================== SECURITY VALIDATIONS ====================
         
         import os
-        from werkzeug.utils import secure_filename
+        from werkzeug.utils import secure_filename # pyright: ignore[reportMissingImports]
         import mimetypes
         
         # 1. Validate MIME type

@@ -103,7 +103,7 @@ class Message(db.Model):
         """Convert message to dictionary for JSON response."""
         sender_photo = None
         if self.sender and self.sender.photo_url:
-            from flask import url_for
+            from flask import url_for # pyright: ignore[reportMissingImports]
             sender_photo = url_for('static', filename=self.sender.photo_url, _external=False)
         
         return {

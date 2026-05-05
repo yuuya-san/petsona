@@ -245,7 +245,6 @@ window.LoaderManager = window.LoaderManager || {
         // Absolute maximum timeout (fallback only, should rarely trigger)
         // This prevents completely stuck loaders but respects actual requests
         this.globalTimeout = setTimeout(() => {
-            console.warn('LoaderManager: Global timeout reached. Forcing hide.');
             this.activeRequests = 0;
             this.hide();
         }, this.maxGlobalWaitTime);

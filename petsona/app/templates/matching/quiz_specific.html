@@ -388,10 +388,10 @@
           const csrfToken = csrfTokenElement ? csrfTokenElement.content : '';
           
           if (!csrfToken) {
-            console.warn('CSRF token not found in meta tag');
+            
           }
-          console.log('CSRF Token:', csrfToken ? 'Present' : 'Missing');
-          console.log('Submitting breed match with answers:', formattedAnswers);
+          
+          
           
           const response = await fetch('/matching/api/breed-match', {
             method: 'POST',
@@ -405,9 +405,9 @@
             })
           });
 
-          console.log('Response status:', response.status);
+          
           const data = await response.json();
-          console.log('Breed match response:', data);
+          
 
           if (data.success) {
             this.quizResults = data;
@@ -416,13 +416,13 @@
             window.location.href = '/matching/results/breed/' + this.breedId;
           } else {
             this.quizComplete = false;
-            console.error('Breed match failed:', data);
-            console.error('Response status:', response.status);
+            
+            
             alert('Error: ' + (data.error || 'Failed to process quiz'));
           }
         } catch (error) {
-          console.error('Quiz submission error:', error);
-          console.error('Error stack:', error.stack);
+          
+          
           this.quizComplete = false;
           alert('An error occurred. Please try again.');
         }

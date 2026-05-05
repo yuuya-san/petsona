@@ -1,7 +1,7 @@
 """Review model for customer reviews of merchant services"""
 from datetime import datetime
 from app.extensions import db
-from sqlalchemy.dialects.mysql import JSON, LONGTEXT
+from sqlalchemy.dialects.mysql import JSON, LONGTEXT # pyright: ignore[reportMissingImports]
 import pytz
 
 # Philippine timezone helper

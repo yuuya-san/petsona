@@ -878,8 +878,6 @@ function merchantApplications() {
 
         init() {
             try {
-                console.log('🟢 Initializing merchant applications component');
-                console.log('Alpine version:', typeof Alpine);
                 
                 // Initialize data
                 this.applications = [];
@@ -893,18 +891,14 @@ function merchantApplications() {
                 
                 // Watch for search/filter changes
                 this.$watch('searchTerm', () => {
-                    console.log('🔍 Search term changed:', this.searchTerm);
                     this.filterApplications();
                 });
                 this.$watch('statusFilter', () => {
-                    console.log('🔽 Status filter changed:', this.statusFilter);
                     this.filterApplications();
                 });
                 
-                console.log('🟡 Starting loadApplications...');
                 this.loadApplications();
             } catch (error) {
-                console.error('❌ Error in init():', error);
             }
         },
 
@@ -944,25 +938,17 @@ function merchantApplications() {
 
         async loadApplications() {
             this.isLoading = true;
-            console.log('🟡 LoadApplications starting...');
             try {
-                console.log('📡 Fetching merchants from API: /admin/api/merchants?status=all');
                 const response = await fetch('/admin/api/merchants?status=all');
-                
-                console.log('✅ API Response status:', response.status);
-                console.log('📋 Response headers:', response.headers.get('content-type'));
                 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('❌ HTTP Error:', response.status, errorText);
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const data = await response.json();
-                console.log('📦 Parsed JSON data:', data);
                 
                 if (data.error) {
-                    console.error('❌ API Error:', data.error);
                     alert('Error loading applications: ' + data.error);
                     this.applications = [];
                     this.updateStats();
@@ -971,10 +957,8 @@ function merchantApplications() {
                 }
                 
                 const merchants = data.merchants || [];
-                console.log(`✅ Loaded ${merchants.length} merchants from API`);
                 
                 if (merchants.length === 0) {
-                    console.warn('⚠️ No merchants returned from API - database might be empty');
                     this.applications = [];
                     this.updateStats();
                     this.filterApplications();
@@ -982,16 +966,8 @@ function merchantApplications() {
                     return;
                 }
                 
-                console.log('🔄 Processing merchants...');
-                
                 // Normalize field names to match template expectations
                 this.applications = merchants.map((m, idx) => {
-                    console.log(`Processing merchant ${idx + 1}/${merchants.length}:`, {
-                        id: m.id,
-                        name: m.business_name,
-                        status: m.application_status,
-                        submitted: m.submitted_at
-                    });
                     
                     return {
                         id: m.id,
@@ -1035,19 +1011,13 @@ function merchantApplications() {
                     };
                 });
                 
-                console.log(`✅ Successfully processed ${this.applications.length} applications`);
-                console.log('📊 Processed applications:', this.applications);
-                
                 this.updateStats();
                 this.filterApplications();
             } catch (error) {
-                console.error('❌ Error loading applications:', error);
-                console.error('Stack trace:', error.stack);
                 alert('Failed to load applications. Please check the console for errors. Error: ' + error.message);
                 this.applications = [];
                 this.updateStats();
             } finally {
-                console.log('✅ LoadApplications complete');
                 this.isLoading = false;
             }
         },
@@ -1059,15 +1029,10 @@ function merchantApplications() {
                 approved: this.applications.filter(a => a.status === 'approved').length,
                 rejected: this.applications.filter(a => a.status === 'rejected').length
             };
-            console.log('Stats updated:', this.totalStats);
+            
         },
 
         filterApplications() {
-            console.log('Filtering applications with:', {
-                statusFilter: this.statusFilter,
-                searchTerm: this.searchTerm,
-                totalApplications: this.applications.length
-            });
             
             this.filteredApplications = this.applications.filter(app => {
                 const matchesStatus = this.statusFilter === 'all' || app.status === this.statusFilter;
@@ -1088,13 +1053,11 @@ function merchantApplications() {
             });
             
             this.currentPage = 1;
-            console.log('Filtered results:', this.filteredApplications.length, 'items');
-            console.log('Filtered applications:', this.filteredApplications);
+            
         },
 
         getFilteredApplications() {
             this.filterApplications();
-            console.log('Returning filtered applications:', this.filteredApplications.length);
             return this.filteredApplications;
         },
 
@@ -1199,7 +1162,7 @@ function merchantApplications() {
 
         async approveApplication(merchantId) {
             try {
-                console.log('Approving merchant:', merchantId);
+                
                 const response = await fetch(`/admin/api/merchants/${merchantId}/approve`, {
                     method: 'POST',
                     headers: { 
@@ -1208,33 +1171,32 @@ function merchantApplications() {
                     }
                 });
 
-                console.log('Approve response status:', response.status);
-                console.log('Response content type:', response.headers.get('content-type'));
+                
 
                 // Check if response is JSON
                 const contentType = response.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
-                    console.error('Response is not JSON, received:', await response.text());
+                    
                     alert('Server error: Invalid response format. Please check your permissions.');
                     return;
                 }
 
                 const data = await response.json();
-                console.log('Approval response data:', data);
+                
 
                 if (response.ok && data.success) {
-                    console.log('Application approved successfully');
+                    
                     this.selectedApp = null;
                     // Redirect to show flash message
                     setTimeout(() => {
                         window.location.href = '/admin/merchants/applications';
                     }, 500);
                 } else {
-                    console.error('Approval error:', data);
+                    
                     alert(`Error: ${data.message || 'Failed to approve application'}`);
                 }
             } catch (error) {
-                console.error('Error approving application:', error);
+                
                 alert('An error occurred while approving the application: ' + error.message);
             }
         },
@@ -1246,7 +1208,7 @@ function merchantApplications() {
             }
 
             try {
-                console.log('Rejecting merchant:', merchantId, 'Reason:', reason);
+                
                 const response = await fetch(`/admin/api/merchants/${merchantId}/reject`, {
                     method: 'POST',
                     headers: { 
@@ -1256,22 +1218,21 @@ function merchantApplications() {
                     body: JSON.stringify({ reason: reason.trim() })
                 });
 
-                console.log('Reject response status:', response.status);
-                console.log('Response content type:', response.headers.get('content-type'));
+                
 
                 // Check if response is JSON
                 const contentType = response.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
-                    console.error('Response is not JSON, received:', await response.text());
+                    
                     alert('Server error: Invalid response format. Please check your permissions.');
                     return;
                 }
 
                 const data = await response.json();
-                console.log('Rejection response data:', data);
+                
 
                 if (response.ok && data.success) {
-                    console.log('Application rejected successfully');
+                    
                     this.selectedApp = null;
                     this.rejectionReason = '';
                     // Redirect to show flash message
@@ -1279,11 +1240,11 @@ function merchantApplications() {
                         window.location.href = '/admin/merchants/applications';
                     }, 500);
                 } else {
-                    console.error('Rejection error:', data);
+                    
                     alert(`Error: ${data.message || 'Failed to reject application'}`);
                 }
             } catch (error) {
-                console.error('Error rejecting application:', error);
+                
                 alert('An error occurred while rejecting the application: ' + error.message);
             }
         }

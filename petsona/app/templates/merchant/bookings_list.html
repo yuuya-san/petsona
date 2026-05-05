@@ -1384,8 +1384,8 @@
         petsBooked = [];
       }
     } catch (e) {
-      console.error('Error parsing pets data:', e);
-      console.log('Raw pets data:', button.getAttribute('data-pets-booked'));
+      
+      
       petsBooked = [];
     }
     
@@ -1397,8 +1397,8 @@
         priceBreakdown = {};
       }
     } catch (e) {
-      console.error('Error parsing price breakdown:', e);
-      console.log('Raw price breakdown:', button.getAttribute('data-price-breakdown'));
+      
+      
       priceBreakdown = {};
     }
 
@@ -1572,7 +1572,7 @@
           }
         } catch (e) {
           // If date parsing fails, just enable the buttons
-          console.error('Error parsing appointment date:', e);
+          
           completedBtn.disabled = false;
           noShowBtn.disabled = false;
           completedBtn.style.opacity = '1';

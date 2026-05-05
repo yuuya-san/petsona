@@ -72,7 +72,6 @@ function injectNotificationCSS() {
         }
     `;
     document.head.appendChild(style);
-    console.log('✅ Notification CSS injected with unread indicators');
 }
 
 // Initialize Socket.IO connection for notifications (wait for Socket.IO to load)
@@ -107,12 +106,10 @@ function format12HourTime(dateString) {
 function initializeNotificationSocket() {
     // Check if io is available (Socket.IO loaded)
     if (typeof io === 'undefined') {
-        console.warn('⏳ Socket.IO not loaded yet, retrying in 500ms...');
         setTimeout(initializeNotificationSocket, 500);
         return;
     }
     
-    console.log('📡 Socket.IO available, initializing notification socket...');
     
     notificationSocket = io({
         transports: ['websocket', 'polling'],
@@ -124,7 +121,6 @@ function initializeNotificationSocket() {
 
     // === SOCKET CONNECTION EVENTS ===
     notificationSocket.on('connect', function() {
-        console.log('✅ Notification Socket Connected');
         isSocketConnected = true;
         
         // Request initial notification count
@@ -133,47 +129,38 @@ function initializeNotificationSocket() {
     });
 
     notificationSocket.on('disconnect', function() {
-        console.log('❌ Notification Socket Disconnected');
         isSocketConnected = false;
     });
 
     notificationSocket.on('error', function(error) {
-        console.error('🔥 Notification Socket Error:', error);
     });
 
     // === RECEIVED NOTIFICATION EVENTS ===
     notificationSocket.on('new_notification_received', function(data) {
-        console.log('📬 New Notification:', data);
         handleNewNotification(data);
     });
 
     notificationSocket.on('unread_count', function(data) {
-        console.log('🔔 Unread Count:', data.count);
         updateNotificationBadge(data.count);
     });
 
     notificationSocket.on('unread_count_update', function(data) {
-        console.log('🔄 Unread Count Updated:', data.unread_count);
         updateNotificationBadge(data.unread_count);
     });
 
     notificationSocket.on('notifications_list', function(data) {
-        console.log('📋 Notifications List:', data.notifications.length);
         displayNotifications(data.notifications, data.unread_count);
     });
 
     notificationSocket.on('notification_marked_read', function(data) {
-        console.log('✓ Notification Marked Read - New Unread:', data.unread_count);
         updateNotificationBadge(data.unread_count);
     });
 
     notificationSocket.on('all_notifications_marked_read', function(data) {
-        console.log('✓ All Notifications Marked Read');
         updateNotificationBadge(0);
     });
 
     notificationSocket.on('notification_detail', function(data) {
-        console.log('📦 Received notification detail:', data);
         if (data.notification) {
             displayNotificationModal(data.notification);
         }
@@ -410,7 +397,6 @@ function markAllNotificationsAsRead() {
 
 // === VIEW NOTIFICATION IN MODAL ===
 function viewNotificationFull(notificationId) {
-    console.log('📖 Opening notification modal for ID:', notificationId);
     
     // Find the notification in the current list
     const container = document.querySelector('.notifications-scroll-container');
@@ -419,7 +405,6 @@ function viewNotificationFull(notificationId) {
     // Get all notification items and find the one we're looking for
     const notificationItem = container.querySelector(`[data-notification-id="${notificationId}"]`);
     if (!notificationItem) {
-        console.warn('Notification item not found in DOM');
         return;
     }
     
@@ -437,12 +422,10 @@ function viewNotificationFull(notificationId) {
 
 // === DISPLAY NOTIFICATION MODAL ===
 function displayNotificationModal(notificationData) {
-    console.log('🔍 Displaying notification modal:', notificationData);
     
     // Get modal elements
     const modal = document.getElementById('notificationModal');
     if (!modal) {
-        console.warn('Notification modal not found in DOM');
         return;
     }
     
@@ -595,7 +578,6 @@ function displayNotificationModal(notificationData) {
     setNotificationToDelete(notificationId);
     
     // Show modal with proper Bootstrap handling
-    console.log('📖 Opening notification modal...');
     try {
         if (typeof $ !== 'undefined' && $.fn.modal) {
             // Ensure modal is properly set up
@@ -606,15 +588,12 @@ function displayNotificationModal(notificationData) {
                 focus: true
             });
             $modal.modal('show');
-            console.log('✅ Modal shown via Bootstrap');
         } else {
             // Fallback for non-Bootstrap environments
             modal.style.display = 'block';
             modal.style.zIndex = '10000';
-            console.log('✅ Modal shown via direct display');
         }
     } catch (error) {
-        console.error('❌ Error opening modal:', error);
         modal.style.display = 'block';
         modal.style.zIndex = '10000';
     }
@@ -668,7 +647,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     showFlashMessage('Failed to delete notification', 'danger');
                 }
             } catch (error) {
-                console.error('Error deleting notification:', error);
                 showFlashMessage('Error deleting notification', 'danger');
             } finally {
                 setButtonLoading(confirmDeleteBtn, false, 'Delete');
@@ -716,7 +694,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     showFlashMessage('Failed to delete notifications', 'danger');
                 }
             } catch (error) {
-                console.error('Error deleting all notifications:', error);
                 showFlashMessage('Error deleting notifications', 'danger');
             } finally {
                 setButtonLoading(confirmDeleteAllBtn, false, 'Delete all');

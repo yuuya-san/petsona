@@ -223,28 +223,41 @@ html, body {
   color: white;
   background: linear-gradient(135deg, #6366f1, #8C00FF);
   transition: all .3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-.submit-btn:hover {
+.submit-btn:hover:not(:disabled) {
   transform: translateY(-3px);
   box-shadow: 0 20px 50px rgba(99, 102, 241, 0.4);
 }
 
-/* ================= SUCCESS ================= */
-
-.success-message {
-  display: none;
-  padding: 1rem;
-  border-radius: 16px;
-  background: rgba(209,250,229,.9);
-  color: #065f46;
-  border: 1px solid #6ee7b7;
-  text-align: center;
-  margin-bottom: 1.5rem;
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
 }
 
-.success-message.show {
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: none;
+}
+
+.submit-btn.loading .spinner {
   display: block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
 
@@ -302,27 +315,27 @@ html, body {
     <div class="glass-card contact-form">
       <h3>Send a Message</h3>
 
-      <div class="success-message" id="success-message">
-        <i class="fas fa-check-circle"></i> Message sent successfully!
-      </div>
-
-      <form id="contact-form">
+      <form id="contact-form" method="POST" action="{{ url_for('auth.contact') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="form-group">
           <label>Full Name *</label>
-          <input type="text" required>
+          <input type="text" name="name" placeholder="Enter your full name" required>
         </div>
 
         <div class="form-group">
           <label>Email *</label>
-          <input type="email" required>
+          <input type="email" name="email" placeholder="Enter your email address" required>
         </div>
 
         <div class="form-group">
           <label>Message *</label>
-          <textarea required></textarea>
+          <textarea name="message" placeholder="Enter your message here" required></textarea>
         </div>
 
-        <button type="submit" class="submit-btn">Send Message</button>
+        <button type="submit" class="submit-btn" id="submit-btn">
+          <span class="spinner"></span>
+          <span id="btn-text">Send Message</span>
+        </button>
       </form>
     </div>
 
@@ -331,13 +344,15 @@ html, body {
 
 <script>
 const form = document.getElementById('contact-form');
-const success = document.getElementById('success-message');
+const submitBtn = document.getElementById('submit-btn');
+const btnText = document.getElementById('btn-text');
 
-form.addEventListener('submit', e => {
-  e.preventDefault();
-  form.reset();
-  success.classList.add('show');
-  setTimeout(() => success.classList.remove('show'), 5000);
+form.addEventListener('submit', function(e) {
+  submitBtn.classList.add('loading');
+  submitBtn.disabled = true;
+  btnText.textContent = 'Sending...';
+  
+  // Form will submit normally
 });
 </script>
 

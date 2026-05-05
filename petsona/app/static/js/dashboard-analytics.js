@@ -17,7 +17,6 @@
     }
     dashboardInitialized = true;
 
-    console.log('Initializing dashboard with stats:', statsData);
     animateMetricCards();
     animateEngagementCards();
     animateActivityItems();
@@ -102,16 +101,13 @@
   function initializeDailyUsersChart(statsData) {
     var dailyUsersCtx = document.getElementById('dailyUsersChart');
     if (!dailyUsersCtx || typeof Chart === 'undefined') {
-      console.warn('Daily users chart: Canvas not found or Chart.js not loaded');
       return;
     }
 
     try {
       var dailyUsersData = statsData.daily_users || {};
-      console.log('Daily users data:', dailyUsersData);
       var dailyLabels = Object.keys(dailyUsersData);
       var dailyValues = Object.values(dailyUsersData);
-      console.log('Daily labels:', dailyLabels, 'Values:', dailyValues);
 
       new Chart(dailyUsersCtx, {
         type: 'bar',
@@ -190,7 +186,6 @@
         }
       });
     } catch (error) {
-      console.error('Error initializing daily users chart:', error);
     }
   }
 
@@ -201,16 +196,13 @@
   function initializeGrowthTrendChart(statsData) {
     var growthTrendCtx = document.getElementById('growthTrendChart');
     if (!growthTrendCtx || typeof Chart === 'undefined') {
-      console.warn('Growth trend chart: Canvas not found or Chart.js not loaded');
       return;
     }
 
     try {
       var growthTrendData = statsData.user_growth_trend || {};
-      console.log('Growth trend data:', growthTrendData);
       var growthLabels = Object.keys(growthTrendData);
       var growthValues = Object.values(growthTrendData);
-      console.log('Growth labels:', growthLabels, 'Values:', growthValues);
 
       new Chart(growthTrendCtx, {
         type: 'line',
@@ -305,7 +297,6 @@
         }
       });
     } catch (error) {
-      console.error('Error initializing growth trend chart:', error);
     }
   }
 
@@ -421,7 +412,6 @@
   document.addEventListener('DOMContentLoaded', function() {
     // Get stats data from window object (injected by template)
     var statsData = window.dashboardStats || {};
-    console.log('DOMContentLoaded: Stats data available:', !!Object.keys(statsData).length);
     initializeDashboard(statsData);
     attachResizeListener();
   });

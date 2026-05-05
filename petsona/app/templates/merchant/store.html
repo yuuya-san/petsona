@@ -1190,7 +1190,7 @@
           }
       })
       .catch(function(error) {
-          console.error('Error:', error);
+          
       })
       .finally(function() {
           btn.disabled = false;
@@ -1273,11 +1273,11 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('🗺️ Initializing store map...');
+    
     
     var mapContainer = document.getElementById('storeMap');
     if (!mapContainer) {
-      console.log('Map container not found');
+      
       return;
     }
 
@@ -1285,14 +1285,14 @@
       if (typeof L !== 'undefined' && mapContainer) {
         initializeStoreMap();
       } else {
-        console.error('Leaflet not available');
+        
       }
     }, 500);
   });
 
   function initializeStoreMap() {
     try {
-      console.log('🌍 Creating store map...');
+      
       
       var mapElement = document.getElementById('storeMap');
       
@@ -1304,8 +1304,7 @@
       var storeName = mapElement.getAttribute('data-name') || 'Store';
       var storeAddress = mapElement.getAttribute('data-address') || 'No address';
 
-      console.log('Map data - Lat:', defaultLat, 'Lng:', defaultLng);
-      console.log('Store LatLng stored:', storeLatLng);
+      
 
       // Create map with proper responsive settings
       globalMap = L.map('storeMap', {
@@ -1319,7 +1318,7 @@
         doubleClickZoom: true
       });
 
-      console.log('✅ Map created at:', storeLatLng);
+      
 
       // Add OpenStreetMap tiles
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -1328,7 +1327,7 @@
         minZoom: 1
       }).addTo(globalMap);
 
-      console.log('✅ Tiles loaded');
+      
 
       // Create a Font Awesome location dot marker icon
       var pinMarkerIcon = L.divIcon({
@@ -1345,7 +1344,7 @@
         zIndexOffset: 1000
       }).addTo(globalMap);
 
-      console.log('✅ Pin marker placed at:', storeLatLng);
+      
 
       // Create popup content with address
       var popupContent = '<div style="text-align: center; min-width: 200px; padding: 8px;">' +
@@ -1362,7 +1361,7 @@
         maxWidth: 250
       });
 
-      console.log('✅ Popup bound to marker');
+      
 
       // Ensure map size is correct without moving marker
       setTimeout(function() {
@@ -1402,7 +1401,7 @@
         });
         resizeObserver.observe(mapElement);
       } catch (e) {
-        console.warn('ResizeObserver not supported, using fallback');
+        
       }
 
       // Fix for viewport meta tag and mobile layout
@@ -1411,10 +1410,10 @@
         viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes');
       }
 
-      console.log('✅ Store map initialized successfully at', storeLatLng);
+      
 
     } catch (error) {
-      console.error('❌ Map initialization error:', error);
+      
     }
   }
 </script>

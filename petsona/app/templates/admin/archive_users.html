@@ -510,11 +510,9 @@
       
       initUsers() {
         // Initialize search functionality
-        console.log('Archive users manager initialized');
       },
 
       filterUsers() {
-        console.log('Filtering archived users with search term:', this.searchTerm);
         
         const searchLower = this.searchTerm.toLowerCase();
         const rows = document.querySelectorAll('.users-table tbody tr.user-row');
@@ -536,7 +534,6 @@
           }
         });
         
-        console.log('Visible archived rows:', visibleCount);
         
         // Show empty state if no rows match
         const table = document.querySelector('.users-table tbody');

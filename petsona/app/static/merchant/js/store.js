@@ -231,9 +231,8 @@ function uploadLogo(event) {
       // Check content type first
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
-        // If not JSON, read as text to show error
+        // If not JSON, read as text to include in error handling
         return response.text().then(text => {
-          console.error('Non-JSON response received:', text);
           throw new Error(`Server returned ${response.status}: Expected JSON but got ${contentType || 'unknown type'}`);
         });
       }
@@ -280,8 +279,6 @@ function uploadLogo(event) {
     })
     .catch(error => {
       clearInterval(simulationInterval);
-      console.error('Upload error:', error);
-      console.error('Error details:', error.message);
       showNotification('Upload failed: ' + error.message, 'error');
       hideLoader();
     })

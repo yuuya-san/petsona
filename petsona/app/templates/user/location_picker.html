@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initMap() {
-  console.log('🌍 Initializing location picker map...');
+  
 
   try {
     // Create the map centered on Philippines
@@ -287,7 +287,7 @@ function initMap() {
       touchZoom: true
     });
 
-    console.log('✅ Map instance created');
+    
 
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -296,14 +296,14 @@ function initMap() {
       minZoom: 5
     }).addTo(map);
 
-    console.log('✅ Tiles added');
+    
 
     // Create draggable marker at center
     marker = L.marker([12.8797, 121.7740], {
       draggable: true
     }).addTo(map).bindPopup('Click on the map to set your location<br><small>Or drag this marker</small>');
 
-    console.log('✅ Marker added');
+    
 
     // Update coordinates when dragging
     marker.on('dragend', function() {
@@ -320,25 +320,25 @@ function initMap() {
     // Force map to resize after a delay
     setTimeout(() => {
       map.invalidateSize(true);
-      console.log('✅ Map resized');
+      
     }, 100);
 
     // Add a second delay for better rendering
     setTimeout(() => {
       map.invalidateSize(true);
-      console.log('✅ Map re-resized');
+      
     }, 500);
 
-    console.log('✅✅✅ LOCATION PICKER MAP READY!!!');
+    
 
   } catch(err) {
-    console.error('❌ MAP ERROR:', err.message);
-    console.error(err);
+    
+    
   }
 }
 
 function updateLocation(lat, lng) {
-  console.log('📍 Updating location:', lat, lng);
+  
 
   selectedLat = lat;
   selectedLng = lng;
@@ -382,7 +382,7 @@ function reverseGeocode(lat, lng) {
     }
   })
   .catch(error => {
-    console.error('Geocoding error:', error);
+    
     addressDisplay.textContent = 'Unable to load address';
   });
 }
@@ -422,7 +422,7 @@ function useCurrentLocation() {
       btn.innerHTML = originalHTML;
     },
     (error) => {
-      console.error('Geolocation error:', error);
+      
       alert('Unable to get your current location. Please select location manually on the map.');
       document.getElementById('coordsDisplay').innerHTML = '📍 Click on the map to select location';
       

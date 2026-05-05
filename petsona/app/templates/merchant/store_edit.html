@@ -747,28 +747,27 @@
   const merchantDataEl = document.getElementById('merchant-data');
   const merchantData = merchantDataEl ? JSON.parse(merchantDataEl.textContent) : { hasData: false };
 
-  console.log('✅ Script starting...');
+  
 
   // Wait for page to fully load
   window.addEventListener('load', function() {
-    console.log('✅ Page loaded, initializing map in 500ms...');
+    
     setTimeout(function() {
-      console.log('✅ Checking map container...');
+      
       const container = document.getElementById('storeMap');
-      console.log('Map container:', container);
-      console.log('Container size:', container?.offsetWidth, 'x', container?.offsetHeight);
-      console.log('Leaflet available?', typeof L !== 'undefined');
+      
+      
       
       if (typeof L !== 'undefined' && container) {
         startMap();
       } else {
-        console.error('❌ Leaflet or container not ready');
+        
       }
     }, 500);
   });
 
   function startMap() {
-    console.log('🌍 Creating map...');
+    
     
     try {
       // Use merchant coordinates if available
@@ -787,7 +786,7 @@
         attributionControl: true
       });
 
-      console.log('✅ Map instance created');
+      
 
       // Add OpenStreetMap tiles
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -796,14 +795,14 @@
         minZoom: 1
       }).addTo(map);
 
-      console.log('✅ Tiles added');
+      
 
       // Create marker
       const marker = L.marker([defaultLat, defaultLng], {
         draggable: true
       }).addTo(map).bindPopup('Your Location');
 
-      console.log('✅ Marker added');
+      
 
       // Update coordinates when dragging
       marker.on('dragend', function() {
@@ -836,19 +835,19 @@
       // Force map to resize
       setTimeout(() => {
         map.invalidateSize(true);
-        console.log('✅ Map resized');
+        
       }, 100);
 
-      console.log('✅✅✅ MAP READY!!!');
+      
 
     } catch(err) {
-      console.error('❌ MAP ERROR:', err.message);
-      console.error(err);
+      
+      
     }
   }
 
   function updateCoords(lat, lng, shouldUpdateAddress = false) {
-    console.log('📍 Updating coords:', lat, lng);
+    
     document.getElementById('latitude').value = lat.toFixed(6);
     document.getElementById('longitude').value = lng.toFixed(6);
     document.getElementById('coordsDisplay').textContent = `📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
@@ -863,7 +862,7 @@
           addressField.value = storedAddress;
         }
         document.getElementById('addressDisplay').textContent = storedAddress;
-        console.log('✅ Loaded stored address:', storedAddress);
+        
       }
     } 
     // When user pins location on map: reverse geocode to get full address
@@ -889,15 +888,15 @@
             const address = data.address || 'Location selected on map';
             addressField.value = address;
             document.getElementById('addressDisplay').textContent = address;
-            console.log('✅ Address loaded:', address);
+            
           } else {
             addressField.value = 'Location selected on map';
             document.getElementById('addressDisplay').textContent = 'Location selected on map';
-            console.warn('⚠️ Could not load address:', data.error);
+            
           }
         })
         .catch(error => {
-          console.error('❌ Geocoding error:', error);
+          
           addressField.value = 'Location selected on map';
           document.getElementById('addressDisplay').textContent = 'Location selected on map';
         });
@@ -906,9 +905,9 @@
   }
 
   function searchLocation(query, map, marker) {
-    console.log('🔍 Searching:', query);
+    
     // Note: Direct nominatim search is blocked by CORS. Use map clicking or select province/city/barangay instead.
-    console.log('💡 Tip: Use the province, city, and barangay dropdowns above, or click on the map to select your location');
+    
     alert('Please use the location dropdowns (Province, City, Barangay) or click on the map to select your store location.');
   }
 
@@ -1107,7 +1106,7 @@
         resetLocationPath();
       }
     } catch (error) {
-      console.error('Error loading regions:', error);
+      
       resetLocationPath();
     }
   }
@@ -1210,7 +1209,7 @@
         await loadCities(selectedCode);
       }
     } catch (error) {
-      console.error('Error loading provinces:', error);
+      
       provinceSelect.innerHTML = '<option value="">Error loading provinces</option>';
       provinceSelect.disabled = true;
       toggleSkipProvinceButton(true);
@@ -1260,7 +1259,7 @@
         validateForm();
       }
     } catch (error) {
-      console.error('Error loading cities:', error);
+      
       citySelect.innerHTML = '<option value="">Error loading cities</option>';
       citySelect.disabled = true;
     }
@@ -1296,7 +1295,7 @@
       barangaySelect.disabled = false;
       syncLocationFallbacks();
     } catch (error) {
-      console.error('Error loading barangays:', error);
+      
       barangaySelect.innerHTML = '<option value="">Error loading barangays</option>';
       barangaySelect.disabled = true;
     }
@@ -1403,7 +1402,7 @@
     }
     errorEl.innerHTML = `<i class="fas fa-exclamation-circle flex-shrink-0"></i><span>${message}</span>`;
     errorEl.style.display = 'block';
-    console.log(`⚠️ Error in ${fieldName}: ${message}`);
+    
   }
 
   function clearFieldError(fieldName) {
@@ -1449,7 +1448,7 @@
       closingTime.required = false;
       operatingDays.forEach(cb => cb.required = false);
       
-      console.log('✅ Switched to 24/7 mode');
+      
     } else {
       // Show custom hours section
       customHoursSection.style.display = 'block';
@@ -1467,7 +1466,7 @@
       closingTime.required = true;
       operatingDays.forEach(cb => cb.required = true);
       
-      console.log('✅ Switched to manual schedule mode');
+      
     }
     
     savePricingToJSON();
@@ -1610,7 +1609,7 @@
     const is24hCheckbox = document.getElementById('is_24h');
     if (is24hCheckbox) {
       is24hCheckbox.addEventListener('change', function() {
-        console.log('🔄 24/7 checkbox changed:', this.checked);
+        
         toggle24Hours();
       });
     }
@@ -1679,11 +1678,10 @@
     const agreeCheckbox = document.getElementById('agree_terms');
     
     if (!form || !submitBtn || !agreeCheckbox) {
-      console.error('❌ Form, submit button, or agreement checkbox not found');
+      
       return;
     }
     
-    console.log('🔧 Form validation initialized');
     
     // Ensure the submit button starts disabled until required fields are valid
     submitBtn.disabled = true;
@@ -1718,13 +1716,13 @@
 
     if (canSubmit) {
       submitBtn.removeAttribute('disabled');
-      console.log('✅ Submit button enabled');
+      
     } else {
       if (agreeChecked) {
-        console.warn('🔒 Submit disabled even though agreement is checked. Blocking field:');
+        
         checkAllFields(false);
       } else {
-        console.log('🔒 Submit button disabled - required fields incomplete or agreement unchecked');
+        
       }
     }
   }
@@ -1786,13 +1784,13 @@
     const agreeCheckbox = document.getElementById('agree_terms');
     if (!agreeCheckbox || !agreeCheckbox.checked) { debugInfo.push('❌ agreement checkbox not checked'); return logAndReturn(debugInfo, silent); }
 
-    console.log('✅✅✅ ALL FIELDS VALID - FORM READY TO SAVE ✅✅✅');
+    
     return true;
   }
 
   function logAndReturn(debugInfo, silent = false) {
     if (debugInfo.length > 0 && !silent) {
-      console.log('BLOCKING ISSUE:', debugInfo[0]);
+      
     }
     return false;
   }
@@ -2168,13 +2166,13 @@
   function loadExistingPricingData(category) {
     const servicePricingField = document.getElementById('service_pricing_json');
     if (!servicePricingField || !servicePricingField.value) {
-      console.log('📋 No existing pricing data found');
+      
       return;
     }
 
     try {
       const pricingData = JSON.parse(servicePricingField.value);
-      console.log('📋 Existing pricing data loaded:', pricingData);
+      
 
       // Find the duration type and pricing for current category
       if (pricingData[category]) {
@@ -2182,7 +2180,7 @@
         const durationType = Object.keys(categoryData)[0]; // Get first duration type (hour, halfday, fullday, night, etc)
         
         if (durationType) {
-          console.log(`✅ Found duration type: ${durationType} for ${category}`);
+          
           
           // Select the duration type radio button
           const durationRadio = document.querySelector(`input[name="duration_type"][value="${durationType}"]`);
@@ -2198,13 +2196,13 @@
                 const fulldayInput = document.getElementById('fullday_hours');
                 if (fulldayInput) {
                   fulldayInput.value = pricingData.fullday_hours;
-                  console.log(`✅ Set fullday hours: ${pricingData.fullday_hours}`);
+                  
                 }
               } else if (durationType === 'halfday' && pricingData.halfday_hours) {
                 const halfdayInput = document.getElementById('halfday_hours');
                 if (halfdayInput) {
                   halfdayInput.value = pricingData.halfday_hours;
-                  console.log(`✅ Set halfday hours: ${pricingData.halfday_hours}`);
+                  
                 }
               } else if (durationType === 'night') {
                 // Load night times for Per Night rate
@@ -2212,14 +2210,14 @@
                   const checkinInput = document.querySelector('input[name="night_checkin_time"]');
                   if (checkinInput) {
                     checkinInput.value = pricingData.night_checkin_time;
-                    console.log(`✅ Set check-in time: ${pricingData.night_checkin_time}`);
+                    
                   }
                 }
                 if (pricingData.night_checkout_time) {
                   const checkoutInput = document.querySelector('input[name="night_checkout_time"]');
                   if (checkoutInput) {
                     checkoutInput.value = pricingData.night_checkout_time;
-                    console.log(`✅ Set check-out time: ${pricingData.night_checkout_time}`);
+                    
                   }
                 }
               }
@@ -2230,7 +2228,7 @@
                 const priceInput = document.querySelector(`input[name="price_${category}_${durationType}_${sizeId}"]`);
                 if (priceInput) {
                   priceInput.value = prices[sizeId];
-                  console.log(`✅ Set price for ${sizeId}: ₱${prices[sizeId]}`);
+                  
                 }
               });
             }, 300);
@@ -2238,7 +2236,7 @@
         }
       }
     } catch (error) {
-      console.error('❌ Error loading pricing data:', error);
+      
     }
   }
 
@@ -2715,9 +2713,9 @@
     // Only save if there's actual pricing data
     if (hasPricingData) {
       document.getElementById('service_pricing_json').value = JSON.stringify(pricing);
-      console.log('💾 Pricing saved:', JSON.parse(document.getElementById('service_pricing_json').value));
+      
     } else {
-      console.log('⏭️ No pricing data to save - preserving existing data');
+      
     }
   }
 

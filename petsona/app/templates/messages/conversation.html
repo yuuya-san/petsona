@@ -121,7 +121,7 @@
               <div class="message-avatar-container">
                 <div class="message-avatar">
                   {% if other_user.photo_url %}
-                    <img src="{{ url_for('static', filename=other_user.photo_url) }}" alt="{{ other_user.first_name }}" class="w-full h-full object-cover" onerror="console.log('Avatar image load failed')">
+                    <img src="{{ url_for('static', filename=other_user.photo_url) }}" alt="{{ other_user.first_name }}" class="w-full h-full object-cover" onerror="">
                   {% else %}
                     <span class="text-xs font-bold">{{ other_user.first_name[0] }}</span>
                   {% endif %}

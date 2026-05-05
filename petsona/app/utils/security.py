@@ -48,7 +48,6 @@ def encrypt_message(plaintext):
         # Decode to string for storage in database
         return encrypted_token.decode('utf-8')
     except Exception as e:
-        print(f"Encryption error: {e}")
         return plaintext
 
 
@@ -68,6 +67,5 @@ def decrypt_message(ciphertext):
         decrypted = cipher.decrypt(ciphertext.encode('utf-8'))
         return decrypted.decode('utf-8')
     except (InvalidToken, Exception) as e:
-        print(f"Decryption error: {type(e).__name__}: {e}")
         # Return original if decryption fails (for backwards compatibility)
         return ciphertext

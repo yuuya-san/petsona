@@ -52,7 +52,6 @@ class MessagingApp {
       this.socket.emit('user_inactive', {
         conversation_id: this.currentConversationId
       });
-      console.log('👋 Marked user as inactive on page leave');
     }
   }
 
@@ -60,11 +59,9 @@ class MessagingApp {
     // Parse ALL message-parser elements on page load
     const allMessages = document.querySelectorAll('.message-parser');
     if (allMessages.length === 0) {
-      console.log('📭 No messages to parse');
       return;
     }
 
-    console.log(`🔍 Parsing ${allMessages.length} messages from database on initialization`);
 
     const parseMedia = (el) => {
       if (!el.dataset.parsed) {
@@ -83,7 +80,6 @@ class MessagingApp {
     if ('requestIdleCallback' in window) {
       requestIdleCallback(() => {
         allMessages.forEach(parseMedia);
-        console.log('✅ All database messages parsed and verified visible');
         
         // Verify all messages are visible
         const bubbles = document.querySelectorAll('.message-bubble');
@@ -96,7 +92,6 @@ class MessagingApp {
     } else {
       setTimeout(() => {
         allMessages.forEach(parseMedia);
-        console.log('✅ All database messages parsed and verified visible');
         
         // Verify all messages are visible
         const bubbles = document.querySelectorAll('.message-bubble');
@@ -118,14 +113,12 @@ class MessagingApp {
         clearInterval(waitForSocket);
         this.socket = window.sharedSocket;
         this.isSocketConnected = true;
-        console.log('✅ Using shared socket connection');
         this.setupSocketEvents();
         
         // Join conversation room immediately
         const convId = this.getCurrentConversationId();
         if (convId && this.socket && this.socket.connected) {
           this.socket.emit('join_conversation', { conversation_id: convId });
-          console.log(`📋 Joined conversation room: ${convId}`);
         }
       }
     }, 50);
@@ -134,7 +127,6 @@ class MessagingApp {
     setTimeout(() => {
       if (!window.sharedSocket && !this.socket) {
         clearInterval(waitForSocket);
-        console.log('⚠️ Creating new socket instance (shared socket not available)');
         this.socket = io({
           upgrade: false,
           reconnection: true,
@@ -152,22 +144,18 @@ class MessagingApp {
 
     this.socket.on('connect', () => {
       this.isSocketConnected = true;
-      console.log('✅ Socket connected');
       // Join conversation room after socket connects - use fresh conversation ID from DOM
       const convId = this.getCurrentConversationId();
       if (convId) {
         this.socket.emit('join_conversation', { conversation_id: convId });
-        console.log(`📋 Joined conversation room: ${convId}`);
       }
     });
 
     this.socket.on('new_message', (data) => {
-      console.log('📨 Received new_message event:', data);
       this.handleNewMessage(data);
     });
 
     this.socket.on('navbar_message_update', (data) => {
-      console.log('📣 Received navbar_message_update event:', data);
       this.handleNavbarMessageUpdate(data);
     });
 
@@ -184,22 +172,18 @@ class MessagingApp {
     });
 
     this.socket.on('user_status_changed', (data) => {
-      console.log('🟢 Received user_status_changed event:', data);
       this.updateUserStatus(data);
     });
 
     this.socket.on('user_status', (data) => {
-      console.log('👤 Received user_status event:', data);
       this.updateUserStatus(data);
     });
 
     this.socket.on('disconnect', (reason) => {
       this.isSocketConnected = false;
-      console.log('❌ Socket disconnected:', reason);
     });
 
     this.socket.on('connect_error', (error) => {
-      console.error('❌ Socket connection error:', error);
     });
   }
 
@@ -212,7 +196,6 @@ class MessagingApp {
     // Check if message already exists by real ID
     const existingMessage = document.querySelector(`[data-message-id="${messageData.id}"]`);
     if (existingMessage) {
-      console.log('✅ Message already in DOM, skipping duplicate:', messageData.id);
       return;
     }
     
@@ -223,7 +206,6 @@ class MessagingApp {
         const tempContent = tempMsg.querySelector('.message-text')?.textContent || '';
         // If temp message has same content and was sent recently, it's the same message
         if (tempContent === messageData.content) {
-          console.log(`✅ Matched existing temp message to real ID ${messageData.id}`);
           tempMsg.setAttribute('data-message-id', messageData.id);
           tempMsg.setAttribute('data-sender-id', messageData.sender_id);
           
@@ -245,7 +227,6 @@ class MessagingApp {
     
     // Add new message to DOM
     this.addMessageToDOM(messageData, isOwnMessage);
-    console.log(`📬 New message added from ${isOwnMessage ? 'self' : 'other'}: ${messageData.id}`);
     this.updateConversationPreview(messageData);
   }
 
@@ -317,7 +298,6 @@ class MessagingApp {
       <div class="message-avatar-container">
         <div class="message-avatar">
           ${otherUserPhoto 
-            ? `<img src="${this.escapeHtml(otherUserPhoto)}" alt="${this.escapeHtml(otherUserName)}" loading="lazy" class="avatar-img" onerror="console.log('Avatar image load failed')">` 
             : `<span class="text-xs font-bold">${otherUserName.charAt(0).toUpperCase()}</span>`}
         </div>
       </div>` : '';
@@ -340,7 +320,6 @@ class MessagingApp {
     // Set message content - store original content for parsing, not escaped
     const messageParser = messageEl.querySelector('.message-parser');
     if (messageParser) {
-      console.log('📝 Setting message content:', messageData.content.substring(0, 100));
       // Store the original content for media parsing
       messageParser.dataset.originalContent = messageData.content;
       messageParser.textContent = messageData.content; // Display as text initially
@@ -405,17 +384,13 @@ class MessagingApp {
         const url = match[2];
         const ext = url.split('.').pop().toLowerCase();
 
-        console.log(`🔍 Found media link: [${filename}](${url}), ext: ${ext}`);
 
         if (imageExts.includes(ext)) {
-          console.log(`✅ Recognized as image: ${filename}`);
           newHtml += `<div class="media-attachment image-attachment" style="margin: 8px 0;">
-                      <img src="${this.escapeHtml(url)}" alt="${this.escapeHtml(filename)}" class="media-image" style="max-width: 100%; height: auto; border-radius: 8px; cursor: pointer;" onclick="openDownloadDialog('${this.escapeHtml(url)}', '${this.escapeHtml(filename)}', 'image')" onerror="console.error('Image failed to load: ${url}');">
                     </div>`;
           hasChanges = true;
           mediaCount++;
         } else {
-          console.log(`✅ Recognized as file: ${filename}`);
           const fileIcon = this.getFileIcon(ext);
           newHtml += `<div class="media-attachment file-attachment" style="margin: 8px 0; padding: 12px; background: #f5f5f5; border-radius: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="openDownloadDialog('${this.escapeHtml(url)}', '${this.escapeHtml(filename)}', 'file')">
                       <div class="file-icon-wrapper" style="flex-shrink: 0;">
@@ -441,14 +416,12 @@ class MessagingApp {
         newHtml += this.escapeHtmlForDOM(html.substring(lastIndex));
         messageParser.innerHTML = newHtml;
         const messageId = element.getAttribute('data-message-id') || 'unknown';
-        console.log(`✅ Parsed ${mediaCount} media items in message ${messageId}`);
       } else {
         // No media found, just escape the text
         const finalText = this.escapeHtmlForDOM(html);
         if (messageParser.innerHTML !== finalText) {
           messageParser.innerHTML = finalText;
         }
-        console.log('✓ No media links found in message');
       }
 
       messageParser.dataset.parsed = 'true';
@@ -457,7 +430,6 @@ class MessagingApp {
       element.style.display = 'flex';
       element.style.visibility = 'visible';
     } catch (error) {
-      console.error('❌ Error parsing media:', error);
       messageParser.dataset.parsed = 'true';
     }
   }
@@ -471,12 +443,10 @@ class MessagingApp {
     
     if (convId) {
       const convIdInt = parseInt(convId);
-      console.log(`🔍 Reading from .messaging-container data-conversation-id="${convId}" → int: ${convIdInt}`);
       this.currentConversationId = convIdInt;
       return convIdInt;
     }
     
-    console.warn('⚠️ ERROR: No .messaging-container found in DOM!');
     return null;
   }
 
@@ -484,13 +454,11 @@ class MessagingApp {
     // Prevent rapid clicking - minimum 500ms between sends
     const now = Date.now();
     if (this.lastSendTime && (now - this.lastSendTime) < 500) {
-      console.warn('⚠️ Send too fast, ignoring');
       return;
     }
     this.lastSendTime = now;
 
     if (this.isSending) {
-      console.warn('⚠️ Already sending a message, ignoring duplicate click');
       return;
     }
 
@@ -561,7 +529,6 @@ class MessagingApp {
 
     chatMessages.appendChild(messageEl);
     this.scrollToBottom();
-    console.log('💭 Optimistic message added to DOM:', tempMessageId);
 
     // Create abort controller with 30 second timeout for message send
     const abortController = new AbortController();
@@ -570,10 +537,6 @@ class MessagingApp {
     // Send to server - always use fresh conversation ID from DOM
     const convIdToSendTo = this.getCurrentConversationId();
     const sendUrl = `/messages/send-message/${convIdToSendTo}`;
-    console.log(`📤 SENDING MESSAGE`);
-    console.log(`   URL: ${sendUrl}`);
-    console.log(`   Content length: ${content.length}`);
-    console.log(`   To conversation ID: ${convIdToSendTo}`);
     
     fetch(sendUrl, {
       method: 'POST',
@@ -586,7 +549,6 @@ class MessagingApp {
     })
       .then(async (res) => {
         clearTimeout(timeoutId);
-        console.log(`📩 Send response status: ${res.status}, headers:`, res.headers.get('content-type'));
         
         // Check if response is JSON
         const contentType = res.headers.get('content-type');
@@ -600,16 +562,13 @@ class MessagingApp {
         }
       })
       .then(({ status, data }) => {
-        console.log(`📩 Server response:`, data);
         
         const messageEl = document.querySelector(`[data-message-id="${tempMessageId}"]`);
         if (!messageEl) {
-          console.warn('⚠️ Optimistic message element not found:', tempMessageId);
           // Try to find if it was already updated by socket event
           if (data.success && data.message) {
             const realMessageEl = document.querySelector(`[data-message-id="${data.message.id}"]`);
             if (realMessageEl) {
-              console.log('✅ Message already exists with real ID, skipping update');
               return;
             }
           }
@@ -617,8 +576,6 @@ class MessagingApp {
         }
 
         if (data.success && status === 200) {
-          console.log('✅ Message confirmed by server:', data.message.id);
-          console.log(`Updating temp ID [${tempMessageId}] → real ID [${data.message.id}]`);
           
           // Update message element with server data
           messageEl.setAttribute('data-message-id', data.message.id);
@@ -642,7 +599,6 @@ class MessagingApp {
           // Parse media if any
           const messageParser = messageEl.querySelector('.message-parser');
           if (messageParser && messageParser.innerHTML.includes('[')) {
-            console.log('🖼️ Parsing media in message:', messageEl.getAttribute('data-message-id'));
             this.scheduleMediaParse(messageEl);
           }
           
@@ -650,11 +606,9 @@ class MessagingApp {
           messageEl.classList.remove('loading-message', 'failed-message');
           messageEl.style.opacity = '1';
         } else {
-          console.error('❌ Server rejected message:', data.error);
           
           // Handle rate limiting with retry
           if (status === 429) {
-            console.log('⏳ Rate limited, will retry message:', tempMessageId);
             this.retryMessageWithBackoff(tempMessageId, content, 1);
             return;
           }
@@ -669,7 +623,6 @@ class MessagingApp {
       })
       .catch((err) => {
         clearTimeout(timeoutId);
-        console.error('❌ Send error:', err.message);
         
         const messageEl = document.querySelector(`[data-message-id="${tempMessageId}"]`);
         if (messageEl) {
@@ -694,14 +647,12 @@ class MessagingApp {
   }
 
   retryMessage(tempMessageId) {
-    console.log('🔄 Retrying message:', tempMessageId);
     const messageEl = document.querySelector(`[data-message-id="${tempMessageId}"]`);
     if (!messageEl) return;
 
     const textEl = messageEl.querySelector('.message-text');
     const content = textEl ? textEl.textContent.trim() : '';
     if (!content) {
-      console.error('❌ No content to retry');
       return;
     }
 
@@ -728,12 +679,10 @@ class MessagingApp {
     const baseDelay = 2000; // 2 seconds
     const delay = baseDelay * Math.pow(2, attemptNumber - 1); // Exponential backoff
 
-    console.log(`⏳ Scheduling retry ${attemptNumber}/${maxAttempts} for message ${tempMessageId} in ${delay}ms`);
 
     setTimeout(() => {
       const messageEl = document.querySelector(`[data-message-id="${tempMessageId}"]`);
       if (!messageEl) {
-        console.log('⚠️ Message element no longer exists, cancelling retry');
         return;
       }
 
@@ -760,7 +709,6 @@ class MessagingApp {
     const convIdToSendTo = this.getCurrentConversationId();
     const sendUrl = `/messages/send-message/${convIdToSendTo}`;
 
-    console.log(`🔄 RETRY ATTEMPT: Sending message ${tempMessageId} to ${sendUrl}`);
 
     fetch(sendUrl, {
       method: 'POST',
@@ -771,7 +719,6 @@ class MessagingApp {
       body: JSON.stringify({ content: content }),
     })
       .then(async (res) => {
-        console.log(`📩 Retry response status: ${res.status}`);
         
         // Check if response is JSON
         const contentType = res.headers.get('content-type');
@@ -789,7 +736,6 @@ class MessagingApp {
         if (!messageEl) return;
 
         if (data.success && status === 200) {
-          console.log('✅ Retry successful:', data.message.id);
           
           // Update message element with server data
           messageEl.setAttribute('data-message-id', data.message.id);
@@ -810,10 +756,8 @@ class MessagingApp {
 
           this.showNotification('✅ Message sent successfully', 'success');
         } else if (status === 429 && nextAttemptNumber <= 3) {
-          console.log(`⏳ Rate limited again, retrying (${nextAttemptNumber}/3)...`);
           this.retryMessageWithBackoff(tempMessageId, content, nextAttemptNumber);
         } else {
-          console.error('❌ Retry failed:', data.error);
           messageEl.classList.add('failed-message');
           const timeEl = messageEl.querySelector('.message-time');
           if (timeEl) {
@@ -823,7 +767,6 @@ class MessagingApp {
         }
       })
       .catch((err) => {
-        console.error('❌ Retry network error:', err);
         const messageEl = document.querySelector(`[data-message-id="${tempMessageId}"]`);
         if (messageEl && nextAttemptNumber <= 3) {
           this.retryMessageWithBackoff(tempMessageId, content, nextAttemptNumber);
@@ -885,7 +828,6 @@ class MessagingApp {
     const uploads = [];
 
     if (pendingPhoto) {
-      console.log('📷 Uploading photo:', pendingPhoto.name);
       const formData = new FormData();
       formData.append('file', pendingPhoto.file);
       formData.append('type', 'photo');
@@ -893,7 +835,6 @@ class MessagingApp {
     }
 
     if (uploads.length === 0) {
-      console.log('✅ No files to upload, sending text only');
       this.isSending = false;
       sendBtn.disabled = false;
       if (!textContent.trim()) {
@@ -904,11 +845,9 @@ class MessagingApp {
       return;
     }
 
-    console.log(`⏳ Uploading ${uploads.length} image(s)...`);
     
     Promise.all(uploads)
       .then((results) => {
-        console.log('✅ All images uploaded:', results);
         let finalContent = textContent || ''; // Start with text content
         
         // Add image references
@@ -921,14 +860,12 @@ class MessagingApp {
         
         // Ensure we have content to send
         if (!finalContent || !finalContent.trim()) {
-          console.error('❌ No content to send after image upload');
           this.showNotification('❌ Error: No content or images to send', 'error');
           this.isSending = false;
           sendBtn.disabled = false;
           return;
         }
         
-        console.log('📨 Sending message with images to database, content length:', finalContent.length);
         
         // Send the actual message with image references
         this.isSending = true;
@@ -936,13 +873,11 @@ class MessagingApp {
         this.sendTextMessageWithButton(finalContent, sendBtn);
       })
       .catch((err) => {
-        console.error('❌ Upload error:', err);
         this.isSending = false;
         sendBtn.disabled = false;
         
         // Provide specific error messages
         const errorMsg = err.message || 'Unknown error';
-        console.error('Error details:', errorMsg);
         
         if (errorMsg.includes('timed out')) {
           this.showNotification('❌ File upload too slow - check your internet connection', 'error');
@@ -967,20 +902,16 @@ class MessagingApp {
   uploadFileInternal(formData, fileType = 'file') {
     const convId = document.querySelector('[data-conversation-id]')?.dataset.conversationId;
     if (!convId) {
-      console.error('❌ No conversation ID found');
       return Promise.reject(new Error('No conversation ID'));
     }
 
     // Create abort controller with 120 second timeout for larger files
     const abortController = new AbortController();
     const timeoutId = setTimeout(() => {
-      console.error('⏱️ File upload timeout - aborting after 120 seconds');
       abortController.abort();
     }, 120000);
 
     const csrfToken = this.getCSRFToken();
-    console.log(`📤 Uploading ${fileType} to conversation ${convId}`);
-    console.log(`   CSRF Token: ${csrfToken ? '✅ Present' : '❌ Missing'}`);
 
     const headers = {};
     if (csrfToken) {
@@ -995,26 +926,21 @@ class MessagingApp {
     })
       .then((res) => {
         clearTimeout(timeoutId);
-        console.log(`📥 Upload response status: ${res.status}`);
         return res.json().then(data => ({ status: res.status, data }));
       })
       .then(({ status, data }) => {
         if (status === 200 && data.success) {
-          console.log('✅ File upload successful:', { filename: data.filename, url: data.url });
           return { filename: data.filename, url: data.url };
         }
         // Extract error message from server response
         const errorMsg = data.error || 'Upload failed';
-        console.error('❌ Upload failed with error:', errorMsg);
         throw new Error(errorMsg);
       })
       .catch((err) => {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
-          console.error('⏱️ File upload timed out');
           throw new Error('File upload timed out - check your internet connection');
         }
-        console.error('❌ Upload error:', err.message);
         throw err;
       });
   }
@@ -1035,7 +961,6 @@ class MessagingApp {
           location.reload();
         }
       })
-      .catch((err) => console.error('Block error:', err));
   }
 
   unblockUser(conversationId) {
@@ -1050,7 +975,6 @@ class MessagingApp {
           location.reload();
         }
       })
-      .catch((err) => console.error('Unblock error:', err));
   }
 
   archiveConversation(conversationId) {
@@ -1065,7 +989,6 @@ class MessagingApp {
           setTimeout(() => (location.href = '/messages'), 500);
         }
       })
-      .catch((err) => console.error('Archive error:', err));
   }
 
   unarchiveConversation(conversationId) {
@@ -1079,7 +1002,6 @@ class MessagingApp {
           this.showNotification('Conversation restored', 'success');
         }
       })
-      .catch((err) => console.error('Unarchive error:', err));
   }
 
   deleteMessage(messageId) {
@@ -1097,7 +1019,6 @@ class MessagingApp {
           this.showNotification('Message deleted', 'success');
         }
       })
-      .catch((err) => console.error('Delete error:', err));
   }
 
   // ==================== TYPING INDICATORS ====================
@@ -1132,7 +1053,6 @@ class MessagingApp {
     typingContainer.classList.remove('hidden');
     typingContainer.classList.add('active');
     this.scrollToBottom();
-    console.log('⌨️ User is typing...');
   }
 
   hideTypingIndicator(data) {
@@ -1141,7 +1061,6 @@ class MessagingApp {
       typingContainer.classList.remove('active');
       typingContainer.classList.add('hidden');
     }
-    console.log('✋ User stopped typing');
   }
 
   updateUserStatus(statusData) {
@@ -1150,7 +1069,6 @@ class MessagingApp {
       const statusTextEl = document.querySelector('.user-status-text');
       
       if (!statusEl || !statusTextEl) {
-        console.log('⚠️ Status elements not found');
         return;
       }
 
@@ -1166,7 +1084,6 @@ class MessagingApp {
         const now = new Date();
         const minutesDiff = (now - lastSeenDate) / (1000 * 60);
         
-        console.log(`⏱️ Last seen: ${minutesDiff.toFixed(1)}m ago, is_online: ${is_online}`);
         
         if (minutesDiff < 5) {
           shouldShowActive = true;
@@ -1178,7 +1095,6 @@ class MessagingApp {
         statusEl.classList.remove('bg-slate-300', 'bg-gray-400');
         statusEl.classList.add('bg-green-400', 'animate-pulse');
         statusTextEl.textContent = 'Active now';
-        console.log(`🟢 ACTIVE NOW`);
       } else {
         // Show offline with time - gray indicator
         statusEl.classList.remove('bg-green-400', 'animate-pulse');
@@ -1190,11 +1106,9 @@ class MessagingApp {
         } else {
           statusTextEl.textContent = 'Offline';
         }
-        console.log(`⚫ OFFLINE`);
       }
       
     } catch (error) {
-      console.error('❌ Error updating status:', error);
     }
   }
 
@@ -1222,7 +1136,6 @@ class MessagingApp {
       
       statusTextEl.textContent = displayText;
     } catch (error) {
-      console.error('❌ Error updating offline text:', error);
       statusTextEl.textContent = 'Offline';
     }
   }
@@ -1412,7 +1325,6 @@ class MessagingApp {
     token = document.querySelector('input[name="csrf_token"]')?.value;
     if (token) return token;
     
-    console.warn('⚠️ CSRF token not found!');
     return '';
   }
 
@@ -1440,9 +1352,6 @@ class MessagingApp {
     const removePhotoPreviewBtn = document.getElementById('remove-photo-preview');
     const photoPreviewContainer = document.getElementById('photo-preview-container');
 
-    console.log('🔗 Attaching event listeners...');
-    console.log(`  photoBtn: ${photoBtn ? '✅' : '❌'}`);
-    console.log(`  photoUpload: ${photoUpload ? '✅' : '❌'}`);
 
     if (textarea) {
       textarea.addEventListener('input', () => this.startTyping());
@@ -1460,14 +1369,12 @@ class MessagingApp {
 
     if (photoBtn) {
       photoBtn.addEventListener('click', () => {
-        console.log('📷 Photo button clicked, triggering file input');
         photoUpload?.click();
       });
     }
 
     if (photoUpload) {
       photoUpload.addEventListener('change', (e) => {
-        console.log('📸 Photo selected:', e.target.files[0]?.name);
         this.handlePhotoUpload(e);
       });
     }
@@ -1494,7 +1401,6 @@ class MessagingApp {
     const convId = document.querySelector('[data-conversation-id]')?.dataset.conversationId;
     if (convId) {
       this.currentConversationId = parseInt(convId);
-      console.log(`📋 Current conversation ID: ${this.currentConversationId}`);
     }
 
     // Get other user ID
@@ -1502,17 +1408,14 @@ class MessagingApp {
     const otherUserId = otherUserIdEl ? parseInt(otherUserIdEl.dataset.otherUserId) : null;
 
     if (!otherUserId) {
-      console.error('❌ Could not find other user ID');
       return;
     }
 
     // Request other user's current status immediately if socket is ready
     const requestStatus = () => {
       if (this.socket && this.socket.connected) {
-        console.log(`👤 Requesting status for user ${otherUserId}...`);
         this.socket.emit('get_user_status', { user_id: otherUserId });
       } else {
-        console.log('⏳ Socket not connected yet, retrying status request...');
         setTimeout(requestStatus, 300);
       }
     };
@@ -1526,7 +1429,6 @@ class MessagingApp {
           conversation_id: this.currentConversationId,
           other_user_id: otherUserId
         });
-        console.log('🟢 Notified server user is online');
       } else {
         setTimeout(notifyOnline, 300);
       }
@@ -1544,7 +1446,6 @@ class MessagingApp {
           conversation_id: this.currentConversationId,
           other_user_id: otherUserId
         });
-        console.log('💓 Heartbeat: User online');
       }
     }, 20000);
 
@@ -1555,7 +1456,6 @@ class MessagingApp {
       
       if (statusTextEl && statusTextEl.dataset.lastSeenTimestamp && !statusEl.classList.contains('status-online')) {
         this.updateOfflineStatusText(statusTextEl, statusTextEl.dataset.lastSeenTimestamp);
-        console.log('🔄 Auto-refresh: Updated offline status text');
       }
     }, 10000);
 
@@ -1563,7 +1463,6 @@ class MessagingApp {
     this.statusRequestInterval = setInterval(() => {
       if (this.socket && this.socket.connected && otherUserId) {
         this.socket.emit('get_user_status', { user_id: otherUserId });
-        console.log('🔎 Auto-refresh: Requested latest status');
       }
     }, 3000);
   }
@@ -1586,7 +1485,6 @@ class MessagingApp {
 
       // Set inactivity timer - shorter for faster detection
       inactivityTimeout = setTimeout(() => {
-        console.log('⏱️ User idle for 3 minutes, marking as inactive');
         if (this.socket && this.socket.connected && this.currentConversationId) {
           this.socket.emit('user_inactive', {
             conversation_id: this.currentConversationId
@@ -1615,7 +1513,6 @@ class MessagingApp {
     // Track page visibility
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
-        console.log('📵 Page hidden, marking user as inactive');
         if (this.socket && this.socket.connected && this.currentConversationId) {
           this.socket.emit('user_inactive', {
             conversation_id: this.currentConversationId
@@ -1623,7 +1520,6 @@ class MessagingApp {
         }
         clearTimeout(inactivityTimeout);
       } else {
-        console.log('📱 Page visible, marking user as online');
         resetActivityTimer();
       }
     });
@@ -1692,16 +1588,12 @@ function openDownloadDialog(url, filename, type) {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 Initializing MessagingApp on DOMContentLoaded...');
   window.messagingApp = new MessagingApp();
   
-  console.log('✅ MessagingApp created. Socket status:', window.messagingApp.isSocketConnected);
-  console.log('✅ Socket object:', window.messagingApp.socket ? 'Present' : 'Missing');
 
   // Parse ALL initial messages after a small delay to ensure DOM is ready
   setTimeout(() => {
     const allMessages = document.querySelectorAll('.message-parser');
-    console.log(`🔍 Found ${allMessages.length} message-parser elements to parse`);
     
     allMessages.forEach((el) => {
       const messageEl = el.closest('.message-bubble');
@@ -1716,13 +1608,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Final verification: Log all messages that should be visible
     const allBubbles = document.querySelectorAll('.message-bubble');
-    console.log(`✅ Final message count: ${allBubbles.length} messages in DOM`);
     allBubbles.forEach((bubble, idx) => {
       const msgId = bubble.getAttribute('data-message-id');
       const isOwn = bubble.classList.contains('own') ? 'own' : 'other';
       const opacity = window.getComputedStyle(bubble).opacity;
       const display = window.getComputedStyle(bubble).display;
-      console.log(`  [${idx + 1}] Message ${msgId} (${isOwn}) - opacity: ${opacity}, display: ${display}`);
     });
   }, 300);
 });

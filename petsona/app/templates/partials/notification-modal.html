@@ -133,14 +133,13 @@
 <script>
 // DEBUG: Log when modal is shown
 document.getElementById('notificationModal')?.addEventListener('show.bs.modal', function() {
-    console.log('\n🔔 NOTIFICATION MODAL OPENED');
+    
     setTimeout(() => {
         const avatarImg = document.getElementById('notifSenderAvatarImg');
         const senderName = document.getElementById('notifSenderName');        
-        console.log('🖼️ Avatar image src:', avatarImg?.src);
-        console.log('👤 Sender name text:', senderName?.textContent);
-        console.log('🖼️ Avatar visible:', window.getComputedStyle(avatarImg).display);
-        console.log('🖼️ Parent visible:', window.getComputedStyle(avatarImg.parentElement).display);
+        
+        
+        
     }, 100);
 });
 

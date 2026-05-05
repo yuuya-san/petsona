@@ -37,13 +37,13 @@ html, body {
 }
 
 body {
-  padding-top: 62px;
+  padding-top: 58px;
 }
 
 /* ================= NAVBAR ================= */
 .navbar {
   position: fixed;
-  top: 15px;
+  top: 0;
   width: 100%;
   height: 58px !important;
   z-index: 1000;
@@ -82,7 +82,7 @@ body {
   max-width: 1600px;
   height: 100%;
   margin: 0 auto;
-  padding: 0 clamp(1rem, 4vw, 3.5rem);
+  padding: 0.5rem clamp(1rem, 4vw, 3.5rem) 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -234,7 +234,7 @@ body {
 /* ================= MOBILE ================= */
 @media (max-width: 900px) {
 
-  body { padding-top: 57px; }
+  body { padding-top: 54px; }
   
   .navbar {
     height: 54px;
@@ -281,14 +281,11 @@ body {
     display: none;
     gap: 0.8rem;
 
-    background: linear-gradient(
-      135deg,
-      rgba(255,255,255,.88),
-      rgba(237,233,254,.82)
-    );
+    background: rgba(55, 65, 81, 0.95);
     backdrop-filter: blur(35px) saturate(1.7);
-    border-top: 1px solid rgba(139,92,246,.2);
-    box-shadow: 0 20px 60px rgba(139,92,246,.12);
+    -webkit-backdrop-filter: blur(35px) saturate(1.7);
+    border-top: 1px solid rgba(75, 85, 99, 0.5);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     animation: slideDownMenu 0.4s ease-out;
   }
 
@@ -313,11 +310,12 @@ body {
   }
 
   .nav-links a {
-    color: #4b5563;
-    padding: .8rem;
+    color: #e5e7eb;
+    padding: 1rem 2rem;
     border-radius: 14px;
     display: block;
     transition: all 0.3s ease;
+    margin: 0 0.5rem;
   }
 
   .nav-links a::after {
@@ -325,38 +323,38 @@ body {
   }
 
   .nav-links a:hover {
-    background: rgba(139,92,246,.18);
-    color: #1f2937;
+    background: rgba(139,92,246,.3);
+    color: #ffffff;
   }
 
   .nav-links a.active {
-    background: rgba(139,92,246,.28);
-    color: #6c54d9;
+    background: rgba(139,92,246,.4);
+    color: #c4b5fd;
     font-weight: 600;
   }
 
   .nav-auth {
     margin-top: .8rem;
     padding-top: .8rem;
-    border-top: 1px solid rgba(255,255,255,.1);
+    border-top: 1px solid #4b5563;
   }
 
   .nav-auth a {
     width: 100%;
     background: linear-gradient(
       135deg,
-      rgba(139,92,246,.2),
-      rgba(168,85,247,.15)
+      rgba(139,92,246,.4),
+      rgba(168,85,247,.3)
     );
-    color: #6c54d9;
-    border-color: rgba(139,92,246,.25);
+    color: #ffffff;
+    border-color: rgba(139,92,246,.5);
   }
 
   .nav-auth a:hover {
     background: linear-gradient(
       135deg,
-      rgba(139,92,246,.3),
-      rgba(168,85,247,.22)
+      rgba(139,92,246,.5),
+      rgba(168,85,247,.4)
     );
   }
 }

@@ -1098,11 +1098,9 @@
       endDate: '',
       
       initLogs() {
-        console.log('Logs manager initialized');
       },
 
       filterLogs() {
-        console.log('Filtering logs with search term:', this.searchTerm, 'dates:', this.startDate, '-', this.endDate);
         
         const searchLower = this.searchTerm.toLowerCase();
         const rows = document.querySelectorAll('.users-table tbody tr.audit-row');
@@ -1141,7 +1139,6 @@
           }
         });
         
-        console.log('Visible rows:', visibleCount);
         
         // Show empty state if no rows match
         const table = document.querySelector('.users-table tbody');

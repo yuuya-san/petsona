@@ -918,7 +918,7 @@
 
   // Fetch merchant pricing data from API
   function fetchMerchantData() {
-    console.log('=== PRICING FETCH START ===');
+    
     
     // Get merchant ID from form hidden input or script data attribute
     const merchantIdInput = document.querySelector('input[name="merchant_id"]');
@@ -927,15 +927,14 @@
     }
     
     if (!merchantId || merchantId === 0) {
-      console.error('Merchant ID not found');
+      
       return;
     }
     
-    console.log('Merchant ID:', merchantId);
     
     // Fetch merchant services and accepted pets from API
     const apiUrl = '/merchant/api/merchant/' + merchantId + '/services';
-    console.log('Fetching from:', apiUrl);
+    
     
     fetch(apiUrl)
       .then(response => {
@@ -947,8 +946,7 @@
       .then(data => {
         merchantData.pets_accepted = data.pets_accepted || [];
         merchantServicePricing = data.pricing || {};
-        console.log('✓ Fetched pets_accepted:', merchantData.pets_accepted);
-        console.log('✓ Fetched pricing:', merchantServicePricing);
+        
         
         // Extract size-based pricing
         extractSizePricing(merchantServicePricing);
@@ -956,17 +954,16 @@
         updateSummary();
       })
       .catch(error => {
-        console.error('Error fetching merchant data:', error);
+        
         populateAllSpeciesDropdowns();
       });
   }
 
   // Extract size-based pricing from service pricing structure
   function extractSizePricing(serviceData) {
-    console.log('=== EXTRACT PRICING START ===');
     
     if (!serviceData || typeof serviceData !== 'object' || Object.keys(serviceData).length === 0) {
-      console.warn('⚠️ serviceData is empty or invalid');
+      
       return;
     }
     
@@ -976,34 +973,32 @@
     for (const category of categories) {
       if (serviceData[category]) {
         const categoryData = serviceData[category];
-        console.log(`✓ Found ${category}:`, categoryData);
+        
         
         // Get the first duration's pricing
         const durations = Object.keys(categoryData);
-        console.log(`  Durations available: ${durations.join(', ')}`);
+        
         
         if (durations.length > 0) {
           const firstDuration = durations[0];
           const durationPricing = categoryData[firstDuration];
           
-          console.log(`  Using first duration: "${firstDuration}"`, durationPricing);
           
           // Convert to sizePricing structure
           if (durationPricing && typeof durationPricing === 'object') {
             for (const [sizeKey, price] of Object.entries(durationPricing)) {
               const sizeKeyLower = sizeKey.toLowerCase();
               sizePricing[sizeKeyLower] = price;
-              console.log(`    ${sizeKey}: ₱${price}`);
+              
             }
-            console.log('✓ Pricing extracted successfully');
+            
             break;
           }
         }
       }
     }
     
-    console.log('Final sizePricing:', sizePricing);
-    console.log('=== EXTRACT PRICING END ===\n');
+    
   }
 
   // Populate a single species dropdown while preserving its selected value
@@ -1034,7 +1029,6 @@
     const category = getPetSizeCategory(weight);
     const price = sizePricing[category];
     
-    console.log(`getPriceForPet(${weight}kg) -> category: ${category}, price: ${price}`);
     
     if (!price) return 0;
     if (typeof price === 'number') return price;
@@ -1217,9 +1211,7 @@
     let sizeBreakdown = { small: 0, medium: 0, large: 0, xlarge: 0 };
     let sizeCount = { small: 0, medium: 0, large: 0, xlarge: 0 };
 
-    console.log('\n=== UPDATE SUMMARY START ===');
-    console.log('Total pets:', totalPets);
-    console.log('Current sizePricing:', sizePricing);
+    
 
     document.querySelectorAll('.petForm').forEach((form, idx) => {
       const weight = parseFloat(form.querySelector('.pet_weight').value) || 0;
@@ -1229,12 +1221,11 @@
         sizeCount[size]++;
         const priceForPet = getPriceForPet(weight);
         sizeBreakdown[size] += priceForPet;
-        console.log(`Pet ${idx + 1}: ${weight}kg -> ${size} -> ₱${priceForPet}`);
+        
       }
     });
 
-    console.log('Size breakdown:', sizeBreakdown);
-    console.log('Size count:', sizeCount);
+    
 
     // Update summary info
     document.getElementById('summaryPets').textContent = totalPets;
@@ -1250,7 +1241,7 @@
     }
 
     const totalPrice = calculateTotalPrice();
-    console.log('Calculated total price:', totalPrice);
+    
     
     document.getElementById('summaryTotalDisplay').textContent = totalPrice.toLocaleString('en-PH');
 
@@ -1265,7 +1256,7 @@
       for (const [size, count] of Object.entries(sizeCount)) {
         if (count > 0) {
           const price = sizeBreakdown[size];
-          console.log(`Breakdown: ${size} × ${count} = ₱${price}`);
+          
           breakdownHTML += `<div class="flex justify-between text-xs px-3 py-2 bg-white/60 rounded border border-purple-150 hover:bg-white/80 transition-all">
             <span class="text-gray-700 font-medium">${sizeLabels[size]} × ${count}</span>
             <span class="font-bold text-purple-600">₱${price.toLocaleString('en-PH')}</span>
@@ -1283,7 +1274,7 @@
       }
     }
     document.getElementById('price_breakdown').value = JSON.stringify(breakdownData);
-    console.log('=== UPDATE SUMMARY END ===\n');
+    
   }
 
   // Event listeners

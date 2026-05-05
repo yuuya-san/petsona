@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify, request, session
-from flask_login import current_user, login_required
+from flask import Blueprint, jsonify, request, session # pyright: ignore[reportMissingImports]
+from flask_login import current_user, login_required # pyright: ignore[reportMissingImports]
 from app.extensions import db, csrf
 from app.models import Species, Breed, Vote
 import json
@@ -48,7 +48,6 @@ def toggle_heart_vote(species_id):
         }), 200
     
     except Exception as e:
-        print(f"Error in toggle_heart_vote: {str(e)}")  # Server-side logging
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -158,7 +157,6 @@ def toggle_breed_heart_vote(breed_id):
         }), 200
     
     except Exception as e:
-        print(f"Error in toggle_breed_heart_vote: {str(e)}")
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 

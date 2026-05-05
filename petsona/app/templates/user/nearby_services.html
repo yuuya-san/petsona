@@ -648,7 +648,6 @@ function premiumNearbyServices() {
     expandedPricing: {},
 
     init() {
-      console.log('Premium Nearby Services initialized');
       
       // Check if location was selected from location picker
       const selectedLat = sessionStorage.getItem('petsona_selected_lat');
@@ -671,14 +670,14 @@ function premiumNearbyServices() {
 
     requestLocation() {
       if (!navigator.geolocation) {
-        console.log('Geolocation not available');
+        
         this.fetchMerchants();
         return;
       }
 
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          console.log('Location obtained:', position.coords);
+          
           this.userLocation = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
@@ -691,7 +690,7 @@ function premiumNearbyServices() {
           this.fetchMerchants();
         },
         (error) => {
-          console.log('Location error:', error);
+          
           this.locationRequested = true;
           this.fetchMerchants();
         },
@@ -719,7 +718,7 @@ function premiumNearbyServices() {
           sort_by: this.sortBy
         };
 
-        console.log('Fetching with:', payload);
+        
 
         const response = await fetch('/user/api/merchants/nearby', {
           method: 'POST',
@@ -737,7 +736,6 @@ function premiumNearbyServices() {
         
         if (data.success) {
           this.merchants = data.merchants;
-          console.log('Loaded merchants:', this.merchants.length);
           
           // Extract unique services from all merchants
           const services = new Set();
@@ -749,13 +747,13 @@ function premiumNearbyServices() {
             }
           });
           this.availableServices = Array.from(services).sort();
-          console.log('Available services:', this.availableServices);
+          
         } else {
           this.merchants = [];
           this.availableServices = [];
         }
       } catch (error) {
-        console.error('Fetch error:', error);
+        
         this.merchants = [];
         this.availableServices = [];
       } finally {
@@ -928,13 +926,13 @@ function locationBadge() {
                             this.hasLocation = true;
                         }
                     } catch (e) {
-                        console.error('Location reverse geocode error:', e);
+                        
                         this.locationText = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
                         this.hasLocation = true;
                     }
                 },
                 error => {
-                    console.error('Geolocation error:', error);
+                    
                     this.locationText = 'Your Location';
                     this.hasLocation = true;
                 },
@@ -969,7 +967,7 @@ function locationBadge() {
                     this.hasLocation = true;
                 }
             } catch (e) {
-                console.error('Selected location reverse geocode error:', e);
+                
                 this.locationText = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
                 this.hasLocation = true;
             }

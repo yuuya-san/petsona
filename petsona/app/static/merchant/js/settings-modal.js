@@ -303,7 +303,6 @@ function submitPasswordChange(currentPassword, newPassword) {
     }
   })
   .catch(error => {
-    console.error('Error:', error);
     showAlert('An error occurred', 'error');
   });
 }
@@ -337,7 +336,6 @@ function resetAuthenticator() {
     }
   })
   .catch(error => {
-    console.error('Error:', error);
     showAlert('An error occurred', 'error');
   });
 }
@@ -390,7 +388,6 @@ function saveEmailPreferences() {
     }
   })
   .catch(error => {
-    console.error('Error:', error);
     showAlert('An error occurred', 'error');
   });
 }
@@ -430,7 +427,6 @@ function savePrivacySettings() {
     }
   })
   .catch(error => {
-    console.error('Error:', error);
     showAlert('An error occurred', 'error');
   });
 }
@@ -474,7 +470,6 @@ function saveNotificationSettings() {
     }
   })
   .catch(error => {
-    console.error('Error:', error);
     showAlert('An error occurred', 'error');
   });
 }
@@ -512,7 +507,6 @@ function saveAppearanceSettings() {
     }
   })
   .catch(error => {
-    console.error('Error:', error);
     showAlert('An error occurred', 'error');
   });
 }
@@ -540,7 +534,6 @@ function downloadUserData() {
     showAlert('Data downloaded successfully!', 'success');
   })
   .catch(error => {
-    console.error('Error:', error);
     showAlert('Failed to download data', 'error');
   });
 }
@@ -573,7 +566,6 @@ function saveDataPrivacySettings() {
     }
   })
   .catch(error => {
-    console.error('Error:', error);
     showAlert('An error occurred', 'error');
   });
 }
@@ -599,7 +591,6 @@ function disconnectApp(appName) {
     }
   })
   .catch(error => {
-    console.error('Error:', error);
     showAlert('An error occurred', 'error');
   });
 }
@@ -633,7 +624,6 @@ function deleteAccount() {
     }
   })
   .catch(error => {
-    console.error('Error:', error);
     showAlert('An error occurred', 'error');
   });
 }
@@ -673,7 +663,6 @@ function saveLanguageSettings() {
     }
   })
   .catch(error => {
-    console.error('Error:', error);
     showAlert('An error occurred', 'error');
   });
 }

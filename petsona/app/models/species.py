@@ -71,7 +71,7 @@ class Species(db.Model):
 
     @property
     def as_dict(self):
-        from markupsafe import escape
+        from markupsafe import escape # pyright: ignore[reportMissingImports]
         return {
             "id": self.id,
             "name": escape(self.name) if self.name else "",

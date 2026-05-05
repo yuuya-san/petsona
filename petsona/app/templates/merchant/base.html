@@ -31,6 +31,14 @@
 
     <style>
     [x-cloak] { display: none !important; }
+    
+    /* Hide scrollbars */
+    ::-webkit-scrollbar {
+      width: 0;
+    }
+    * {
+      scrollbar-width: none;
+    }
     </style>
 
     <!-- Font Awesome CDN -->
@@ -124,7 +132,11 @@ window.addEventListener('load', () => {
     const content = document.getElementById('page-content');
 
     if (skeleton) skeleton.remove();
-    if (content) content.classList.remove('d-none');
+    if (content) {
+        content.classList.remove('d-none');
+        // Small delay for smooth transition
+        setTimeout(() => content.classList.add('visible'), 50);
+    }
 });
 </script>
 

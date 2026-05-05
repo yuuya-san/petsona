@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify, flash, current_app # pyright: ignore[reportMissingImports]
 from flask_login import current_user, login_required # pyright: ignore[reportMissingImports]
 from datetime import datetime
 import uuid
@@ -152,8 +152,7 @@ def general_results():
                     session['last_matches'] = matches
                     session.modified = True
             except Exception as e:
-                print(f"Error loading matches from history: {e}")
-    
+                flash('Error loading previous matches, showing empty results. Please retake the quiz.', 'warning')
     # If still no matches, redirect back to quiz
     if not matches:
         return redirect(url_for('matching.quiz'))
@@ -275,7 +274,6 @@ def history():
     
     try:
         matches = MatchHistory.query.filter_by(user_id=current_user.id).order_by(MatchHistory.created_at.desc()).all()
-        print(f"[HISTORY] Found {len(matches)} matches for user {current_user.id}")
         
         matches_data = []
         for match in matches:
@@ -283,16 +281,11 @@ def history():
                 match_dict = match.as_dict
                 matches_data.append(match_dict)
             except Exception as e:
-                print(f"[HISTORY ERROR] Failed to convert match {match.id}: {e}")
-                import traceback
-                traceback.print_exc()
+                flash('Error loading previous matches, showing empty results. Please retake the quiz.', 'warning')
         
-        print(f"[HISTORY] Returning {len(matches_data)} matches to template")
         return render_template("matching/history.html", matches=matches_data)
     except Exception as e:
-        print(f"[HISTORY ERROR] Exception in history route: {e}")
-        import traceback
-        traceback.print_exc()
+        flash('Error loading match history. Please try again later.', 'warning')
         return render_template("matching/history.html", matches=[])
 
 
@@ -342,8 +335,7 @@ def view_result(result_id):
                 session.modified = True
                 return redirect(url_for('matching.general_results'))
         except Exception as e:
-            print(f"Error reconstructing general matches: {e}")
-            pass
+            flash('Error loading previous matches, showing empty results. Please retake the quiz.', 'warning')
         
         # Fallback if reconstruction fails
         return redirect(url_for('matching.history'))
@@ -396,7 +388,7 @@ def view_result(result_id):
                 from_history=True
             )
         except Exception as e:
-            print(f"Error rendering breed results: {e}")
+            flash('Error rendering breed results. Please try again later.', 'warning')
             return redirect(url_for('matching.history'))
     
     else:
@@ -599,8 +591,7 @@ def api_breed_match():
                 db.session.add(match_record)
                 db.session.commit()
             except Exception as e:
-                print(f"Error saving match history: {str(e)}")
-                pass
+                flash('Error saving match history. Please try again later.', 'warning')
 
         return jsonify({
             'success': True,
@@ -615,9 +606,7 @@ def api_breed_match():
         }), 200
 
     except Exception as e:
-        print(f"Breed match error: {str(e)}")
-        import traceback
-        print(traceback.format_exc())
+        flash('Error calculating breed match. Please try again later.', 'warning')
         return jsonify({'error': str(e), 'success': False}), 500
 
 
@@ -692,9 +681,7 @@ def api_question_scores(breed_id):
         }), 200
     
     except Exception as e:
-        print(f"Question scores error: {str(e)}")
-        import traceback
-        print(traceback.format_exc())
+        flash('Error calculating question scores. Please try again later.', 'warning')
         return jsonify({'error': str(e), 'success': False}), 500
 
 

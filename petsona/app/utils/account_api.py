@@ -1,10 +1,10 @@
 """Account API utilities for password and 2FA management."""
-from flask import Blueprint, request, jsonify, current_app
-from flask_login import login_required, current_user
+from flask import Blueprint, request, jsonify, current_app # pyright: ignore[reportMissingImports]
+from flask_login import login_required, current_user # pyright: ignore[reportMissingImports]
 from ..extensions import db
 from ..models import BackupCode
 from ..auth.emails import send_backup_codes_email
-import pyotp
+import pyotp # pyright: ignore[reportMissingImports]
 import qrcode
 from io import BytesIO
 import base64
@@ -59,7 +59,6 @@ def generate_qr_code_data_url(data):
         
         return f"data:image/png;base64,{img_str}"
     except Exception as e:
-        print(f"Error generating QR code: {e}")
         return None
 
 def verify_password(user, password):
@@ -118,24 +117,18 @@ def enable_2fa(user, secret, verification_code):
         if not backup_codes or len(backup_codes) == 0:
             raise Exception("Failed to generate backup codes")
         
-        print(f"✓ 2FA enabled for user {user.id}")
-        print(f"✓ Generated {len(backup_codes)} backup codes")
-        
         # Send backup codes to email
         try:
             send_backup_codes_email(user, backup_codes)
-            print(f"✓ Backup codes email sent to {user.email}")
         except Exception as email_error:
-            print(f"⚠ Warning: Failed to send backup codes email: {str(email_error)}")
             # Don't fail the 2FA setup if email fails, codes are still saved
-        
+            pass
         return True, {
             "message": "2FA enabled successfully. Backup codes have been sent to your email.",
             "backup_codes": backup_codes
         }
     except Exception as e:
         db.session.rollback()
-        print(f"✗ Error enabling 2FA: {str(e)}")
         return False, f"Error enabling 2FA: {str(e)}"
 
 def disable_2fa(user):
@@ -153,13 +146,9 @@ def disable_2fa(user):
         deleted_count = BackupCode.query.filter_by(user_id=user.id).delete()
         db.session.commit()
         
-        print(f"✓ 2FA disabled for user {user.id}")
-        print(f"✓ Deleted {deleted_count} backup codes (had {backup_code_count} before deletion)")
-        
         return True, "2FA disabled successfully. All backup codes have been deleted."
     except Exception as e:
         db.session.rollback()
-        print(f"✗ Error disabling 2FA: {str(e)}")
         return False, f"Error disabling 2FA: {str(e)}"
 
 def get_2fa_status(user):

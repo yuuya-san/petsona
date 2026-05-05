@@ -105,7 +105,6 @@ class QRCodeGenerator:
             return f"/static/uploads/qr_codes/{filename}"
             
         except Exception as e:
-            print(f"Error generating QR code for booking {booking_id}: {str(e)}")
             return None
     
     def delete_qr_code(self, booking_id: int, booking_number: str) -> bool:
@@ -119,7 +118,6 @@ class QRCodeGenerator:
                 return True
             return False
         except Exception as e:
-            print(f"Error deleting QR code: {str(e)}")
             return False
 
 

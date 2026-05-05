@@ -385,14 +385,14 @@
         });
 
         try {
-          console.log('Submitting quiz with answers:', formattedAnswers);
+          
           const csrfTokenElement = document.querySelector('meta[name="csrf-token"]');
           const csrfToken = csrfTokenElement ? csrfTokenElement.content : '';
           
           if (!csrfToken) {
-            console.warn('CSRF token not found in meta tag');
+            
           }
-          console.log('CSRF Token:', csrfToken ? 'Present' : 'Missing');
+          
           
           const response = await fetch('/matching/api/quiz-submit', {
             method: 'POST',
@@ -403,25 +403,25 @@
             body: JSON.stringify(formattedAnswers)
           });
 
-          console.log('Response status:', response.status);
+          
           const data = await response.json();
-          console.log('Quiz submission response:', data);
+          
 
           if (data.success && response.ok) {
             this.quizResults = data;
             // Keep loader visible and redirect after 2.5 seconds to ensure session is saved
             await new Promise(resolve => setTimeout(resolve, 2500));
-            console.log('Redirecting to results page...');
+            
             window.location.href = '/matching/results/general';
           } else {
             this.quizComplete = false;
-            console.error('Quiz submission failed:', data);
-            console.error('Response status:', response.status);
+            
+            
             alert('Error: ' + (data.error || 'Failed to process quiz'));
           }
         } catch (error) {
-          console.error('Quiz submission error:', error);
-          console.error('Error stack:', error.stack);
+          
+          
           this.quizComplete = false;
           alert('An error occurred. Please try again.');
         }

@@ -1,6 +1,6 @@
 """Profile forms for editing user information and avatar."""
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed
+from flask_wtf import FlaskForm # pyright: ignore[reportMissingImports]
+from flask_wtf.file import FileField, FileAllowed # pyright: ignore[reportMissingImports]
 from wtforms import StringField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Length, Optional
 import os

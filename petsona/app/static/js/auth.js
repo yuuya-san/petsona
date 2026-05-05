@@ -12,7 +12,6 @@ function initFlashMessages() {
   const flashMessages = document.querySelectorAll(".flash");
   
   if (flashMessages.length > 0) {
-    console.log("Flash messages found:", flashMessages.length);
   }
   
   flashMessages.forEach((flash) => {

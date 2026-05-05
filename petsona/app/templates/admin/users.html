@@ -1024,13 +1024,7 @@
     return {
       searchTerm: '',
       
-      initUsers() {
-        // Initialize search functionality
-        console.log('Users manager initialized');
-      },
-
       filterUsers() {
-        console.log('Filtering users with search term:', this.searchTerm);
         
         const searchLower = this.searchTerm.toLowerCase();
         const rows = document.querySelectorAll('.users-table tbody tr.user-row');
@@ -1051,9 +1045,7 @@
             row.style.display = 'none';
           }
         });
-        
-        console.log('Visible rows:', visibleCount);
-        
+                
         // Show empty state if no rows match
         const table = document.querySelector('.users-table tbody');
         const emptyRow = table?.querySelector('tr:not(.user-row)');

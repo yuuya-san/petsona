@@ -30,23 +30,8 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/flash-messages.css') }}">
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <!-- Alpine -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-    <script>
-        tailwind.config = {
-        theme: {
-            extend: {
-            colors: {
-                lavender: '#E6E6FA'
-            }
-            }
-        }
-        }
-    </script>
 
     <style>
     [x-cloak] { display: none !important; }
@@ -64,25 +49,12 @@
 
   <style>
     /* ================= SCROLLBAR STYLING ================= */
+    /* Hide scrollbars */
     ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+      width: 0;
     }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #8C00FF;
-      border-radius: 4px;
-      transition: background 0.3s ease;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #7a00d9;
-    }
-    /* Firefox scrollbar */
     * {
-      scrollbar-width: thin;
-      scrollbar-color: #8C00FF transparent;
+      scrollbar-width: none;
     }
 
     /* ================= FULL PAGE GLASSMORPHISM ================= */
@@ -109,7 +81,7 @@
 
     /* ================= PAGE CONTENT WRAPPER ================= */
     #page-content {
-      display: flex;
+      display: none;
       flex-direction: column;
       min-height: 100vh;
       margin-top: 0;
@@ -244,7 +216,11 @@
       const content = document.getElementById('page-content');
 
       if (skeleton) skeleton.remove();
-      if (content) content.style.display = 'flex';
+      if (content) {
+        content.style.display = 'flex';
+        // Small delay for smooth transition
+        setTimeout(() => content.classList.add('visible'), 50);
+      }
     });
   </script>
 

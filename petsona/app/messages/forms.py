@@ -1,5 +1,5 @@
 """Forms for messaging."""
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm # pyright: ignore[reportMissingImports]
 from wtforms import StringField, TextAreaField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length, ValidationError
 

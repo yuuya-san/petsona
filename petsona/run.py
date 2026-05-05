@@ -27,9 +27,8 @@ with app.app_context():
             password="Petsona-0717",
             photo_url=DEFAULT_ADMIN_PHOTO
         )
-        print(f"Default admin account created: {ADMIN_EMAIL} / Petsona-0717")
     else:
-        print(f"Admin account already exists: {ADMIN_EMAIL}")
+        pass
 
 if __name__ == '__main__':
     # Dev server — in production, use Gunicorn/uWSGI behind Nginx with python-socketio

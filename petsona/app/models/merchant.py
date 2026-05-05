@@ -1,6 +1,6 @@
 from datetime import datetime
 from app.extensions import db
-from sqlalchemy.dialects.mysql import JSON, LONGTEXT
+from sqlalchemy.dialects.mysql import JSON, LONGTEXT # pyright: ignore[reportMissingImports]
 
 
 class Merchant(db.Model):
@@ -226,7 +226,7 @@ class Merchant(db.Model):
 
     def get_logo_url(self):
         """Returns logo URL or placeholder"""
-        from flask import url_for
+        from flask import url_for # pyright: ignore[reportMissingImports]
         if self.logo_path:
             return url_for('static', filename=f'uploads/merchants/{self.id}/{self.logo_path}')
         # Return placeholder with business initials

@@ -18,7 +18,6 @@ class NavbarSocketManager {
     try {
       // Check if Socket.IO library is available
       if (typeof io === 'undefined') {
-        console.warn('⚠️ Socket.IO client library not loaded');
         return;
       }
 
@@ -38,9 +37,7 @@ class NavbarSocketManager {
       this.setupEventHandlers();
       this.initializeMessageItems();
       this.initialized = true;
-      console.log('✅ Navbar Socket Manager initialized');
     } catch (error) {
-      console.error('❌ Error initializing Navbar Socket Manager:', error);
     }
   }
 
@@ -77,41 +74,34 @@ class NavbarSocketManager {
 
     // Listen for unread message count updates
     this.socket.on('message_unread_count_update', (data) => {
-      console.log('📬 Message unread count update:', data);
       this.updateUnreadBadge(data.unread_count);
     });
 
     // Listen for new message navbar updates
     this.socket.on('navbar_message_update', (data) => {
-      console.log('💬 Navbar message update:', data);
       this.updateMessageDropdown(data);
     });
 
     // Listen for message read updates
     this.socket.on('message_read', (data) => {
-      console.log('✓ Message read:', data);
       this.handleMessageRead(data);
     });
 
     // Connection established
     this.socket.on('connect', () => {
-      console.log('🔗 Navbar Socket connected:', this.socket.id);
     });
 
     // Disconnection
     this.socket.on('disconnect', () => {
-      console.log('🔌 Navbar Socket disconnected');
     });
 
     // Reconnection
     this.socket.on('reconnect', () => {
-      console.log('🔄 Navbar Socket reconnected');
       this.refreshNavbarData();
     });
 
     // Error handling
     this.socket.on('error', (error) => {
-      console.error('⚠️ Socket error:', error);
     });
 
     // Setup click handlers for message items
@@ -182,7 +172,6 @@ class NavbarSocketManager {
   updateMessageDropdown(data) {
     const scrollContainer = document.querySelector('.messages-scroll-container');
     if (!scrollContainer) {
-      console.warn('Messages scroll container not found');
       return;
     }
 
@@ -323,7 +312,6 @@ class NavbarSocketManager {
    * Refresh navbar data from server
    */
   refreshNavbarData() {
-    console.log('🔄 Refreshing navbar data...');
     // Make AJAX call to fetch updated unread count
     fetch('/api/unread-count')
       .then(response => response.json())
@@ -332,7 +320,7 @@ class NavbarSocketManager {
           this.updateUnreadBadge(data.unread_count);
         }
       })
-      .catch(error => console.error('Error refreshing navbar:', error));
+      .catch(error => {});
   }
 
   /**

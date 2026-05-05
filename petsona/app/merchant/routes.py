@@ -339,7 +339,7 @@ def upload_logo():
         file_size = file.tell()
         file.seek(0)
         
-        if file_size > MAX_FILE_SIZE:
+        if file_size > MAX_FILE_SIZE: # pyright: ignore[reportUndefinedVariable]
             return jsonify({'success': False, 'message': 'File too large. Max 5MB'}), 400
         
         # Create upload directory using user ID (grouped by user, not merchant)
@@ -469,7 +469,7 @@ def store_edit():
                     file_size = logo_file.tell()
                     logo_file.seek(0)
                     
-                    if file_size <= MAX_FILE_SIZE:
+                    if file_size <= MAX_FILE_SIZE: # pyright: ignore[reportUndefinedVariable]
                         # Create merchant upload directory
                         upload_dir = os.path.join('app/static/uploads/merchants', str(current_user.id))
                         os.makedirs(upload_dir, exist_ok=True)

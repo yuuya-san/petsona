@@ -1,4 +1,4 @@
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm # pyright: ignore[reportMissingImports]
 from wtforms import StringField, FileField, SelectField, BooleanField, SubmitField, IntegerField, PasswordField, EmailField
 from wtforms.validators import DataRequired, URL, NumberRange, Length, Email, ValidationError, Optional
 import re

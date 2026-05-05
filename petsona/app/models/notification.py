@@ -2,6 +2,7 @@
 from datetime import datetime
 from app.extensions import db
 import pytz
+from flask import flash # pyright: ignore[reportMissingImports]
 
 # Philippine timezone helper
 PH_TZ = pytz.timezone('Asia/Manila')
@@ -84,7 +85,6 @@ class Notification(db.Model):
                 'email': self.from_user.email,
                 'photo_url': self.from_user.photo_url
             }
-            print(f"[✅ DB] from_user relationship found: {sender_info['name']}, photo_url={sender_info['photo_url']}")
         elif self.from_user_id:
             # Fallback: Query User table directly using from_user_id
             from app.models.user import User
@@ -96,10 +96,8 @@ class Notification(db.Model):
                     'email': sender.email,
                     'photo_url': sender.photo_url
                 }
-                print(f"[✅ DB] from_user_id lookup: {sender_info['name']}, photo_url={sender_info['photo_url']}")
             else:
-                print(f"[❌ DB] No user found for from_user_id={self.from_user_id}")
-        
+                pass        
         # Format timestamps
         created_time_short = self.created_at.strftime('%I:%M %p') if self.created_at else ''
         created_time_full = self.created_at.strftime('%B %d, %Y at %I:%M %p') if self.created_at else ''
@@ -150,8 +148,6 @@ class Notification(db.Model):
             Notification object
         """
         try:
-            print(f"\n[DB] Creating notification for user {user_id}: {title}")
-            print(f"[DB]   From user: {from_user_id}")
             
             notification = Notification(
                 user_id=user_id,
@@ -165,23 +161,18 @@ class Notification(db.Model):
                 related_type=related_type,
                 created_at=get_ph_datetime()
             )
-            
-            print(f"[DB] Notification object created: {notification}")
-            
+                        
             db.session.add(notification)
-            print(f"[DB] Added to session")
             
             db.session.flush()
-            print(f"[DB] Flushed (ID assigned): {notification.id}")
             
             db.session.commit()
-            print(f"[DB] ✅ COMMITTED - Notification ID {notification.id} inserted into database")
             
             return notification
         except Exception as e:
-            print(f"[DB] ❌ ERROR: {str(e)}")
+            flash(f"[DB] ❌ ERROR: {str(e)}", 'danger')
             import traceback
             traceback.print_exc()
             db.session.rollback()
-            print(f"[DB] Rolled back")
+            flash(f"[DB] Rolled back", 'danger')
             return None

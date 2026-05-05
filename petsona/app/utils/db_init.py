@@ -55,10 +55,9 @@ def add_missing_columns(engine):
                 ADD COLUMN is_open BOOLEAN DEFAULT 1 
                 AFTER is_verified
             """))
-            print("✅ Added is_open column to merchants table")
         except Exception as e:
             if "Duplicate column" not in str(e) and "already exists" not in str(e):
-                print(f"⚠️ Error adding is_open column: {e}")
+                pass
             # else: column already exists, continue
         
         # Add is_24h column to merchants table if it doesn't exist
@@ -68,10 +67,7 @@ def add_missing_columns(engine):
                 ADD COLUMN is_24h BOOLEAN DEFAULT 0 
                 AFTER closing_time
             """))
-            print("✅ Added is_24h column to merchants table")
         except Exception as e:
             if "Duplicate column" not in str(e) and "already exists" not in str(e):
-                print(f"⚠️ Error adding is_24h column: {e}")
+                pass
             # else: column already exists, continue
-            else:
-                print("is_open column already exists in merchants table")

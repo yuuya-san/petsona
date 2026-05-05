@@ -1,3 +1,4 @@
+from flask import flash # pyright: ignore[reportMissingImports]
 from datetime import datetime, timedelta
 from app.extensions import db
 import json
@@ -62,7 +63,7 @@ class MatchHistory(db.Model):
                         'species_name': self.breed.species.name if self.breed.species else None,
                     }
                 except Exception as e:
-                    print(f"[ERROR] Failed to serialize breed: {e}")
+                    flash(f"[ERROR] Failed to serialize breed info: {e}", 'danger')
                     breed_dict = None
             
             # Convert UTC timestamp to Philippines Time (UTC+8)
@@ -78,7 +79,7 @@ class MatchHistory(db.Model):
                         created_at_utc = self.created_at
                     created_at_pht = created_at_utc.astimezone(pht_tz).isoformat()
                 except Exception as e:
-                    print(f"[ERROR] Failed to convert timestamp: {e}")
+                    flash(f"[ERROR] Failed to convert timestamp: {e}", 'danger')
                     created_at_pht = self.created_at.isoformat() if self.created_at else None
             
             return {
@@ -99,7 +100,7 @@ class MatchHistory(db.Model):
                 'created_at': created_at_pht,
             }
         except Exception as e:
-            print(f"[ERROR] Failed to convert match to dict: {e}")
+            flash(f"[ERROR] Failed to convert match to dict: {e}", 'danger')
             return {
                 'id': self.id,
                 'user_id': self.user_id,

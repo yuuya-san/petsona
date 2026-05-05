@@ -3357,7 +3357,7 @@
     const appealReason = document.getElementById('appealReason').value.trim();
     
     if (!appealReason) {
-      alert('Please provide an explanation for your appeal.');
+      
       return;
     }
 
@@ -3380,18 +3380,17 @@
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        alert('Your appeal has been submitted successfully. The merchant will review it shortly.');
+        
         closeAppealModal();
         location.reload();
       } else {
-        alert('Error submitting appeal: ' + (data.message || 'Unknown error'));
+        
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
       }
     })
     .catch(error => {
-      console.error('Error:', error);
-      alert('Error submitting appeal. Please try again.');
+      
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalText;
     });
@@ -3405,7 +3404,7 @@
     
     // Show download prompt after modal renders
     setTimeout(() => {
-      alert('Click the Download buttons in the receipt modal to save as PDF or Image.');
+      
     }, 300);
   }
 
@@ -3539,15 +3538,13 @@
             }
             button.innerHTML = originalHTML;
             button.disabled = false;
-            console.error('Error generating receipt:', err);
-            alert('Error downloading receipt. Please try again.');
+            
           });
         }, 500);
       } catch (err) {
         button.innerHTML = originalHTML;
         button.disabled = false;
-        console.error('Error:', err);
-        alert('Error downloading receipt. Please try again.');
+        
       }
     }, 300);
   }
@@ -3559,7 +3556,7 @@
     const qrUrl = button.dataset.qrUrl;
     
     if (!qrUrl) {
-      alert('QR code not available');
+      
       return;
     }
     
@@ -3660,15 +3657,13 @@
           }
           downloadBtn.innerHTML = originalText;
           downloadBtn.disabled = false;
-          console.error('Error generating image:', err);
-          alert('Error saving receipt as image. Please try again.');
+          
         });
       }, 500);
     } catch (err) {
       downloadBtn.innerHTML = originalText;
       downloadBtn.disabled = false;
-      console.error('Error:', err);
-      alert('Error saving receipt. Please try again.');
+      
     }
   }
 
@@ -3787,15 +3782,13 @@
           }
           downloadBtn.innerHTML = originalText;
           downloadBtn.disabled = false;
-          console.error('Error generating PDF:', err);
-          alert('Error saving receipt as PDF. Please try again.');
+          
         });
       }, 500);
     } catch (err) {
       downloadBtn.innerHTML = originalText;
       downloadBtn.disabled = false;
-      console.error('Error:', err);
-      alert('Error saving receipt. Please try again.');
+      
     }
   }
 
@@ -4143,8 +4136,8 @@
       }
     })
     .catch(error => {
-      console.error('Error:', error);
-      showFlashMessage('Error submitting review. Please try again.', 'error');
+      
+      
       const buttonToRestore = document.querySelector('#reviewModal .btn-primary') || document.querySelector('#reviewModal .modal-footer button:last-child');
       if (buttonToRestore) {
         buttonToRestore.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Review';

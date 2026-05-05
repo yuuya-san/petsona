@@ -1,11 +1,11 @@
-from flask import request
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed
+from flask import request # pyright: ignore[reportMissingImports]
+from flask_wtf import FlaskForm # pyright: ignore[reportMissingImports]
+from flask_wtf.file import FileField, FileAllowed # pyright: ignore[reportMissingImports]
 from wtforms import StringField, TextAreaField, IntegerField, FloatField, SelectField, SelectMultipleField, TimeField, BooleanField, SubmitField, HiddenField
 from wtforms.validators import DataRequired, Email, Length, NumberRange, URL, Optional, Regexp, ValidationError
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.fields import Field
-from werkzeug.datastructures import FileStorage
+from werkzeug.datastructures import FileStorage # pyright: ignore[reportMissingImports]
 
 # ========== ALLOWED VALUES CONSTANTS ==========
 ALLOWED_BUSINESS_CATEGORIES = [

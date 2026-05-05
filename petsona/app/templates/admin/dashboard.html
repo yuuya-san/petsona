@@ -1701,15 +1701,11 @@
   var dataElement = document.getElementById('dashboard-stats-data');
   if (dataElement) {
     try {
-      console.log('Raw JSON data:', dataElement.textContent);
       window.dashboardStats = JSON.parse(dataElement.textContent);
-      console.log('Parsed dashboard stats:', window.dashboardStats);
     } catch (error) {
-      console.error('Failed to parse dashboard stats:', error);
       window.dashboardStats = {};
     }
   } else {
-    console.error('Dashboard stats data element not found');
     window.dashboardStats = {};
   }
 </script>

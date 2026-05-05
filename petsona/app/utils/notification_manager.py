@@ -93,17 +93,9 @@ class NotificationManager:
                 logger.error("[NOTIF MANAGER] ❌ user_id is required but was None or empty")
                 return None
                 
-            print(f"\n[NOTIF MANAGER] create_and_emit called")
-            print(f"  user_id: {user_id}")
-            print(f"  title: {title}")
-            print(f"  from_user_id: {from_user_id}")
-            print(f"  notification_type: {notification_type}")
-            
             config = NotificationManager.get_notification_config(notification_type)
-            print(f"  config: {config}")
             
             # Create notification in database with user_id validation
-            print(f"[NOTIF MANAGER] Calling Notification.create_notification()...")
             notification = Notification.create_notification(
                 user_id=int(user_id),
                 from_user_id=int(from_user_id) if from_user_id else None,
@@ -116,16 +108,11 @@ class NotificationManager:
                 related_type=related_type
             )
             
-            print(f"[NOTIF MANAGER] Notification.create_notification returned: {notification}")
-            
             if notification:
-                print(f"[NOTIF MANAGER] ✓ Notification created with ID {notification.id}")
-                print(f"[NOTIF MANAGER] ✓ Saved to user {notification.user_id}")
                 
                 # Emit via SocketIO to user's room for real-time delivery
                 try:
                     room = f'user_{user_id}'
-                    print(f"[NOTIF MANAGER] 📡 Emitting new_notification_received to room: {room}")
                     socketio.emit('new_notification_received', {
                         'notification_id': notification.id,
                         'title': notification.title,
@@ -135,21 +122,16 @@ class NotificationManager:
                         'link': notification.link,
                         'timestamp': datetime.now(PH_TZ).isoformat()
                     }, room=room, namespace='/')
-                    print(f"[NOTIF MANAGER] ✓ SocketIO event emitted to {room}")
                 except Exception as emit_error:
-                    print(f"[NOTIF MANAGER] ⚠️  SocketIO emit error (notification still saved): {emit_error}")
                     logger.warning(f"SocketIO emit failed but notification was saved: {emit_error}")
                 
                 logger.info(f"✅ Notification {notification.id} created and emitted for user {user_id}: {title}")
-                print(f"[NOTIF MANAGER] ✅ COMPLETE - Notification {notification.id} ready\n")
                 return notification
             else:
-                print(f"[NOTIF MANAGER] ✗ create_notification returned None")
                 logger.error(f"Failed to create notification for user {user_id}")
                 return None
                 
         except Exception as e:
-            print(f"[NOTIF MANAGER] ❌ EXCEPTION: {str(e)}")
             import traceback
             traceback.print_exc()
             logger.error(f"Error creating and emitting notification: {str(e)}", exc_info=True)

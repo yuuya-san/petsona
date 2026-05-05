@@ -13,7 +13,7 @@ from itsdangerous import URLSafeTimedSerializer # pyright: ignore[reportMissingI
 import random
 from datetime import datetime, timedelta
 from ..extensions import limiter
-from .emails import send_password_reset_email, send_backup_codes_email, send_registration_otp_email
+from .emails import send_password_reset_email, send_backup_codes_email, send_registration_otp_email, send_email
 from app.utils.audit import log_event, user_snapshot
 from sqlalchemy import func # pyright: ignore[reportMissingImports]
 import pyotp # pyright: ignore[reportMissingImports]
@@ -100,8 +100,35 @@ def about():
     return render_template('auth/about.html')
 
 
-@bp.route('/contact')
+@bp.route('/contact', methods=['GET', 'POST'])
+@limiter.limit("3 per hour")
 def contact():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        message = request.form.get('message')
+        
+        if not all([name, email, message]):
+            flash('All fields are required.', 'danger')
+            return redirect(url_for('auth.contact'))
+        
+        # Send email to admin
+        html_body = render_template('auth/contact_email.html', 
+                                   name=name, 
+                                   email=email, 
+                                   message=message,
+                                   current_time=get_ph_datetime().strftime('%B %d, %Y at %I:%M %p'))
+        send_email('New Contact Message - Petsona', ['petsona.helpcare@gmail.com'], html_body)
+        
+        # Send confirmation email to user
+        reply_body = render_template('auth/contact_reply_email.html', 
+                                    name=name, 
+                                    message=message)
+        send_email('Thank You for Contacting Petsona', [email], reply_body)
+        
+        flash('Message sent successfully!', 'success')
+        return redirect(url_for('auth.contact'))
+    
     return render_template('auth/contact.html')
 
 
@@ -198,7 +225,6 @@ def login_google():
     session['google_intent'] = 'login'
     session['google_action'] = 'Sign in'
     redirect_uri = url_for("auth.google_callback", _external=True)
-    print(f"DEBUG: Login - Asking Google for permission")
     current_app.logger.info(f"Google OAuth - User attempting sign in")
     return oauth.google.authorize_redirect(redirect_uri, prompt='consent')
 
@@ -209,7 +235,6 @@ def register_google():
     session['google_intent'] = 'register'
     session['google_action'] = 'Sign up'
     redirect_uri = url_for("auth.google_callback", _external=True)
-    print(f"DEBUG: Register - Asking Google for permission")
     current_app.logger.info(f"Google OAuth - User attempting sign up")
     return oauth.google.authorize_redirect(redirect_uri, prompt='consent')
 

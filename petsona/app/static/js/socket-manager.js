@@ -16,7 +16,9 @@ class SocketManager {
   }
 
   log(...args) {
-    if (this.debugMode) console.log(...args);
+    if (this.debugMode && window['console'] && typeof window['console']['log'] === 'function') {
+      window['console']['log'](...args);
+    }
   }
 
   /**
@@ -26,7 +28,6 @@ class SocketManager {
     try {
       // Check if Socket.IO library is available
       if (typeof io === 'undefined') {
-        console.warn('⚠️ Socket.IO client library not loaded');
         return;
       }
 
@@ -51,7 +52,6 @@ class SocketManager {
 
       this.setupEventHandlers();
     } catch (error) {
-      console.error('❌ Error initializing Socket.IO:', error);
     }
   }
 
@@ -82,7 +82,7 @@ class SocketManager {
 
     // Server sent error
     this.socket.on('error', (error) => {
-      console.error('❌ Socket.IO error:', error);
+      this.log('❌ Socket.IO error:', error);
     });
 
     // Connection response
@@ -117,7 +117,6 @@ class SocketManager {
     this.socket.on('reconnect', () => {
       this.connected = true;
       this.reconnectAttempts = 0;
-      console.log('🔄 Socket.IO reconnected');
     });
   }
 
@@ -128,7 +127,6 @@ class SocketManager {
    */
   watchSpecies(speciesId, callback) {
     if (!this.socket || !this.connected) {
-      console.warn(`⏳ Socket not ready yet. Retrying watcher setup...`);
       setTimeout(() => this.watchSpecies(speciesId, callback), 100);
       return;
     }
@@ -138,7 +136,6 @@ class SocketManager {
 
     // Notify server
     this.socket.emit('watch_species', { species_id: speciesId });
-    console.log(`👁️ Watching species ${speciesId}`);
   }
 
   /**
@@ -150,14 +147,12 @@ class SocketManager {
 
     this.watchers.delete(speciesId);
     this.socket.emit('unwatch_species', { species_id: speciesId });
-    console.log(`👁️ Stopped watching species ${speciesId}`);
   }
 
   /**
    * Re-watch all species after reconnection
    */
   rewatchAllSpecies() {
-    console.log(`🔄 Re-registering ${this.watchers.size} species watchers...`);
     for (const [speciesId, callback] of this.watchers.entries()) {
       this.socket.emit('watch_species', { species_id: speciesId });
     }
@@ -177,7 +172,6 @@ class SocketManager {
     if (this.socket) {
       this.socket.disconnect();
       this.connected = false;
-      console.log('🔌 Socket.IO disconnected');
     }
   }
 
@@ -187,7 +181,6 @@ class SocketManager {
   reconnect() {
     if (this.socket) {
       this.socket.connect();
-      console.log('🔄 Socket.IO reconnecting...');
     }
   }
 }
