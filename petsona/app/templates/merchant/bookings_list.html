@@ -1281,7 +1281,7 @@
 
     $('#rejectBookingNumber').text(bookingNumber);
     $('#rejectCustomerName').text(customerName);
-    $('#rejectBookingForm').attr('action', '/merchant/bookings/' + bookingId + '/reject');
+    $('#rejectBookingForm').attr('action', '/merchant/bookings/' + bookingId + '/cancel');
 
     // Reset button state
     $('#rejectSubmitBtn').prop('disabled', false);
@@ -1332,10 +1332,13 @@
   });
 
   $('#rejectBookingForm').on('submit', function (e) {
+    e.preventDefault();
     const submitBtn = $('#rejectSubmitBtn');
     submitBtn.prop('disabled', true);
     $('#rejectButtonContent').hide();
     $('#rejectSpinner').show();
+    
+    this.submit();
   });
 
   $('#markCompletedForm').on('submit', function (e) {
