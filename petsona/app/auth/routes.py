@@ -155,6 +155,7 @@ def register():
         # Generate OTP
         otp = str(random.randint(100000, 999999))
         session['registration_otp'] = otp
+        session['otp_generated_time'] = datetime.now().isoformat()
         # Send OTP email using professional template
         send_registration_otp_email(email, otp)
         return redirect(url_for('auth.verify_otp'))
@@ -180,6 +181,18 @@ def verify_otp():
     if 'registration' not in session or 'registration_otp' not in session:
         flash('Session expired or invalid. Please register again.', 'danger')
         return redirect(url_for('auth.register'))
+    
+    # Check if OTP has expired (10 minutes)
+    otp_generated_time_str = session.get('otp_generated_time')
+    if otp_generated_time_str:
+        otp_generated_time = datetime.fromisoformat(otp_generated_time_str)
+        if datetime.now() - otp_generated_time > timedelta(minutes=10):
+            flash('Your verification code has expired. Please register again to get a new code.', 'danger')
+            session.pop('registration', None)
+            session.pop('registration_otp', None)
+            session.pop('otp_generated_time', None)
+            return redirect(url_for('auth.register'))
+    
     if form.validate_on_submit():
         if form.otp.data == session.get('registration_otp'):
             reg = session['registration']
@@ -215,6 +228,7 @@ def resend_otp():
         return redirect(url_for('auth.register'))
     otp = str(random.randint(100000, 999999))
     session['registration_otp'] = otp
+    session['otp_generated_time'] = datetime.now().isoformat()
     send_registration_otp_email(reg['email'], otp)
     flash('A new verification code has been sent to your email.', 'info')
     return redirect(url_for('auth.verify_otp'))

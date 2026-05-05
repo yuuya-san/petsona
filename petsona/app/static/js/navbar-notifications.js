@@ -102,6 +102,51 @@ function format12HourTime(dateString) {
     }
 }
 
+function getNotificationRedirectUrl(notificationData) {
+    if (!notificationData) {
+        return null;
+    }
+
+    if (notificationData.link) {
+        return notificationData.link;
+    }
+
+    const relatedType = (notificationData.related_type || '').toString().toLowerCase().trim();
+    const relatedId = notificationData.related_id;
+    const pathname = window.location.pathname.toLowerCase();
+
+    if (!relatedType || !relatedId) {
+        return null;
+    }
+
+    switch (relatedType) {
+        case 'booking':
+            if (pathname.startsWith('/merchant')) {
+                return '/merchant/bookings-list';
+            }
+            return '/user/bookings';
+        case 'message':
+            if (relatedId) {
+                return `/messages/conversation/${relatedId}`;
+            }
+            return '/messages/inbox';
+        case 'merchant':
+            return '/merchant/dashboard';
+        case 'merchant_application':
+            return '/merchant/dashboard';
+        case 'user':
+            return '/user/dashboard';
+        default:
+            if (pathname.startsWith('/merchant')) {
+                return '/merchant/dashboard';
+            }
+            if (pathname.startsWith('/admin')) {
+                return '/admin/dashboard';
+            }
+            return '/user/dashboard';
+    }
+}
+
 // Function to initialize Socket.IO when ready
 function initializeNotificationSocket() {
     // Check if io is available (Socket.IO loaded)
@@ -528,6 +573,9 @@ function displayNotificationModal(notificationData) {
             actionLink.style.display = 'none !important';
         }
     }
+
+    // Compute redirect URL for View button
+    const viewUrl = getNotificationRedirectUrl(notificationData);
     
     // Update notification counter
     const currentCounter = document.getElementById('notifCurrent');
@@ -549,28 +597,26 @@ function displayNotificationModal(notificationData) {
         nextBtn.style.opacity = currentNotificationIndex >= (allNotifications.length - 1) ? '0.5' : '1';
     }
     
-    // Handle mark as read button
+    // Handle View button
     const markReadBtn = document.getElementById('notificationMarkReadBtn');
     if (markReadBtn) {
-        if (isRead) {
-            markReadBtn.innerHTML = '<i class="fas fa-check-double"></i> Already Read';
-            markReadBtn.disabled = true;
-            markReadBtn.style.opacity = '0.6';
-        } else {
-            markReadBtn.innerHTML = '<i class="fas fa-check"></i> Mark as Read';
+        if (viewUrl) {
+            markReadBtn.style.display = 'inline-flex';
             markReadBtn.disabled = false;
             markReadBtn.style.opacity = '1';
+            markReadBtn.innerHTML = '<i class="fas fa-eye"></i> View';
             markReadBtn.onclick = function() {
-                markNotificationAsRead(notificationId);
-                // Close modal after marking as read
-                setTimeout(function() {
-                    if (typeof $ !== 'undefined' && $.fn.modal) {
-                        $('#notificationModal').modal('hide');
-                    } else {
-                        modal.style.display = 'none';
-                    }
-                }, 300);
+                if (!isRead) {
+                    markNotificationAsRead(notificationId);
+                }
+                window.location.href = viewUrl;
             };
+        } else {
+            markReadBtn.innerHTML = '<i class="fas fa-eye"></i> View';
+            markReadBtn.disabled = true;
+            markReadBtn.style.opacity = '0.6';
+            markReadBtn.style.display = 'inline-flex';
+            markReadBtn.onclick = null;
         }
     }
     

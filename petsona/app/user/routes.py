@@ -516,22 +516,6 @@ def my_bookings():
                          status_filter=status_filter)
 
 
-@bp.route('/booking/<int:booking_id>')
-@login_required
-@user_required
-def booking_details(booking_id):
-    """Display booking details"""
-    from app.models.booking import Booking
-    
-    booking = Booking.query.filter_by(id=booking_id, user_id=current_user.id).first()
-    
-    if not booking:
-        flash('Booking not found.', 'danger')
-        return redirect(url_for('user.my_bookings'))
-    
-    return render_template('user/booking_details.html', booking=booking)
-
-
 @bp.route('/booking/<int:booking_id>/receipt')
 @login_required
 @user_required
