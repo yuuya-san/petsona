@@ -60,35 +60,23 @@ def get_serializer():
 
 @bp.route('/home')
 def home():
-    page = request.args.get('page', 1, type=int)
-
-    # Paginate active species
-    pagination = Species.query.filter(
-        Species.deleted_at.is_(None)
-    ).order_by(Species.name.asc()).paginate(
-        page=page, per_page=1000, error_out=False
-    )
-
-    species_list = pagination.items
-
-    # Count active breeds per species
-    # Returns a dictionary {species_id: breed_count}
-    breed_counts = dict(
-        db.session.query(
-            Breed.species_id,
-            func.count(Breed.id)
-        )
-        .filter(Breed.is_active==True)  # only active breeds
-        .group_by(Breed.species_id)
-        .all()
-    )
+    # Get dynamic stats from database
+    from app.models import Breed, Merchant, MatchHistory
     
-
+    # Count total active breeds
+    total_breeds = Breed.query.filter(Breed.is_active == True).count()
+    
+    # Count total merchants
+    total_merchants = Merchant.query.count()
+    
+    # Count total matches
+    total_matches = MatchHistory.query.count()
+    
     return render_template(
         'auth/home.html',
-        species_list=species_list,
-        pagination=pagination,
-        page_title="Pet Species"
+        total_breeds=total_breeds,
+        total_merchants=total_merchants,
+        total_matches=total_matches
     )
 
 @bp.route('/feature')

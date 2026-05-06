@@ -297,8 +297,7 @@ class MessagingApp {
     const avatarHTML = !isOwn ? `
       <div class="message-avatar-container">
         <div class="message-avatar">
-          ${otherUserPhoto 
-            : `<span class="text-xs font-bold">${otherUserName.charAt(0).toUpperCase()}</span>`}
+          ${otherUserPhoto ? `<img src="${otherUserPhoto}" alt="${otherUserName}" class="w-8 h-8 rounded-full object-cover">` : `<span class="text-xs font-bold">${otherUserName.charAt(0).toUpperCase()}</span>`}
         </div>
       </div>` : '';
 

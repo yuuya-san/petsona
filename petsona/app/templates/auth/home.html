@@ -62,11 +62,13 @@
 
 /* Headline scales perfectly */
 .hero h1 {
-  font-size: clamp(1.75rem, 5.5vw, 4.5rem);
+  font-size: clamp(1.25rem, 4vw, 3.5rem);
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: clamp(0.8rem, 2vw, 1.5rem);
   word-spacing: -0.05em;
+  color: white;
+  white-space: nowrap;
 }
 
 .hero h1 span {
@@ -76,8 +78,21 @@
   background-clip: text;
 }
 
+.hero-subtitle {
+  display: block;
+  font-size: clamp(0.8rem, 2.5vw, 1.8rem);
+  font-weight: 600;
+  margin-top: clamp(0.5rem, 1vw, 0.8rem);
+  letter-spacing: 0.02em;
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  white-space: nowrap;
+}
+
 .hero p {
-  font-size: clamp(0.95rem, 2vw, 1.2rem);
+  font-size: clamp(0.95rem, 1.5vw, 1rem);
   max-width: 700px;
   color: #e5e7eb;
   margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
@@ -304,6 +319,10 @@
     font-size: clamp(3rem, 5vw, 5.5rem);
   }
 
+  .hero-subtitle {
+    font-size: clamp(1.2rem, 3vw, 2.2rem);
+  }
+
   .glass-card {
     width: clamp(320px, 28vw, 420px);
     margin-left: clamp(3rem, 5vw, 6rem);
@@ -320,6 +339,11 @@
   .hero h1 {
     font-size: clamp(1.3rem, 4vw, 2.5rem);
     margin-bottom: 0.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(0.7rem, 2vw, 1.2rem);
+    margin-top: 0.3rem;
   }
 
   .hero p {
@@ -390,18 +414,18 @@
 <section class="hero">
   <div class="hero-content">
     <h1>
-      Find Your <span>Purfect Pet</span><br>
-      Match Instantly
+      Find Your Purrfect Match
+      <span class="hero-subtitle">Meet Your Ideal Pet in Seconds</span>
     </h1>
 
     <p>
-      Discover breeds that truly fit your lifestyle. Our smart system matches
-      you with the ideal companion based on personality, lifestyle, income, space, and experience.
+      Explore breeds that truly complement your way of life. 
+      Our intelligent system pairs you with the right companion by considering your personality, lifestyle, budget, living space, and experience level—making it easier to find a pet that feels just right.
     </p>
 
     <div class="hero-buttons">
       <a href="{{ url_for('auth.login') }}" class="btn-hero-primary">
-        Find your Purfect Match
+        Find your Purrfect Match
       </a>
       <a href="{{ url_for('auth.login') }}" class="btn-hero-secondary">
         Browse Pet Breeds
@@ -410,16 +434,16 @@
 
     <div class="hero-stats">
       <div class="stat">
-        <strong>500+</strong>
+        <strong>{{ total_breeds }}+</strong>
         <span>Pet Breeds</span>
       </div>
       <div class="stat">
-        <strong>98%</strong>
+        <strong>{{ total_matches }}</strong>
         <span>Happy Matches</span>
       </div>
       <div class="stat">
-        <strong>24/7</strong>
-        <span>Care Guides</span>
+        <strong>{{ total_merchants }}</strong>
+        <span>Pet Hotels</span>
       </div>
     </div>
   </div>
@@ -427,8 +451,9 @@
   <div class="glass-card">
     <h3>Smart Pet Matching</h3>
     <p>
-      Personalized recommendations based on your home, time, and lifestyle —
-      not just random breeds.
+      Get personalized pet recommendations that truly fit your life. Instead of random choices,
+      we match you based on your home, available time, lifestyle, budget,
+      and experience—so you can find a companion that naturally fits into your everyday routine.
     </p>
   </div>
 </section>
