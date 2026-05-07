@@ -341,17 +341,8 @@
   }
 </style>
 
-<div class="min-h-screen bg-gradient-to-br from-white via-purple-50 to-white" x-data="dashboard()">
-  <!-- Header Section -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
-    <div class="animate-slideInLeft space-y-2">
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold">
-        <span class="gradient-text">Welcome Back!</span>
-      </h1>
-      <p class="text-gray-600 text-lg max-w-2xl">Discover your perfect companion with our intelligent matching system</p>
-    </div>
-  </div>
-
+<div class="min-h-screen" x-data="dashboard()">
+  
   <!-- Quick Stats Section -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -417,8 +408,13 @@
         <div class="hidden lg:flex justify-center items-center">
           <div class="relative">
             <div class="absolute inset-0 bg-gradient-to-br from-purple-200 to-purple-100 rounded-3xl blur-3xl opacity-30"></div>
-            <div class="relative text-9xl animate-float">💕</div>
-          </div>
+            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+            <lord-icon
+                src="https://cdn.lordicon.com/qlrjanhh.json"
+                trigger="hover"
+                style="width:250px;height:250px">
+            </lord-icon>          
+            </div>
         </div>
       </div>
     </div>
@@ -651,28 +647,28 @@
         {
           label: 'Species',
           value: '{{ species_count }}',
-          icon: '<i class="fas fa-paw"></i>',
+          icon: '<lord-icon src="https://cdn.lordicon.com/lpsfmknj.json" trigger="hover" style="width:50px;height:50px"></lord-icon>',
           color: '#7c3aed',
           hovered: false
         },
         {
           label: 'Breeds',
           value: '{{ breed_count }}',
-          icon: '<i class="fas fa-tag"></i>',
+          icon: '<lord-icon src="https://cdn.lordicon.com/umhjhhxv.json" trigger="hover" style="width:50px;height:50px"></lord-icon>',
           color: '#a855f7',
           hovered: false
         },
         {
           label: 'Responsible Owners',
           value: '{{ user_count }}',
-          icon: '<i class="fas fa-users"></i>',
+          icon: '<lord-icon src="https://cdn.lordicon.com/ntfaoelc.json" trigger="morph" state="morph-circle" style="width:50px;height:50px"></lord-icon>',
           color: '#10b981',
           hovered: false
         },
         {
           label: 'Matches Made',
           value: '{{ match_count }}',
-          icon: '<i class="fas fa-handshake"></i>',
+          icon: '<lord-icon src="https://cdn.lordicon.com/qlrjanhh.json" trigger="morph" state="morph-two-hearts" style="width:50px;height:50px"></lord-icon>',
           color: '#ec4899',
           hovered: false
         }

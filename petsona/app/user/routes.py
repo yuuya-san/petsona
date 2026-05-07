@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request, abort, jso
 from flask_login import login_required, current_user # pyright: ignore[reportMissingImports]
 from app.user import bp
 from app.decorators import user_required
-from app.models import Species, Breed, Merchant, MatchHistory
+from app.models import Species, Breed, Merchant, MatchHistory, Vote
 from app import db
 from app.extensions import csrf
 from app.utils.notification_manager import NotificationManager
@@ -168,9 +168,20 @@ def species_index():
 
     species_list = pagination.items
 
+    # Determine which species the current user has already voted for
+    species_ids = [species.id for species in species_list]
+    voted_species_ids = set()
+    if species_ids:
+        user_votes = Vote.query.filter(
+            Vote.user_id == current_user.id,
+            Vote.species_id.in_(species_ids)
+        ).all()
+        voted_species_ids = {vote.species_id for vote in user_votes}
+
     return render_template(
         'user/species_index.html',
         species_list=species_list,
+        voted_species_ids=voted_species_ids,
         pagination=pagination,
         page_title="Pet Species"
     )
@@ -187,10 +198,20 @@ def view_species(id):
         is_active=True   
     ).order_by(Breed.name.asc()).all()
 
+    breed_ids = [breed.id for breed in breeds]
+    voted_breed_ids = set()
+    if breed_ids:
+        user_votes = Vote.query.filter(
+            Vote.user_id == current_user.id,
+            Vote.breed_id.in_(breed_ids)
+        ).all()
+        voted_breed_ids = {vote.breed_id for vote in user_votes}
+
     return render_template(
         'user/view_species.html',
         species=species,
         breeds=breeds,
+        voted_breed_ids=voted_breed_ids,
         page_title=f"{species.name} Breeds"
     )
 
@@ -561,8 +582,8 @@ def cancel_booking(booking_id):
     
     if not booking.can_be_cancelled:
         flash('This booking cannot be cancelled.', 'danger')
-        return redirect(url_for('user.booking_details', booking_id=booking_id))
-    
+        return redirect(url_for('user.my_bookings'))
+
     try:
         logger.info(f"\n{'='*60}")
         logger.info(f"CANCELLING BOOKING {booking_id}")

@@ -366,6 +366,85 @@
     transform: translateY(-8px);
   }
 
+  .vote-overlay {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+    width: auto;
+    max-width: none;
+  }
+
+  .vote-button {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-width: 6rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    background: rgba(255, 255, 255, 0.42);
+    color: #7c3aed;
+    box-shadow: 0 12px 28px rgba(99, 102, 241, 0.12);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+  }
+
+  .vote-button:hover {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 18px 35px rgba(99, 102, 241, 0.18);
+  }
+
+  .vote-button.voted {
+    background: rgba(167, 139, 250, 0.95);
+    color: #ffffff;
+    border-color: rgba(167, 139, 250, 0.8);
+  }
+
+  .vote-button.voted lord-icon {
+    filter: drop-shadow(0 0 0.35rem rgba(124, 58, 237, 0.2));
+  }
+
+  .vote-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+  }
+
+  .vote-button:not(.voted) .vote-count {
+    background: rgba(167, 139, 250, 0.9);
+    color: #ffffff;
+  }
+
+  .vote-button.voted .vote-count {
+    background: rgba(255, 255, 255, 0.9);
+    color: #7c3aed;
+  }
+
+  .vote-button:not(.voted) lord-icon {
+    filter: drop-shadow(0 0 0.15rem rgba(124, 58, 237, 0.1));
+  }
+
+  .vote-button.voted lord-icon {
+    filter: drop-shadow(0 0 0.25rem rgba(255, 255, 255, 0.42));
+  }
+
   /* Spinner Animation */
   @keyframes spin {
     to {
@@ -655,11 +734,30 @@
 
         <div x-data="{ menu: false, confirm: false }"
             class="w-full rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col overflow-hidden relative"
-            style="height: 350px; min-height: 350px; max-height: 350px;
+            style="height: 380px; min-height: 380px; max-height: 380px;
                     background-image: url('{{ image_url }}');
                     background-size: cover;
                     background-position: center;
                     background-repeat: no-repeat;">
+
+          <div class="vote-overlay">
+            <button
+              type="button"
+              class="vote-button breed-vote-button"
+              data-breed-id="{{ breed.id }}"
+              data-voted="{{ 'true' if breed.id in voted_breed_ids else 'false' }}"
+              aria-label="Vote for {{ breed.name }}"
+            >
+              <lord-icon
+                src="https://cdn.lordicon.com/qlrjanhh.json"
+                trigger="morph"
+                state="morph-glitter"
+                colors="{{ 'primary:#ffffff,secondary:#ffffff' if breed.id in voted_breed_ids else 'primary:#d4d1fa,secondary:#c69cf4' }}"
+                style="width:34px;height:28px">
+              </lord-icon>
+              <span class="vote-count" aria-live="polite">{{ breed.heart_vote_count or 0 }}</span>
+            </button>
+          </div>
 
         <!-- CONTENT -->
         <div class="p-4 sm:p-5 flex flex-col flex-1">
@@ -1138,4 +1236,88 @@
     </div>
   </div>
 
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
+<script>
+  function getCSRFToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+  }
+
+  function setLordiconColors(button, voted) {
+    const icon = button.querySelector('lord-icon');
+    if (!icon) return;
+    const colors = voted ? 'primary:#ffffff,secondary:#ffffff' : 'primary:#d4d1fa,secondary:#c69cf4';
+    icon.setAttribute('colors', colors);
+  }
+
+  function updateBreedVoteButton(button, voted) {
+    if (voted) {
+      button.dataset.voted = 'true';
+      button.classList.add('voted');
+    } else {
+      button.dataset.voted = 'false';
+      button.classList.remove('voted');
+    }
+    setLordiconColors(button, voted);
+  }
+
+  async function toggleBreedVote(button) {
+    const breedId = button.dataset.breedId;
+    const voteCountEl = button.querySelector('.vote-count');
+    if (!breedId || !voteCountEl) return;
+
+    button.disabled = true;
+    try {
+      const response = await fetch(`/api/votes/breed/${breedId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken()
+        }
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        console.error('Breed vote error:', data.error || 'Unknown error');
+        return;
+      }
+
+      updateBreedVoteButton(button, data.voted);
+      voteCountEl.textContent = data.total_votes ?? voteCountEl.textContent;
+    } catch (error) {
+      console.error('Breed vote request failed:', error);
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function initializeBreedVoteButtons() {
+    document.querySelectorAll('.breed-vote-button').forEach(button => {
+      updateBreedVoteButton(button, button.dataset.voted === 'true');
+      button.addEventListener('click', () => toggleBreedVote(button));
+    });
+  }
+
+  function registerBreedVoteSocketHandlers() {
+    if (!window.socketManager) return;
+
+    document.querySelectorAll('.breed-vote-button').forEach(button => {
+      const breedId = button.dataset.breedId;
+      if (!breedId) return;
+
+      socketManager.watchBreed(breedId, (voteCount) => {
+        const voteCountEl = document.querySelector(`.breed-vote-button[data-breed-id="${breedId}"] .vote-count`);
+        if (voteCountEl) {
+          voteCountEl.textContent = voteCount;
+        }
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeBreedVoteButtons();
+    registerBreedVoteSocketHandlers();
+  });
+</script>
+
 {% endblock %}
+

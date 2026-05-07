@@ -13,7 +13,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: clamp(2rem, 6vh, 3.2rem) 1rem;
+  padding: clamp(1rem, 4vh, 2rem) 1rem;
 }
 
 .auth-bg::before {
@@ -44,9 +44,8 @@
 .auth-card {
   position: relative;
   z-index: 3;
-  width: 100%;
-  max-width: 400px;
-  padding: 1.4rem 1.5rem;
+  width: clamp(280px, 85vw, 400px);
+  padding: 1rem 1.2rem;
   border-radius: 20px;
   background: linear-gradient(
     135deg,
@@ -70,7 +69,7 @@
 .subtitle {
   color: #6366f1;
   font-size: 0.8rem;
-  margin-bottom: 1.2rem;
+  margin-bottom: 0.8rem;
 }
 .section-title { color: #0d0d0d; }
 
@@ -171,7 +170,7 @@
   flex-direction: column;
   gap: 0.15rem;
   padding: 0.4rem;
-  margin: 0.3rem 0;
+  margin: 0.2rem 0;
   background: rgba(99, 102, 241, 0.08);
   border-radius: 6px;
   border-left: 2px solid rgba(99, 102, 241, 0.3);
@@ -197,7 +196,7 @@
 }
 
 .password-strength-meter {
-  margin: 0.3rem 0;
+  margin: 0.2rem 0;
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
@@ -225,7 +224,7 @@
 }
 
 .links {
-  margin-top: 1.2rem;
+  margin-top: 0.8rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -258,7 +257,7 @@
 ================================ */
 
 .social-login {
-  margin-top: 1rem;
+  margin-top: 0.8rem;
   display: flex;
   justify-content: center;
   gap: 0.7rem;
@@ -331,7 +330,7 @@
 ================================ */
 
 .auth-separator {
-  margin: 1.1rem 0 0.9rem;
+  margin: 0.8rem 0 0.7rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -364,10 +363,19 @@
    SMART FORM COMPRESSION (SMALL DEVICES)
 ================================ */
 
+/* Tablet */
+@media (max-width: 768px) {
+  .auth-card {
+    width: clamp(250px, 90vw, 350px);
+    padding: 1.3rem 1.4rem;
+  }
+}
+
 /* Phones & small tablets */
 @media (max-width: 480px) {
 
   .auth-card {
+    width: clamp(220px, 95vw, 320px);
     padding: 1.1rem 1.3rem;
     border-radius: 16px;
   }
@@ -413,10 +421,93 @@
   }
 
   .links {
-    margin-top: 0.9rem;
+    margin-top: 0.4rem;
     font-size: 0.7rem;
   }
 }
+
+/* Short height / landscape */
+@media (max-height: 620px) {
+  .auth-bg {
+    padding-top: 0.5rem;
+  }
+
+  .auth-card {
+    padding: 0.8rem 1rem;
+    width: clamp(220px, 95vw, 320px);
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
+  }
+
+  .title {
+    font-size: 1.1rem;
+  }
+
+  .subtitle {
+    font-size: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .auth-form {
+    gap: 0.6rem;
+  }
+
+  .input-group {
+    padding-bottom: 0.15rem;
+  }
+
+  .input-field {
+    font-size: 0.8rem;
+    padding: 0.25rem 0;
+  }
+
+  .themed-btn {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    min-height: 28px;
+  }
+
+  .auth-separator {
+    margin: 0.3rem 0 0.3rem;
+    font-size: 0.6rem;
+  }
+
+  .social-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+  }
+
+  .social-btn.google-wide {
+    padding: 0.6rem;
+  }
+
+  .social-btn i {
+    font-size: 0.9rem;
+  }
+
+  .password-requirements {
+    gap: 0.08rem;
+    padding: 0.25rem;
+    margin: 0.15rem 0;
+  }
+
+  .requirement {
+    font-size: 0.55rem;
+  }
+
+  .requirement i {
+    font-size: 0.45rem;
+  }
+
+  .password-strength-meter {
+    margin: 0.15rem 0;
+    gap: 0.08rem;
+  }
+
+  .strength-text {
+    font-size: 0.5rem;
+  }
 
 </style>
 

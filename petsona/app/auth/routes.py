@@ -1,7 +1,7 @@
 
 from app.models.species import Species
 from app.models.breed import Breed
-from app.models import BackupCode
+from app.models import BackupCode, PasswordResetToken
 
 from flask import g, render_template, redirect, url_for, flash, request, current_app, session # pyright: ignore[reportMissingImports]
 from flask_login import login_user, logout_user, login_required, current_user # pyright: ignore[reportMissingImports]
@@ -19,6 +19,7 @@ from sqlalchemy import func # pyright: ignore[reportMissingImports]
 import pyotp # pyright: ignore[reportMissingImports]
 import secrets
 import pytz
+import hashlib
 
 # Philippine timezone helper
 PH_TZ = pytz.timezone('Asia/Manila')
@@ -642,8 +643,20 @@ def forgot_password():
         email = form.email.data.lower()
         user = User.query.filter_by(email=email).first()
         if user:
+            # Check if account was created with Google OAuth
+            if user.registration_method == 'google':
+                log_event('user.password_reset_google_account', details={'user': user_snapshot(user)})
+                flash('Your account is linked with Google. You cannot reset your password through this method. Please sign in with Google.', 'info')
+                return redirect(url_for('auth.login'))
+            
             s = get_serializer()
             token = s.dumps({'user_id': user.id})
+            
+            # Create token hash for one-time use tracking
+            token_hash = hashlib.sha256(token.encode()).hexdigest()
+            
+            # Store token in database with 30-minute expiry
+            PasswordResetToken.create_token(user.id, token_hash, expiry_seconds=1800)
 
             # Audit: reset requested
             log_event('user.password_reset_requested', details={'user': user_snapshot(user)})
@@ -676,8 +689,31 @@ def forgot_password():
 def reset_password(token):
     form = ResetPasswordForm()
     s = get_serializer()
+    
+    # Hash the token for database lookup
+    token_hash = hashlib.sha256(token.encode()).hexdigest()
+    
+    # Check token status in database (one-time use + expiration)
+    token_status = PasswordResetToken.check_token_status(token_hash)
+    
+    if token_status == 'already_used':
+        flash('This password reset link has already been used. Please request a new one.', 'warning')
+        log_event('user.password_reset_link_already_used', details={'token_excerpt': token[:32]})
+        return redirect(url_for('auth.forgot_password'))
+    
+    if token_status == 'expired':
+        flash('Your password reset link has expired. Please request a new one.', 'warning')
+        log_event('user.password_reset_expired', details={'token_excerpt': token[:32]})
+        return redirect(url_for('auth.forgot_password'))
+    
+    if token_status == 'not_found':
+        flash('Invalid password reset link. Please request a new one.', 'danger')
+        log_event('user.password_reset_invalid_token', details={'token_excerpt': token[:32]})
+        return redirect(url_for('auth.forgot_password'))
+    
+    # Also validate with itsdangerous for additional security
     try:
-        data = s.loads(token, max_age=current_app.config['RESET_TOKEN_EXPIRY'])
+        data = s.loads(token, max_age=1800)  # 30 minutes
         user_id = data.get('user_id')
     except Exception:
         flash('Invalid or expired password reset token.', 'danger')
@@ -695,6 +731,12 @@ def reset_password(token):
         user.failed_login_attempts = 0
         user.lockout_until = None
         db.session.commit()
+        
+        # Mark token as used
+        reset_token = PasswordResetToken.query.filter_by(token_hash=token_hash).first()
+        if reset_token:
+            reset_token.mark_as_used()
+        
         log_event('user.password_reset_success', details={'user': user_snapshot(user)})
         flash('Your password has been reset. You can now log in.', 'success')
         return redirect(url_for('auth.login'))

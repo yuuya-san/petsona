@@ -134,10 +134,17 @@ class Booking(db.Model):
     @property
     def can_be_cancelled(self):
         """Check if booking can still be cancelled"""
+        if self.is_cancelled or self.is_completed:
+            return False
+
+        if self.status == 'pending':
+            return True
+
         appt_dt = self.appointment_date
         if appt_dt.tzinfo is None:
             appt_dt = appt_dt.replace(tzinfo=PH_TZ)
-        return not self.is_cancelled and not self.is_completed and get_ph_datetime() < appt_dt
+
+        return get_ph_datetime() < appt_dt
 
     @property
     def total_pets_count(self):

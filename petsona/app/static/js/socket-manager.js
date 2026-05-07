@@ -8,6 +8,7 @@ class SocketManager {
     this.socket = null;
     this.connected = false;
     this.watchers = new Map(); // species_id -> callback function
+    this.breedWatchers = new Map(); // breed_id -> callback function
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
     // Disable debug logging for performance
@@ -69,6 +70,7 @@ class SocketManager {
       
       // Re-register watchers after reconnection
       this.rewatchAllSpecies();
+      this.rewatchAllBreeds();
       
       // Notify listeners that socket is ready
       window.dispatchEvent(new CustomEvent('socket-ready', { detail: this.socket }));
@@ -93,12 +95,26 @@ class SocketManager {
     // Vote update from server
     this.socket.on('vote_update', (data) => {
       const { species_id, vote_count } = data;
+      const key = String(species_id);
       this.log(`📡 Vote update received for species ${species_id}: ${vote_count} votes`);
       
       // Call registered callback for this species
-      if (this.watchers.has(species_id)) {
-        const callback = this.watchers.get(species_id);
+      if (this.watchers.has(key)) {
+        const callback = this.watchers.get(key);
         callback(vote_count);
+      }
+    });
+
+    // Breed vote update from server
+    this.socket.on('breed_vote_update', (data) => {
+      const { breed_id, total_votes, voted, user_id } = data;
+      const key = String(breed_id);
+      this.log(`📡 Breed vote update received for breed ${breed_id}: ${total_votes} votes`);
+
+      // Call registered callback for this breed
+      if (this.breedWatchers.has(key)) {
+        const callback = this.breedWatchers.get(key);
+        callback(total_votes, voted, user_id);
       }
     });
 
@@ -126,13 +142,14 @@ class SocketManager {
    * @param {function} callback - Function to call when vote count changes
    */
   watchSpecies(speciesId, callback) {
+    const key = String(speciesId);
     if (!this.socket || !this.connected) {
       setTimeout(() => this.watchSpecies(speciesId, callback), 100);
       return;
     }
 
     // Store callback
-    this.watchers.set(speciesId, callback);
+    this.watchers.set(key, callback);
 
     // Notify server
     this.socket.emit('watch_species', { species_id: speciesId });
@@ -144,8 +161,9 @@ class SocketManager {
    */
   unwatchSpecies(speciesId) {
     if (!this.socket) return;
+    const key = String(speciesId);
 
-    this.watchers.delete(speciesId);
+    this.watchers.delete(key);
     this.socket.emit('unwatch_species', { species_id: speciesId });
   }
 
@@ -155,6 +173,39 @@ class SocketManager {
   rewatchAllSpecies() {
     for (const [speciesId, callback] of this.watchers.entries()) {
       this.socket.emit('watch_species', { species_id: speciesId });
+    }
+  }
+
+  /**
+   * Register a watcher for a specific breed
+   * @param {number} breedId - The breed ID to watch
+   * @param {function} callback - Function to call when vote count changes
+   */
+  watchBreed(breedId, callback) {
+    const key = String(breedId);
+    if (!this.socket || !this.connected) {
+      setTimeout(() => this.watchBreed(breedId, callback), 100);
+      return;
+    }
+
+    this.breedWatchers.set(key, callback);
+  }
+
+  /**
+   * Unregister a watcher for a specific breed
+   * @param {number} breedId - The breed ID to unwatch
+   */
+  unwatchBreed(breedId) {
+    const key = String(breedId);
+    this.breedWatchers.delete(key);
+  }
+
+  /**
+   * Re-watch all breeds after reconnection
+   */
+  rewatchAllBreeds() {
+    for (const [breedId, callback] of this.breedWatchers.entries()) {
+      this.watchBreed(breedId, callback);
     }
   }
 
@@ -188,5 +239,6 @@ class SocketManager {
 // Create global instance
 const socketManager = new SocketManager();
 
-// Also expose socket globally for backward compatibility with inline scripts
+// Expose manager globally for page scripts and compatibility
+window.socketManager = socketManager;
 window.socket = socketManager.socket;

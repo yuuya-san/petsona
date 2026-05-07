@@ -570,7 +570,12 @@
         <a href="{{ url_for('matching.quiz') }}"
            class="bg-purple-500 hover:bg-purple-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl font-semibold shadow-sm transition flex items-center justify-center sm:justify-start gap-2 text-sm sm:text-base whitespace-nowrap"
         >
-          <i class="fa-solid fa-magnifying-glass"></i>
+          <lord-icon
+              src="https://cdn.lordicon.com/wjyqkiew.json"
+              trigger="hover"
+              colors="primary:#ffffff,secondary:#e4e4e4"
+              style="width:25px;height:25px">
+          </lord-icon>
           <span class="hidden sm:inline">Find Me Pet</span>
           <span class="sm:hidden">Find Pet</span>
         </a>
@@ -580,7 +585,13 @@
           @click="speciesModal = true; editingSpecies = null; imagePreview=null; formSubmitting=false; speciesName=''; speciesDescription=''; speciesEthicalNotes=''; speciesIcon='fa-solid fa-paw'"
           class="bg-indigo-800 hover:bg-indigo-900 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl font-semibold shadow-sm transition flex items-center justify-center gap-2 text-sm sm:text-base whitespace-nowrap"
         >
-          <i class="fa-solid fa-circle-plus"></i>
+          <lord-icon
+              src="https://cdn.lordicon.com/vjgknpfx.json"
+              trigger="hover"
+              state="hover-swirl"
+              colors="primary:#ffffff,secondary:#b4b4b4"
+              style="width:25px;height:25px">
+          </lord-icon>
           <span class="hidden sm:inline">Add Pet Profile</span>
           <span class="sm:hidden">Add</span>
         </button>
@@ -591,7 +602,13 @@
     <div class="animate-slideDown">
       <div class="glass-search rounded-2xl sm:rounded-3xl px-4 sm:px-6 py-3 sm:py-4">
         <div class="flex items-center gap-3 sm:gap-4">
-          <i class="fa-solid fa-magnifying-glass text-indigo-800 text-lg sm:text-xl flex-shrink-0"></i>
+          <script src="https://cdn.lordicon.com/lordicon.js"></script>
+          <lord-icon
+              src="https://cdn.lordicon.com/vgxjrbxm.json"
+              trigger="morph"
+              state="morph-check"
+              style="width:35px;height:35px">
+          </lord-icon>
           <input 
             type="text" 
             x-model="searchQuery"

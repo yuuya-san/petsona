@@ -97,6 +97,11 @@
   color: #ef4444;
 }
 
+.metric-icon.cancelled {
+  background: rgba(239, 68, 68, 0.1);
+  color: #c50808;
+}
+
 .metric-icon.no-show {
   background: rgba(139, 92, 246, 0.1);
   color: #8b5cf6;
@@ -256,6 +261,12 @@
 .status-rejected {
   background: rgba(239, 68, 68, 0.15);
   color: #991b1b;
+}
+
+
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.15);
+  color: #c50808;
 }
 
 .status-no-show {
@@ -614,6 +625,8 @@
                       <i class="fas fa-check-double"></i> Completed
                     {% elif booking.status == 'rejected' %}
                       <i class="fas fa-times"></i> Rejected
+                    {% elif booking.status == 'cancelled' %}
+                      <i class="fas fa-times"></i> Cancelled
                     {% elif booking.status == 'no-show' %}
                       <i class="fas fa-ban"></i> No Show
                     {% else %}

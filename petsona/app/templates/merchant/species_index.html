@@ -1,6 +1,21 @@
 {% extends "merchant/base.html" %}
 {% block content %}
 
+<!-- 
+  UNIVERSAL PET PROFILE MANAGEMENT SYSTEM
+  
+  This template has been refactored to present a "Pet Profile" system instead of a
+  biological "Species" database. The interface speaks to users about lifestyle
+  compatibility, not scientific classification.
+  
+  Key principles:
+  - Universal pet type support (not biology-locked)
+  - Compatibility engine integration (all fields map cleanly)
+  - Non-technical, human-friendly language
+  - Emotionally guided rather than data-focused
+  - Mobile-first, accessibility-ready
+-->
+
 <style>
   @keyframes fadeIn {
     from {
@@ -87,6 +102,85 @@
 
   .species-item.hidden {
     display: none;
+  }
+
+  .vote-overlay {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+    width: auto;
+    max-width: none;
+  }
+
+  .vote-button {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-width: 6rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    background: rgba(255, 255, 255, 0.42);
+    color: #7c3aed;
+    box-shadow: 0 12px 28px rgba(99, 102, 241, 0.12);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+  }
+
+  .vote-button:hover {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 18px 35px rgba(99, 102, 241, 0.18);
+  }
+
+  .vote-button.voted {
+    background: rgba(167, 139, 250, 0.95);
+    color: #ffffff;
+    border-color: rgba(167, 139, 250, 0.8);
+  }
+
+  .vote-button.voted lord-icon {
+    filter: drop-shadow(0 0 0.35rem rgba(124, 58, 237, 0.2));
+  }
+
+  .vote-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+  }
+
+  .vote-button:not(.voted) .vote-count {
+    background: rgba(167, 139, 250, 0.9);
+    color: #ffffff;
+  }
+
+  .vote-button.voted .vote-count {
+    background: rgba(255, 255, 255, 0.9);
+    color: #7c3aed;
+  }
+
+  .vote-button:not(.voted) lord-icon {
+    filter: drop-shadow(0 0 0.15rem rgba(124, 58, 237, 0.1));
+  }
+
+  .vote-button.voted lord-icon {
+    filter: drop-shadow(0 0 0.25rem rgba(255, 255, 255, 0.42));
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -552,7 +646,12 @@
         <a href="{{ url_for('matching.quiz') }}"
            class="bg-purple-500 hover:bg-purple-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl font-semibold shadow-sm transition flex items-center justify-center sm:justify-start gap-2 text-sm sm:text-base whitespace-nowrap"
         >
-          <i class="fa-solid fa-magnifying-glass"></i>
+          <lord-icon
+              src="https://cdn.lordicon.com/wjyqkiew.json"
+              trigger="hover"
+              colors="primary:#ffffff,secondary:#e4e4e4"
+              style="width:25px;height:25px">
+          </lord-icon>
           <span class="hidden sm:inline">Find Me Pet</span>
           <span class="sm:hidden">Find Pet</span>
         </a>
@@ -563,7 +662,12 @@
     <div class="animate-slideDown">
       <div class="glass-search rounded-2xl sm:rounded-3xl px-4 sm:px-6 py-3 sm:py-4">
         <div class="flex items-center gap-3 sm:gap-4">
-          <i class="fa-solid fa-magnifying-glass text-indigo-800 text-lg sm:text-xl flex-shrink-0"></i>
+        <lord-icon
+            src="https://cdn.lordicon.com/vgxjrbxm.json"
+            trigger="morph"
+            state="morph-check"
+            style="width:35px;height:35px">
+        </lord-icon>
           <input 
             type="text" 
             x-model="searchQuery"
@@ -596,12 +700,30 @@
         <div x-data="{ menu: false }"
             data-species-name="{{ species.name.lower() }}"
             class="species-item w-full rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col overflow-hidden relative"
-            style="height: 350px; min-height: 350px; max-height: 350px;
+            style="height: 380px; min-height: 380px; max-height: 380px;
                     background-image: url('{{ image_url }}');
                     background-size: cover;
                     background-position: center;
                     background-repeat: no-repeat;">
 
+          <div class="vote-overlay">
+            <button
+              type="button"
+              class="vote-button species-vote-button"
+              data-species-id="{{ species.id }}"
+              data-voted="{{ 'true' if species.id in voted_species_ids else 'false' }}"
+              aria-label="Vote for {{ species.name }}"
+            >
+              <lord-icon
+                src="https://cdn.lordicon.com/qlrjanhh.json"
+                trigger="morph"
+                state="morph-glitter"
+                colors="{{ 'primary:#ffffff,secondary:#ffffff' if species.id in voted_species_ids else 'primary:#d4d1fa,secondary:#c69cf4' }}"
+                style="width:34px;height:25px">
+              </lord-icon>
+              <span class="vote-count" aria-live="polite">{{ species.heart_vote_count or 0 }}</span>
+            </button>
+          </div>
 
       <!-- CONTENT -->
       <div class="p-4 sm:p-5 lg:p-6 flex flex-col flex-1 gap-4">
@@ -945,8 +1067,85 @@
   </div>
 </div>
 
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
+
 <!-- SEARCH FILTER SCRIPT -->
 <script>
+  function getCSRFToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+  }
+
+  function setLordiconColors(button, voted) {
+    const icon = button.querySelector('lord-icon');
+    if (!icon) return;
+    const colors = voted ? 'primary:#ffffff,secondary:#ffffff' : 'primary:#d4d1fa,secondary:#c69cf4';
+    icon.setAttribute('colors', colors);
+  }
+
+  function updateVoteButton(button, voted) {
+    if (voted) {
+      button.dataset.voted = 'true';
+      button.classList.add('voted');
+    } else {
+      button.dataset.voted = 'false';
+      button.classList.remove('voted');
+    }
+    setLordiconColors(button, voted);
+  }
+
+  async function toggleSpeciesVote(button) {
+    const speciesId = button.dataset.speciesId;
+    const voteCountEl = button.closest('.vote-overlay')?.querySelector('.vote-count');
+    if (!speciesId || !voteCountEl) return;
+
+    button.disabled = true;
+    try {
+      const response = await fetch(`/api/votes/heart/${speciesId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken()
+        }
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        console.error('Vote error:', data.error || 'Unknown error');
+        return;
+      }
+
+      updateVoteButton(button, data.voted);
+      voteCountEl.textContent = data.total_votes ?? voteCountEl.textContent;
+    } catch (error) {
+      console.error('Vote request failed:', error);
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function initializeSpeciesVoteButtons() {
+    document.querySelectorAll('.species-vote-button').forEach(button => {
+      updateVoteButton(button, button.dataset.voted === 'true');
+      button.addEventListener('click', () => toggleSpeciesVote(button));
+    });
+  }
+
+  function registerSpeciesVoteSocketHandlers() {
+    if (!window.socketManager) return;
+
+    document.querySelectorAll('.species-vote-button').forEach(button => {
+      const speciesId = button.dataset.speciesId;
+      if (!speciesId) return;
+
+      socketManager.watchSpecies(speciesId, (voteCount) => {
+        const voteCountEl = document.querySelector(`.species-vote-button[data-species-id="${speciesId}"] .vote-count`);
+        if (voteCountEl) {
+          voteCountEl.textContent = voteCount;
+        }
+      });
+    });
+  }
+
   function performSearch(query) {
     const items = document.querySelectorAll('.species-item');
     let visibleCount = 0;
@@ -981,6 +1180,9 @@
     searchInput.addEventListener('input', (e) => {
       performSearch(e.target.value);
     });
+
+    initializeSpeciesVoteButtons();
+    registerSpeciesVoteSocketHandlers();
 
     if (window.Alpine) {
       window.addEventListener('alpine:init', () => {

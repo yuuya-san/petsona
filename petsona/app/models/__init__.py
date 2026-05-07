@@ -9,3 +9,4 @@ from .booking import Booking
 from .notification import Notification
 from .backup_code import BackupCode
 from .review import Review
+from .password_reset_token import PasswordResetToken

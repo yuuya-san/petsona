@@ -15,6 +15,7 @@ from app.models.merchant import Merchant
 from app.models.booking import Booking
 from app.models.notification import Notification
 from app.models.user import User
+from app.models.vote import Vote
 from app.models.review import Review
 from app.extensions import db, csrf
 from app.merchant.forms import MerchantApplicationForm, MerchantStoreUpdateForm
@@ -859,9 +860,19 @@ def species_index():
 
     species_list = pagination.items
 
+    species_ids = [species.id for species in species_list]
+    voted_species_ids = set()
+    if species_ids:
+        user_votes = Vote.query.filter(
+            Vote.user_id == current_user.id,
+            Vote.species_id.in_(species_ids)
+        ).all()
+        voted_species_ids = {vote.species_id for vote in user_votes}
+
     return render_template(
         'merchant/species_index.html',
         species_list=species_list,
+        voted_species_ids=voted_species_ids,
         pagination=pagination,
         page_title="Pet Species"
     )
@@ -879,10 +890,20 @@ def view_species(id):
         is_active=True   
     ).order_by(Breed.name.asc()).all()
 
+    breed_ids = [breed.id for breed in breeds]
+    voted_breed_ids = set()
+    if breed_ids:
+        user_votes = Vote.query.filter(
+            Vote.user_id == current_user.id,
+            Vote.breed_id.in_(breed_ids)
+        ).all()
+        voted_breed_ids = {vote.breed_id for vote in user_votes}
+
     return render_template(
         'merchant/view_species.html',
         species=species,
         breeds=breeds,
+        voted_breed_ids=voted_breed_ids,
         page_title=f"{species.name} Breeds"
     )
 
