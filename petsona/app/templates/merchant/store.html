@@ -26,8 +26,8 @@
   </div>
 </div>
 
-<div class="min-h-screen bg-gradient-to-b from-white via-purple-50/20 to-white py-8 sm:py-12 lg:py-16 px-2 sm:px-3 lg:px-6">
-  <div class="max-w-7xl mx-auto">
+<div class="min-h-screen py-8 sm:py-12 lg:py-16 px-3 sm:px-5 lg:px-6">
+  <div class="w-full max-w-[95vw] mx-auto">
     
     <!-- Page Header -->
     <div class="mb-8 sm:mb-10 lg:mb-12 animate-fade-in">
@@ -51,9 +51,9 @@
         <div class="lg:col-span-2 space-y-6 sm:space-y-7">
           
           <!-- Store Hero Section -->
-          <div class="group bg-white/70 backdrop-blur-2xl rounded-3xl shadow-xl overflow-hidden border border-white/60 hover:shadow-2xl transition-all duration-300 animate-fade-in" style="animation-delay: 0.1s">
+          <div data-card="true" class="group bg-white/95 rounded-[28px] shadow-[0_24px_70px_rgba(15,23,42,0.08)] overflow-hidden border border-slate-200 hover:shadow-[0_30px_90px_rgba(15,23,42,0.1)] transition-all duration-300 animate-fade-in" style="animation-delay: 0.1s">
             <!-- Banner Background -->
-            <div class="h-32 sm:h-40 bg-gradient-to-br from-purple-100 via-purple-50 to-pink-100 relative overflow-hidden">
+            <div class="h-32 sm:h-40 bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 relative overflow-hidden">
               <div class="absolute inset-0 opacity-10">
                 <svg class="w-full h-full" viewBox="0 0 1200 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M0,100 Q300,50 600,100 T1200,100 L1200,0 L0,0 Z" fill="currentColor"/>
@@ -68,11 +68,11 @@
                 <!-- Store Logo -->
                 <div class="relative">
                   {% if merchant.logo_path %}
-                    <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden bg-white shadow-lg border-4 border-white">
+                    <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-[28px] overflow-hidden bg-white shadow-lg border-4 border-white">
                       <img src="/static/uploads/{{ merchant.logo_path }}" alt="{{ merchant.business_name }}" class="w-full h-full object-cover">
                     </div>
                   {% else %}
-                    <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white shadow-lg border-4 border-white cursor-pointer hover:shadow-xl transition-all" onclick="openLogoUploadModal()">
+                    <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-[28px] bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white shadow-lg border-4 border-white cursor-pointer hover:shadow-xl transition-all" onclick="openLogoUploadModal()">
                       <i class="fas fa-image text-5xl opacity-50"></i>
                     </div>
                   {% endif %}
@@ -104,7 +104,7 @@
                         class="inline-flex items-center justify-center gap-1.5 
                               px-3 py-2 
                               text-white font-semibold text-xs sm:text-sm 
-                              rounded-lg shadow hover:shadow-md 
+                              rounded-[24px] shadow hover:shadow-md 
                               transition-all duration-200 
                               active:scale-95 whitespace-nowrap
                               {% if merchant.is_open %}open{% else %}closed{% endif %}"
@@ -124,7 +124,7 @@
                             bg-gradient-to-br from-purple-500 to-purple-700 
                             hover:from-purple-600 hover:to-purple-800 
                             text-white font-semibold text-xs sm:text-sm 
-                            rounded-lg shadow hover:shadow-md 
+                            rounded-[24px] shadow hover:shadow-md 
                             transition-all duration-200 
                             active:scale-95 whitespace-nowrap"
                     >
@@ -139,41 +139,41 @@
               <!-- Quick Info Grid -->
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <!-- Email -->
-                <div class="group bg-white/60 backdrop-blur-lg rounded-2xl p-4 border border-white/70 hover:shadow-xl transition-all">
-                  <p class="text-gray-600 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
-                    <i class="fas fa-envelope text-purple-600"></i> Email
+                <div data-card="true" class="group bg-white rounded-[24px] p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                  <p class="text-slate-500 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
+                    <i class="fas fa-envelope text-slate-700"></i> Email
                   </p>
                   <p class="text-gray-900 font-semibold text-sm break-words">{{ merchant.contact_email }}</p>
                 </div>
 
                 <!-- Phone -->
-                <div class="group bg-white/60 backdrop-blur-lg rounded-2xl p-4 border border-white/70 hover:shadow-xl transition-all">
-                  <p class="text-gray-600 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
-                    <i class="fas fa-phone text-purple-600"></i> Phone
+                <div data-card="true" class="group bg-white rounded-[24px] p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                  <p class="text-slate-500 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
+                    <i class="fas fa-phone text-slate-700"></i> Phone
                   </p>
                   <p class="text-gray-900 font-semibold text-sm break-words">{{ merchant.contact_phone }}</p>
                 </div>
 
                 <!-- Location -->
-                <div class="group bg-white/60 backdrop-blur-lg rounded-2xl p-4 border border-white/70 hover:shadow-xl transition-all">
-                  <p class="text-gray-600 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
-                    <i class="fas fa-map-pin text-purple-600"></i> Location
+                <div data-card="true" class="group bg-white rounded-[24px] p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                  <p class="text-slate-500 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
+                    <i class="fas fa-map-pin text-slate-700"></i> Location
                   </p>
                   <p class="text-gray-900 font-semibold text-sm break-words">{{ merchant.city }}, {{ merchant.province }}</p>
                 </div>
 
                 <!-- Contact Person -->
-                <div class="group bg-white/60 backdrop-blur-lg rounded-2xl p-4 border border-white/70 hover:shadow-xl transition-all">
-                  <p class="text-gray-600 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
-                    <i class="fas fa-user text-purple-600"></i> Manager
+                <div data-card="true" class="group bg-white rounded-[24px] p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                  <p class="text-slate-500 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
+                    <i class="fas fa-user text-slate-700"></i> Manager
                   </p>
                   <p class="text-gray-900 font-semibold text-sm break-words">{{ merchant.owner_manager_name }}</p>
                 </div>
 
                 <!-- Opening Hours -->
-                <div class="group bg-white/60 backdrop-blur-lg rounded-2xl p-4 border border-white/70 hover:shadow-xl transition-all">
-                  <p class="text-gray-600 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
-                    <i class="fas fa-clock text-purple-600"></i> Hours
+                <div data-card="true" class="group bg-white rounded-[24px] p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                  <p class="text-slate-500 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
+                    <i class="fas fa-clock text-slate-700"></i> Hours
                   </p>
                   <p class="text-gray-900 font-semibold text-sm">
                     {% if merchant.opening_time and merchant.closing_time %}
@@ -195,9 +195,9 @@
                 </div>
 
                 <!-- Rating -->
-                <div class="group bg-white/60 backdrop-blur-lg rounded-2xl p-4 border border-white/70 hover:shadow-xl transition-all">
-                  <p class="text-gray-600 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
-                    <i class="fas fa-star text-purple-600"></i> Rating
+                <div data-card="true" class="group bg-white rounded-[24px] p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                  <p class="text-slate-500 text-xs font-semibold uppercase mb-1 flex items-center gap-2">
+                    <i class="fas fa-star text-slate-700"></i> Rating
                   </p>
                   {% if store_rating > 0 %}
                     <div class="flex flex-col gap-2">
@@ -215,18 +215,18 @@
 
               <!-- Business Description -->
               {% if merchant.business_description %}
-              <div class="bg-white/60 backdrop-blur-lg rounded-2xl p-4 sm:p-5 border border-white/70 shadow-lg mb-6 sm:mb-8">
-                <h4 class="font-bold text-gray-900 text-sm sm:text-base mb-3 flex items-center gap-2">
-                  <i class="fas fa-align-left text-purple-600"></i> About Us
+              <div data-card="true" class="bg-white rounded-[26px] p-4 sm:p-5 border border-slate-200 shadow-sm mb-6 sm:mb-8">
+                <h4 class="font-bold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+                  <i class="fas fa-align-left text-slate-700"></i> About Us
                 </h4>
                 <p class="text-gray-700 leading-relaxed text-sm sm:text-base">{{ merchant.business_description }}</p>
               </div>
               {% endif %}
 
               <!-- Address & Map -->
-              <div class="bg-white/60 backdrop-blur-lg rounded-2xl p-4 sm:p-5 border border-white/70 shadow-lg mb-6 sm:mb-8">
-                <h4 class="font-bold text-gray-900 text-sm sm:text-base mb-3 flex items-center gap-2">
-                  <i class="fas fa-location-dot text-orange-600"></i> Full Address
+              <div data-card="true" class="bg-white rounded-[26px] p-4 sm:p-5 border border-slate-200 shadow-sm mb-6 sm:mb-8">
+                <h4 class="font-bold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+                  <i class="fas fa-location-dot text-slate-700"></i> Full Address
                 </h4>
                 <div class="space-y-3">
                   <p class="text-gray-700 text-sm leading-relaxed">{{ merchant.full_address }}</p>
@@ -263,9 +263,9 @@
               </div>
 
               {% if merchant.get_operating_days() %}
-              <div class="bg-white/60 backdrop-blur-lg rounded-2xl p-4 sm:p-5 border border-white/70 shadow-lg mb-6 sm:mb-8">
-                <h4 class="font-bold text-gray-900 text-sm sm:text-base mb-3 flex items-center gap-2">
-                  <i class="fas fa-calendar-week text-purple-600"></i> Operating Days
+              <div data-card="true" class="bg-white rounded-[26px] p-4 sm:p-5 border border-slate-200 shadow-sm mb-6 sm:mb-8">
+                <h4 class="font-bold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+                  <i class="fas fa-calendar-week text-slate-700"></i> Operating Days
                 </h4>
                 <div class="flex flex-wrap gap-2">
                   {% set day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
@@ -284,9 +284,9 @@
 
               <!-- Cancellation Policy -->
               {% if merchant.cancellation_policy %}
-              <div class="bg-amber-50/60 backdrop-blur-lg rounded-2xl p-4 sm:p-5 border border-amber-200/50 shadow-lg mb-6 sm:mb-8">
-                <h4 class="font-bold text-gray-900 text-sm sm:text-base mb-3 flex items-center gap-2">
-                  <i class="fas fa-calendar-times text-amber-600"></i> Cancellation Policy
+              <div data-card="true" class="bg-white rounded-[26px] p-4 sm:p-5 border border-slate-200 shadow-sm mb-6 sm:mb-8">
+                <h4 class="font-bold text-slate-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+                  <i class="fas fa-calendar-times text-slate-700"></i> Cancellation Policy
                 </h4>
                 <p class="text-gray-700 leading-relaxed text-sm">{{ merchant.cancellation_policy }}</p>
               </div>
@@ -302,13 +302,13 @@
           <div class="space-y-4">
             <!-- Pets Accepted -->
             {% if merchant.get_pets_list() %}
-            <div class="bg-white/70 backdrop-blur-lg rounded-2xl p-5 border border-white/70 shadow-lg hover:shadow-xl transition-all">
-              <h4 class="font-bold text-gray-900 text-sm mb-4 flex items-center gap-2">
-                <i class="fas fa-paw text-purple-600"></i> Pets Accepted
+            <div data-card="true" class="bg-white rounded-[26px] p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all">
+              <h4 class="font-bold text-slate-900 text-sm mb-4 flex items-center gap-2">
+                <i class="fas fa-paw text-slate-700"></i> Pets Accepted
               </h4>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
                 {% for pet in merchant.get_pets_list() %}
-                  <div class="flex items-center gap-2 p-2 bg-purple-50/50 rounded-lg">
+                  <div class="flex items-center gap-2 p-2 bg-purple-50/50 rounded-[20px]">
                     <i class="fas fa-check text-purple-600 text-sm"></i>
                     <span class="text-gray-700 text-sm truncate">{{ pet }}</span>
                   </div>
@@ -320,7 +320,7 @@
           </div>
 
           <!-- Map Section -->
-          <div class="bg-white rounded-2xl p-0 border border-gray-200 shadow-lg overflow-hidden animate-fade-in" style="animation-delay: 0.2s">
+          <div data-card="true" class="bg-white rounded-[28px] p-0 border border-slate-200 shadow-sm overflow-hidden animate-fade-in" style="animation-delay: 0.2s">
             <div id="storeMap" 
                  data-lat="{{ merchant.latitude or 14.5995 }}"
                  data-lng="{{ merchant.longitude or 120.9842 }}"
@@ -339,9 +339,9 @@
               </h3>
 
               <!-- Service Pricing Card -->
-              <div class="bg-white/80 backdrop-blur-xl rounded-2xl p-5 sm:p-6 border border-white/60 shadow-lg hover:shadow-xl transition-all">
-                <h4 class="font-semibold text-gray-900 text-sm flex items-center gap-2 mb-4">
-                  <i class="fas fa-money-bill-wave text-green-600"></i>
+              <div data-card="true" class="bg-white rounded-[26px] p-5 sm:p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                <h4 class="font-semibold text-slate-900 text-sm flex items-center gap-2 mb-4">
+                  <i class="fas fa-money-bill-wave text-slate-700"></i>
                   Service Pricing
                 </h4>
 
@@ -359,7 +359,7 @@
                         
                         <!-- Per Hour -->
                         {% if 'hour' in hotel_pricing and hotel_pricing['hour'] is mapping %}
-                          <div class="mb-3 p-3 bg-blue-50/40 rounded-lg">
+                          <div class="mb-3 p-3 bg-blue-50/40 rounded-[20px]">
                             <p class="text-xs font-semibold text-blue-700 mb-2">Per Hour</p>
                             <div class="grid grid-cols-2 gap-2 text-xs">
                               {% for size, price in hotel_pricing['hour'].items() %}
@@ -373,7 +373,7 @@
                         
                         <!-- Per Night -->
                         {% if 'night' in hotel_pricing and hotel_pricing['night'] is mapping %}
-                          <div class="p-3 bg-blue-50/40 rounded-lg">
+                          <div class="p-3 bg-blue-50/40 rounded-[20px]">
                             <p class="text-xs font-semibold text-blue-700 mb-2">Per Night</p>
                             <div class="grid grid-cols-2 gap-2 text-xs">
                               {% for size, price in hotel_pricing['night'].items() %}
@@ -411,7 +411,7 @@
                         
                         <!-- Per Hour -->
                         {% if 'hour' in boarding_pricing and boarding_pricing['hour'] is mapping %}
-                          <div class="mb-3 p-3 bg-indigo-50/40 rounded-lg">
+                          <div class="mb-3 p-3 bg-indigo-50/40 rounded-[20px]">
                             <p class="text-xs font-semibold text-indigo-700 mb-2">Per Hour</p>
                             <div class="grid grid-cols-2 gap-2 text-xs">
                               {% for size, price in boarding_pricing['hour'].items() %}
@@ -425,7 +425,7 @@
                         
                         <!-- Per Night -->
                         {% if 'night' in boarding_pricing and boarding_pricing['night'] is mapping %}
-                          <div class="p-3 bg-indigo-50/40 rounded-lg">
+                          <div class="p-3 bg-indigo-50/40 rounded-[20px]">
                             <p class="text-xs font-semibold text-indigo-700 mb-2">Per Night</p>
                             <div class="grid grid-cols-2 gap-2 text-xs">
                               {% for size, price in boarding_pricing['night'].items() %}
@@ -463,7 +463,7 @@
                         
                         <!-- Full Day -->
                         {% if 'fullday' in daycare_pricing and daycare_pricing['fullday'] is mapping %}
-                          <div class="mb-3 p-3 bg-amber-50/40 rounded-lg">
+                          <div class="mb-3 p-3 bg-amber-50/40 rounded-[20px]">
                             <p class="text-xs font-semibold text-amber-700 mb-2">Full Day</p>
                             <div class="grid grid-cols-2 gap-2 text-xs">
                               {% for size, price in daycare_pricing['fullday'].items() %}
@@ -484,7 +484,7 @@
                         
                         <!-- Half Day -->
                         {% if 'halfday' in daycare_pricing and daycare_pricing['halfday'] is mapping %}
-                          <div class="p-3 bg-amber-50/40 rounded-lg">
+                          <div class="p-3 bg-amber-50/40 rounded-[20px]">
                             <p class="text-xs font-semibold text-amber-700 mb-2">Half Day</p>
                             <div class="grid grid-cols-2 gap-2 text-xs">
                               {% for size, price in daycare_pricing['halfday'].items() %}
@@ -582,6 +582,33 @@
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  [data-card="true"] {
+    border-radius: 28px !important;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06) !important;
+  }
+
+  /* Enforce rounded corners on all buttons */
+  button, 
+  a[class*="btn"], 
+  a[class*="button"],
+  a[class*="bg-gradient"],
+  input[type="button"],
+  input[type="submit"],
+  .rounded-lg {
+    border-radius: 12px !important;
+  }
+
+  /* Make all icons purple by default */
+  i {
+    color: #a855f7 !important;
+  }
+
+  /* Keep icons inside white text elements white for contrast */
+  .text-white i {
+    color: white !important;
   }
 
   /* ==========================================
@@ -941,6 +968,7 @@
       width: 32px;
       height: 32px;
     }
+  }
 
   /* Leaflet Map Styles */
   #storeMap {

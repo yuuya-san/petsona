@@ -42,7 +42,7 @@
 ================================ */
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   margin-bottom: 2.5rem;
 }
@@ -110,6 +110,25 @@
 .metric-icon.rating {
   background: #f3f4f6;
   color: #8b5cf6;
+}
+
+.metric-icon.overview {
+  background: #f3f4f6;
+  color: #6366f1;
+}
+
+.metric-icon.revenue {
+  background: #f3f4f6;
+  color: #f97316;
+}
+
+.metric-change.overview {
+  display: grid;
+  gap: 0.5rem;
+  color: #4b5563;
+  margin-top: 1rem;
+  padding-top: 0;
+  border-top: none;
 }
 
 .metric-label {
@@ -336,57 +355,6 @@
 }
 
 /* ================================
-   TWO COLUMN LAYOUT
-================================ */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
-  margin-bottom: 2.5rem;
-}
-
-/* ================================
-   STATS BOX
-================================ */
-.stats-box {
-  background: white;
-  border-radius: 18px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.stats-box h4 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1f2937;
-  margin-bottom: 1.5rem;
-}
-
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 0;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.stat-item:last-child {
-  border-bottom: none;
-}
-
-.stat-label {
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.stat-value {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: #1f2937;
-}
-
-/* ================================
    RESPONSIVE
 ================================ */
 @media (max-width: 1024px) {
@@ -593,117 +561,125 @@
         </div>
       </div>
 
+      <!-- Monthly Revenue -->
+      <div class="metric-card">
+        <div class="metric-icon revenue">
+          <lord-icon
+              src="https://cdn.lordicon.com/vciwwbwo.json"
+              trigger="morph"
+              stroke="bold"
+              state="morph-coins"
+              style="width:50px;height:50px">
+          </lord-icon>
+        </div>
+        <div class="metric-label">This Month Revenue</div>
+        <div class="metric-value">
+          <span>₱{{ "%.2f"|format(monthly_revenue) }}</span>
+        </div>
+        <div class="metric-change positive">
+          <i class="fas fa-arrow-up"></i> Based on completed bookings
+        </div>
+      </div>
+
+      <!-- Monthly Overview Card -->
+      <div class="metric-card">
+        <div class="metric-icon overview">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="metric-label">Monthly Overview</div>
+        <div class="metric-value">
+          <span>{{ total_bookings }} bookings</span>
+        </div>
+        <div class="metric-change overview">
+          <div><strong>Pending:</strong> {{ pending_count }}</div>
+          <div><strong>Confirmed:</strong> {{ approved_count }}</div>
+          <div><strong>Completion Rate:</strong> {{ completion_rate }}%</div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Main Grid: Bookings + Quick Stats -->
-    <div class="dashboard-grid">
-      <!-- Recent Bookings -->
-      <div class="bookings-section">
-        <div class="section-title">
-          <i class="fas fa-calendar-check"></i>
-          Recent Bookings
-        </div>
+    <!-- Recent Bookings -->
+    <div class="bookings-section">
+      <div class="section-title">
+        <i class="fas fa-calendar-check"></i>
+        Recent Bookings
+      </div>
 
-        {% if recent_bookings %}
-        <div class="table-wrapper">
-          <table class="bookings-table">
-            <thead>
-              <tr>
-                <th>Booking ID</th>
-                <th>Customer</th>
-                <th>Date & Time</th>
-                <th>Status</th>
-                <th>Amount</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for booking in recent_bookings %}
-              <tr>
-                <td data-label="Booking ID"><span class="booking-id">#{{ booking.booking_number }}</span></td>
-                <td data-label="Customer"><span class="customer-name">{{ booking.user.first_name }} {{ booking.user.last_name }}</span></td>
-                <td data-label="Date & Time"><span class="booking-date">{{ booking.appointment_date.strftime('%b %d, %Y') }}<br>
-                {% if booking.appointment_time %}
-                  {% set time_parts = booking.appointment_time.split(':') if booking.appointment_time is string else none %}
-                  {% if time_parts and time_parts|length >= 2 %}
-                    {% set hour = time_parts[0]|int %}
-                    {% set minute = time_parts[1] %}
-                    {% if hour >= 12 %}{% if hour > 12 %}{{ hour - 12 }}{% else %}{{ hour }}{% endif %}:{{ minute }} PM{% else %}{% if hour == 0 %}12{% else %}{{ hour }}{% endif %}:{{ minute }} AM{% endif %}
-                  {% elif booking.appointment_time.strftime %}
-                    {{ booking.appointment_time.strftime('%I:%M %p') }}
-                  {% else %}
-                    {{ booking.appointment_time }}
-                  {% endif %}
+      {% if recent_bookings %}
+      <div class="table-wrapper">
+        <table class="bookings-table">
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>Customer</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+              <th>Amount</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in recent_bookings %}
+            <tr>
+              <td data-label="Booking ID"><span class="booking-id">#{{ booking.booking_number }}</span></td>
+              <td data-label="Customer"><span class="customer-name">{{ booking.user.first_name }} {{ booking.user.last_name }}</span></td>
+              <td data-label="Date & Time"><span class="booking-date">{{ booking.appointment_date.strftime('%b %d, %Y') }}<br>
+              {% if booking.appointment_time %}
+                {% set time_parts = booking.appointment_time.split(':') if booking.appointment_time is string else none %}
+                {% if time_parts and time_parts|length >= 2 %}
+                  {% set hour = time_parts[0]|int %}
+                  {% set minute = time_parts[1] %}
+                  {% if hour >= 12 %}{% if hour > 12 %}{{ hour - 12 }}{% else %}{{ hour }}{% endif %}:{{ minute }} PM{% else %}{% if hour == 0 %}12{% else %}{{ hour }}{% endif %}:{{ minute }} AM{% endif %}
+                {% elif booking.appointment_time.strftime %}
+                  {{ booking.appointment_time.strftime('%I:%M %p') }}
                 {% else %}
-                  N/A
+                  {{ booking.appointment_time }}
                 {% endif %}
-                </span></td>
-                <td data-label="Status">
-                  <span class="status-badge status-{{ booking.status }}">
-                    {% if booking.status == 'pending' %}
-                      <i class="fas fa-clock"></i> Pending
-                    {% elif booking.status == 'confirmed' %}
-                      <i class="fas fa-check"></i> Confirmed
-                    {% elif booking.status == 'completed' %}
-                      <i class="fas fa-check-double"></i> Completed
-                    {% elif booking.status == 'rejected' %}
-                      <i class="fas fa-times"></i> Rejected
-                    {% elif booking.status == 'cancelled' %}
-                      <i class="fas fa-times"></i> Cancelled
-                    {% elif booking.status == 'no-show' %}
-                      <i class="fas fa-ban"></i> No Show
-                    {% else %}
-                      {{ booking.status | capitalize }}
-                    {% endif %}
-                  </span>
-                </td>
-                <td data-label="Amount">
-                  <span class="booking-amount">₱{{ "%.2f"|format(booking.total_amount) }}</span>
-                </td>
-                <td data-label="Action">
-                  <div class="action-buttons">
-                    <a href="{{ url_for('merchant.bookings_list') }}" class="action-btn view" title="View Details">
-                      <i class="fas fa-eye"></i>
-                    </a>
-                  </div>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        {% else %}
-        <div class="empty-state">
-          <div class="empty-state-icon">📅</div>
-          <div class="empty-state-text">No bookings yet</div>
-        </div>
-        {% endif %}
+              {% else %}
+                N/A
+              {% endif %}
+              </span></td>
+              <td data-label="Status">
+                <span class="status-badge status-{{ booking.status }}">
+                  {% if booking.status == 'pending' %}
+                    <i class="fas fa-clock"></i> Pending
+                  {% elif booking.status == 'confirmed' %}
+                    <i class="fas fa-check"></i> Confirmed
+                  {% elif booking.status == 'completed' %}
+                    <i class="fas fa-check-double"></i> Completed
+                  {% elif booking.status == 'rejected' %}
+                    <i class="fas fa-times"></i> Rejected
+                  {% elif booking.status == 'cancelled' %}
+                    <i class="fas fa-times"></i> Cancelled
+                  {% elif booking.status == 'no-show' %}
+                    <i class="fas fa-ban"></i> No Show
+                  {% else %}
+                    {{ booking.status | capitalize }}
+                  {% endif %}
+                </span>
+              </td>
+              <td data-label="Amount">
+                <span class="booking-amount">₱{{ "%.2f"|format(booking.total_amount) }}</span>
+              </td>
+              <td data-label="Action">
+                <div class="action-buttons">
+                  <a href="{{ url_for('merchant.bookings_list') }}" class="action-btn view" title="View Details">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-
-      <!-- Quick Stats Sidebar -->
-      <div class="stats-box">
-        <h4>Monthly Overview</h4>
-        
-        <div class="stat-item">
-          <span class="stat-label">Total Bookings</span>
-          <span class="stat-value">{{ total_bookings }}</span>
-        </div>
-
-        <div class="stat-item">
-          <span class="stat-label">Pending</span>
-          <span class="stat-value">{{ pending_count }}</span>
-        </div>
-
-        <div class="stat-item">
-          <span class="stat-label">Confirmed</span>
-          <span class="stat-value">{{ approved_count }}</span>
-        </div>
-
-        <div class="stat-item">
-          <span class="stat-label">Completion Rate</span>
-          <span class="stat-value">{{ completion_rate }}%</span>
-        </div>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">📅</div>
+        <div class="empty-state-text">No bookings yet</div>
       </div>
+      {% endif %}
     </div>
 
   </div>

@@ -106,6 +106,15 @@ def dashboard():
     
     # Calculate completion rate as percentage of completed vs total bookings
     completion_rate = round((total_completed / total_bookings * 100) if total_bookings > 0 else 0)
+
+    # Calculate estimated monthly revenue from completed bookings in the current month
+    now = datetime.now()
+    monthly_revenue = db.session.query(func.sum(Booking.total_amount)).filter(
+        Booking.merchant_id == merchant.id,
+        Booking.status == 'completed',
+        func.extract('year', Booking.appointment_date) == now.year,
+        func.extract('month', Booking.appointment_date) == now.month
+    ).scalar() or 0.0
     
     # Retrieve top 3 active pet species by popularity
     top_species = Species.query.filter(
@@ -123,6 +132,7 @@ def dashboard():
         completed_count=total_completed,
         no_show_count=total_no_show,
         completion_rate=completion_rate,
+        monthly_revenue=monthly_revenue,
         recent_bookings=recent_bookings
     )
 
