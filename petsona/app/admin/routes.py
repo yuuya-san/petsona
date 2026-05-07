@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, abort, jsonify # pyright: ignore[reportMissingImports]
+from flask import render_template, flash, redirect, url_for, abort, jsonify, make_response # pyright: ignore[reportMissingImports]
 from flask_login import login_required, current_user # pyright: ignore[reportMissingImports]
 from app.admin import bp
 from flask import request # pyright: ignore[reportMissingImports]
@@ -11,10 +11,13 @@ from app.extensions import limiter, csrf
 from app.models import User, AuditLog, Merchant
 from app.models.notification import Notification
 from app import db
-from sqlalchemy import func # pyright: ignore[reportMissingImports]
+from sqlalchemy import func, or_, cast # pyright: ignore[reportMissingImports]
 import random
 from app.auth.emails import send_temp_credentials
 from app.utils.audit import log_event, user_snapshot
+import csv
+import json
+from io import StringIO
 from datetime import datetime
 from pytz import timezone, UTC # pyright: ignore[reportMissingModuleSource]
 from app.utils.activity_formatter import format_activity
@@ -29,6 +32,14 @@ PH_TZ = pytz.timezone('Asia/Manila')
 def get_ph_datetime():
     """Get current datetime in Philippine timezone"""
     return datetime.now(PH_TZ)
+
+
+def to_ph_time(dt):
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        dt = UTC.localize(dt)
+    return dt.astimezone(PH_TZ)
 
 # Default avatars
 DEFAULT_AVATARS = [
@@ -337,12 +348,81 @@ def audit_logs():
         .paginate(page=page, per_page=per_page, error_out=False)
     )
 
+    for log in pagination.items:
+        log.ph_timestamp = to_ph_time(log.timestamp)
+
     return render_template(
         "admin/audit_logs.html",
         logs=pagination.items,
         pagination=pagination,
         page_title="Audit Logs"
     )
+
+@bp.route("/audit_logs/export")
+@login_required
+@admin_required
+def export_audit_logs():
+    """Export visible audit logs to a CSV file for Excel."""
+    if current_user.role != "admin":
+        flash("Access denied.", "danger")
+        return redirect(url_for("admin.audit_logs"))
+
+    search = request.args.get("search", "", type=str).strip()
+    start_date = request.args.get("start_date", type=str)
+    end_date = request.args.get("end_date", type=str)
+
+    query = AuditLog.query.filter_by(deleted_at=None)
+
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            or_(
+                AuditLog.event.ilike(search_term),
+                AuditLog.actor_email.ilike(search_term),
+                cast(AuditLog.actor_id, db.String).ilike(search_term),
+            )
+        )
+
+    if start_date:
+        try:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            query = query.filter(AuditLog.timestamp >= start)
+        except ValueError:
+            pass
+
+    if end_date:
+        try:
+            end = datetime.strptime(end_date, "%Y-%m-%d")
+            query = query.filter(AuditLog.timestamp <= end)
+        except ValueError:
+            pass
+
+    logs = query.order_by(AuditLog.timestamp.desc()).all()
+
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["ID", "Event", "Actor", "Timestamp", "IP Address", "User Agent", "Details"])
+
+    for log in logs:
+        actor = log.actor_email if log.actor_email else (f"User #{log.actor_id}" if log.actor_id else "System")
+        details = log.get_details()
+        if isinstance(details, dict):
+            details = json.dumps(details, ensure_ascii=False)
+        csv_timestamp = to_ph_time(log.timestamp)
+        writer.writerow([
+            log.id,
+            log.event,
+            actor,
+            csv_timestamp.strftime("%Y-%m-%d %H:%M:%S") if csv_timestamp else "",
+            log.ip_address or "",
+            log.user_agent or "",
+            details or ""
+        ])
+
+    response = make_response(output.getvalue())
+    response.headers["Content-Disposition"] = "attachment; filename=audit_logs.csv"
+    response.headers["Content-Type"] = "text/csv; charset=utf-8"
+    return response
 
 @bp.route("/audit_logs/delete/<int:log_id>", methods=["POST"])
 @login_required

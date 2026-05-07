@@ -53,13 +53,13 @@
     align-items: center;
     justify-content: center;
     font-size: 24px;
-    color: white;
+    color: #666;
     flex-shrink: 0;
   }
 
-  .petsona-mh-stat-icon.total { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-  .petsona-mh-stat-icon.average { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
-  .petsona-mh-stat-icon.best { background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); }
+  .petsona-mh-stat-icon.total { background: #f5f5f5; }
+  .petsona-mh-stat-icon.average { background: #f5f5f5; }
+  .petsona-mh-stat-icon.best { background: #f5f5f5; }
 
   .petsona-mh-stat-content {
     flex: 1;
@@ -83,13 +83,14 @@
   .petsona-mh-history-section {
     width: 100%;
     min-height: 100vh;
-    background: linear-gradient(135deg, rgba(249, 250, 251, 0.8) 0%, rgba(243, 244, 246, 0.6) 100%);
+    background: transparent;
   }
 
   .petsona-mh-history-container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 24px;
+    padding-top: 40px;
   }
 
   .petsona-mh-page-header {
@@ -133,13 +134,7 @@
     width: 100%;
   }
 
-  @media (max-width: 1024px) {
-    .petsona-mh-stats-container {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .petsona-mh-stats-container {
       grid-template-columns: 1fr;
     }
@@ -883,7 +878,11 @@
     <div class="petsona-mh-stats-container">
       <div class="petsona-mh-stat-card">
         <div class="petsona-mh-stat-icon total">
-          <i class="fa-solid fa-chart-simple"></i>
+          <lord-icon
+              src="https://cdn.lordicon.com/noncoqhc.json"
+              trigger="hover"
+              style="width:50px;height:50px">
+          </lord-icon>
         </div>
         <div class="petsona-mh-stat-content">
           <p class="petsona-mh-stat-label">Total Quizzes</p>
@@ -893,7 +892,12 @@
       
       <div class="petsona-mh-stat-card">
         <div class="petsona-mh-stat-icon average">
-          <i class="fa-solid fa-square-poll-vertical"></i>
+          <lord-icon
+              src="https://cdn.lordicon.com/utdckhgo.json"
+              trigger="morph"
+              state="morph-diversified"
+              style="width:50px;height:50px">
+          </lord-icon>
         </div>
         <div class="petsona-mh-stat-content">
           <p class="petsona-mh-stat-label">Average Score</p>
@@ -903,7 +907,12 @@
       
       <div class="petsona-mh-stat-card">
         <div class="petsona-mh-stat-icon best">
-          <i class="fa-solid fa-trophy"></i>
+          <lord-icon
+              src="https://cdn.lordicon.com/aapkxxza.json"
+              trigger="hover"
+              state="hover-enlarge"
+              style="width:50px;height:50px">
+          </lord-icon>
         </div>
         <div class="petsona-mh-stat-content">
           <p class="petsona-mh-stat-label">Best Match</p>
@@ -1007,6 +1016,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>

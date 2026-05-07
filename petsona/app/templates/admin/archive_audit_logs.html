@@ -33,20 +33,33 @@
   }
 
   .users-section {
-    background: linear-gradient(135deg, #f8f7ff 0%, #fafbfc 100%);
-    min-height: 100vh;
-    padding: 2rem 1rem;
+    background: none;
+    min-height: auto;
+    padding: 2rem 0 1rem;
+    overflow-x: hidden;
   }
   .users-container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: 95vw;
     margin: 0 auto;
-    padding: 0;
+    padding: 0 1rem;
+    box-sizing: border-box;
   }
   .page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .page-header .header-left {
+    min-width: 0;
+  }
+  .page-header .header-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     gap: 1rem;
     flex-wrap: wrap;
   }
@@ -428,6 +441,31 @@
     transition: all 0.3s ease;
   }
 
+  .modal-content.delete-modal,
+  .modal-content.view-modal {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+      0 12px 48px rgba(168, 85, 247, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    border-radius: 1rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+  }
+
+  .modal-content.delete-modal .modal-body,
+  .modal-content.view-modal .modal-body {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 1.5rem;
+  }
+
   .delete-modal .modal-body {
     padding: 1.5rem;
   }
@@ -538,19 +576,29 @@
     flex-shrink: 0;
   }
 
-  .delete-modal .modal-footer {
+  .delete-modal .modal-footer,
+  .view-modal .modal-footer {
     padding: 1rem 1.5rem;
     border-top: 1px solid rgba(168, 85, 247, 0.15);
     background: rgba(168, 85, 247, 0.02);
     display: flex;
     gap: 0.75rem;
     justify-content: flex-end;
+    flex-wrap: nowrap;
   }
 
-  .delete-modal .modal-footer form {
+  .delete-modal .modal-footer form,
+  .view-modal .modal-footer form {
     display: flex;
     gap: 0.75rem;
     align-items: center;
+  }
+
+  .modal-footer .btn {
+    min-width: 140px;
+    width: 150px;
+    justify-content: center;
+    text-align: center;
   }
 
   .btn {

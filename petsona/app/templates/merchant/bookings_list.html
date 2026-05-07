@@ -309,15 +309,18 @@
     justify-content: center;
     font-size: 24px;
     color: white;
+    background: #f3f4f6;
   }
 
-  .stat-icon.total { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-  .stat-icon.pending { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-  .stat-icon.cancelled { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
-  .stat-icon.confirmed { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-  .stat-icon.completed { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-  .stat-icon.rejected { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
-  .stat-icon.noshow { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); }
+  .stat-icon.total,
+  .stat-icon.pending,
+  .stat-icon.cancelled,
+  .stat-icon.confirmed,
+  .stat-icon.completed,
+  .stat-icon.rejected,
+  .stat-icon.noshow {
+    background: #f3f4f6;
+  }
 
   .stat-content {
     flex: 1;
@@ -509,7 +512,13 @@
     <div class="stats-container">
       <div class="stat-card">
         <div class="stat-icon pending">
-          <i class="fas fa-hourglass-half"></i>
+          <lord-icon
+              src="https://cdn.lordicon.com/twpfmtiv.json"
+              trigger="hover"
+              stroke="bold"
+              state="hover-oscillate"
+              style="width:50px;height:50px">
+          </lord-icon>
         </div>
         <div class="stat-content">
           <div class="stat-label">Pending</div>
@@ -519,7 +528,13 @@
       
       <div class="stat-card">
         <div class="stat-icon cancelled">
-          <i class="fas fa-times-circle"></i>
+          <lord-icon
+              src="https://cdn.lordicon.com/gdfrsvpt.json"
+              trigger="hover"
+              stroke="bold"
+              state="hover-oscillate"
+              style="width:50px;height:50px">
+          </lord-icon>
         </div>
         <div class="stat-content">
           <div class="stat-label">Cancelled</div>
@@ -529,7 +544,12 @@
       
       <div class="stat-card">
         <div class="stat-icon rejected">
-          <i class="fas fa-ban"></i>
+          <lord-icon
+              src="https://cdn.lordicon.com/uziyiqqa.json"
+              trigger="hover"
+              stroke="bold"
+              style="width:50px;height:50px">
+          </lord-icon>
         </div>
         <div class="stat-content">
           <div class="stat-label">Rejected</div>
@@ -539,31 +559,47 @@
       
       <div class="stat-card">
         <div class="stat-icon confirmed">
-          <i class="fas fa-check-circle"></i>
+          <lord-icon
+              src="https://cdn.lordicon.com/wbwvtzuo.json"
+              trigger="hover"
+              state="hover-loading"
+              stroke="bold"
+              style="width:50px;height:50px">
+          </lord-icon>
         </div>
         <div class="stat-content">
           <div class="stat-label">Confirmed</div>
           <div class="stat-number">{{ total_confirmed }}</div>
         </div>
       </div>
-      
-      <div class="stat-card">
-        <div class="stat-icon completed">
-          <i class="fas fa-check-double"></i>
-        </div>
-        <div class="stat-content">
-          <div class="stat-label">Completed</div>
-          <div class="stat-number">{{ total_completed }}</div>
-        </div>
-      </div>
-      
+
       <div class="stat-card">
         <div class="stat-icon noshow">
-          <i class="fas fa-exclamation-circle"></i>
+          <lord-icon
+              src="https://cdn.lordicon.com/gdfrsvpt.json"
+              trigger="hover"
+              stroke="bold"
+              style="width:50px;height:50px">
+          </lord-icon>
         </div>
         <div class="stat-content">
           <div class="stat-label">No Show</div>
           <div class="stat-number">{{ total_no_show }}</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon completed">
+          <lord-icon
+              src="https://cdn.lordicon.com/wbwvtzuo.json"
+              trigger="hover"
+              stroke="bold"
+              style="width:50px;height:50px">
+          </lord-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Completed</div>
+          <div class="stat-number">{{ total_completed }}</div>
         </div>
       </div>
     </div>
@@ -1182,6 +1218,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
 <script>
   // Convert 24-hour time to 12-hour format with AM/PM
   function formatTime12Hour(time) {

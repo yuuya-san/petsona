@@ -4,12 +4,13 @@
 <style>
   /* --- Copied from users.html for design and responsiveness --- */
   .users-section {
-    background: linear-gradient(135deg, #f8f7ff 0%, #fafbfc 100%);
+    background: transparent;
     min-height: 100vh;
     padding: 2rem 1rem;
   }
   .users-container {
-    max-width: 1200px;
+    width: 95vw;
+    max-width: 100%;
     margin: 0 auto;
     padding: 0;
   }
@@ -276,6 +277,71 @@
     margin-bottom: 1rem;
     opacity: 0.5;
   }
+
+  /* Modal Responsive Styling */
+  .modal-dialog {
+    max-width: 480px;
+    width: 95vw;
+    height: 85vh !important;
+    display: flex;
+    align-items: center;
+  }
+
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 85vh;
+  }
+
+  .modal-header,
+  .modal-footer {
+    flex: 0 0 auto;
+  }
+
+  .modal-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid rgba(168, 85, 247, 0.1);
+  }
+
+  .modal-footer form {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .modal-footer .btn {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    text-align: center;
+    justify-content: center;
+    min-height: 44px;
+    font-weight: 600;
+  }
+
+  .modal-footer .btn-cancel {
+    flex: 1;
+  }
+
+  .modal-footer .btn-success {
+    flex: 1;
+  }
+  @media (max-width: 480px) {
+    .modal-dialog {
+      width: 95vw;
+      margin: 1rem auto;
+    }
+  }
+
   @media (max-width: 768px) {
     .search-filter-card {
       padding: 1.5rem;

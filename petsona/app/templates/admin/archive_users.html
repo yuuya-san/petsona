@@ -4,14 +4,30 @@
 <style>
   /* --- Copied from users.html for design and responsiveness --- */
   .users-section {
-    background: linear-gradient(135deg, #f8f7ff 0%, #fafbfc 100%);
     min-height: 100vh;
-    padding: 2rem 1rem;
+    padding: 2.5rem 0.75rem;
+    background: transparent;
   }
+
   .users-container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 0;
+    padding: 0 1.25rem;
+    box-sizing: border-box;
+  }
+
+  .users-card {
+    width: 100%;
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    box-sizing: border-box;
   }
   .page-header {
     display: flex;
@@ -53,10 +69,39 @@
   .users-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
   }
   .users-table thead {
     background: rgba(168, 85, 247, 0.08);
     border-bottom: 1px solid rgba(168, 85, 247, 0.15);
+  }
+  .users-table th,
+  .users-table td {
+    min-width: 0;
+  }
+  .users-table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .users-table td a {
+    display: inline-block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .td-name {
+    width: 25%;
+  }
+  .td-email {
+    width: 30%;
+  }
+  .td-role {
+    width: 20%;
+  }
+  .td-actions {
+    width: 15%;
   }
   .users-table th {
     padding: 1rem;
@@ -253,6 +298,132 @@
     margin-bottom: 1rem;
     opacity: 0.5;
   }
+
+  @media (max-width: 1024px) {
+    .users-section {
+      padding: 1rem 0.5rem;
+    }
+
+    .users-container {
+      width: 100%;
+      max-width: 100%;
+      padding: 0;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .users-card,
+    .table-container,
+    .search-filter-card {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .users-table th,
+    .users-table td {
+      padding: 0.75rem 0.65rem;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      white-space: normal;
+      min-width: 0;
+    }
+
+    .users-table td a {
+      white-space: normal;
+    }
+
+    .users-table th {
+      font-size: 0.78rem;
+    }
+
+    .users-table td {
+      font-size: 0.8rem;
+    }
+
+    .role-badge {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+    }
+
+    .btn {
+      font-size: 0.85rem;
+    }
+  }
+
+  /* Responsive modal fit under 100vh */
+  .modal-dialog {
+    max-width: 480px;
+    width: 100%;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+  .modal-content {
+    max-height: calc(100vh - 2rem);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .modal-body {
+    overflow-y: auto;
+    max-height: calc(100vh - 16rem);
+  }
+  .modal-footer {
+    flex-shrink: 0;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .modal-footer .btn {
+    min-width: 120px;
+    font-size: 0.82rem;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .modal-footer .btn span {
+    width: 100%;
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .modal-dialog {
+      max-width: calc(100% - 1rem);
+      margin: 0.5rem auto;
+    }
+
+    .modal-content {
+      max-height: calc(100vh - 1rem);
+      border-radius: 1.5rem;
+    }
+
+    .modal-header {
+      padding: 1rem;
+    }
+
+    .modal-body {
+      padding: 1rem;
+      max-height: calc(100vh - 14rem);
+    }
+
+    .modal-footer {
+      padding: 1rem;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .modal-footer .btn {
+      width: 100%;
+    }
+  }
+
   @media (max-width: 768px) {
     .search-filter-card {
       padding: 1.5rem;

@@ -3,15 +3,37 @@
 
 <style>
   .users-section {
-    background: linear-gradient(135deg, #f8f7ff 0%, #fafbfc 100%);
     min-height: 100vh;
-    padding: 2rem 1rem;
+    padding: 2.5rem 0.75rem;
+    background: transparent;
   }
 
   .users-container {
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 0;
+    padding: 0 1.25rem;
+    box-sizing: border-box;
+  }
+
+  .users-card {
+    width: 100%;
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    box-sizing: border-box;
+  }
+
+  .users-table {
+    width: 100%;
+    min-width: 0;
+    border-collapse: collapse;
+    table-layout: fixed;
   }
 
   .page-header {
@@ -91,7 +113,13 @@
   .users-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
   }
+
+  .users-table th:nth-child(1) { width: 28%; }
+  .users-table th:nth-child(2) { width: 38%; }
+  .users-table th:nth-child(3) { width: 18%; }
+  .users-table th:nth-child(4) { width: 16%; }
 
   .users-table thead {
     background: rgba(168, 85, 247, 0.08);
@@ -392,7 +420,63 @@
     opacity: 0.5;
   }
 
+  @media (max-width: 1024px) {
+    .users-container {
+      padding: 0 1rem;
+    }
+
+    .users-table {
+      table-layout: fixed;
+      font-size: 0.82rem;
+    }
+
+    .users-table th,
+    .users-table td {
+      padding: 0.75rem 0.65rem;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      white-space: normal;
+      min-width: 0;
+    }
+
+    .users-table th {
+      font-size: 0.78rem;
+    }
+
+    .users-table td {
+      font-size: 0.8rem;
+    }
+
+    .role-badge {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+    }
+
+    .action-btn {
+      width: 1.75rem;
+      height: 1.75rem;
+      font-size: 0.75rem;
+    }
+
+    .pagination-info {
+      font-size: 0.82rem;
+    }
+
+    .pagination-btn {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+
   @media (max-width: 768px) {
+    .users-section {
+      padding: 1rem 0.25rem;
+    }
+
+    .users-container {
+      padding: 0;
+    }
+
     .search-filter-card {
       padding: 1.5rem;
       margin-bottom: 1.5rem;
@@ -430,6 +514,64 @@
   /* Hide rows that don't match search */
   .user-row[style*="display: none"] {
     display: none !important;
+  }
+
+  /* Modal Styles from Merchant Applications */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .modal-content-wrapper {
+    background: white;
+    border-radius: 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 1px rgba(168, 85, 247, 0.2);
+    max-width: 480px;
+    width: min(95vw, 480px);
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    animation: slideDown 0.4s ease-out;
+    box-sizing: border-box;
+  }
+
+  /* Modal Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slideDown {
+    animation: slideDown 0.4s ease-out;
   }
 
   /* Delete Modal Glassmorphism */
@@ -491,6 +633,8 @@
 
   .modal-body {
     padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
   }
 
   .modal-description {
@@ -543,15 +687,55 @@
   }
 
   .modal-footer {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: nowrap;
     border-top: 1px solid rgba(168, 85, 247, 0.15);
     padding: 1.5rem;
     background: rgba(168, 85, 247, 0.02);
+    overflow-x: auto;
   }
 
   .modal-footer form {
     display: flex;
     gap: 0.75rem;
     justify-content: flex-end;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .modal-footer .btn {
+    flex: 1 1 140px;
+    min-width: 110px;
+    max-width: 220px;
+    height: 48px;
+    padding: 0 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .modal-footer .btn-label,
+  .modal-footer .btn svg,
+  .modal-footer .btn i {
+    display: inline-flex;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .btn--compact {
+    font-size: 0.82rem !important;
+    padding: 0.45rem 0.85rem !important;
   }
 
   .btn {
@@ -622,7 +806,6 @@
   }
 
   .view-modal .modal-body {
-    max-height: 50vh;
     overflow-y: auto;
     padding: 1.25rem;
   }
@@ -673,6 +856,14 @@
   }
 
   @media (max-width: 640px) {
+    .users-section {
+      padding: 0.5rem 0.25rem;
+    }
+
+    .users-container {
+      padding: 0;
+    }
+
     .page-header {
       flex-direction: column;
       align-items: flex-start;
@@ -710,6 +901,41 @@
 
     .pagination-controls {
       justify-content: center;
+    }
+
+    /* Modal Responsiveness */
+    .modal-content-wrapper {
+      max-width: 95vw;
+      margin: 1rem;
+      border-radius: 1.5rem;
+    }
+
+    .modal-header {
+      padding: 1rem;
+    }
+
+    .modal-title {
+      font-size: 1.125rem;
+    }
+
+    .modal-body {
+      padding: 1rem;
+    }
+
+    .modal-footer {
+      padding: 1rem;
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+      overflow-x: auto;
+    }
+
+    .modal-footer form {
+      flex-wrap: nowrap;
+    }
+
+    .modal-footer .btn {
+      min-width: 120px;
+      flex: 1 1 140px;
     }
   }
 </style>
@@ -815,8 +1041,7 @@
                     <button type="button"
                             class="action-btn view"
                             title="View"
-                            data-toggle="modal"
-                            data-target="#viewUserModal"
+                            onclick="openViewModal(this)"
                             data-user-id="USER-{{ user.created_at.year }}-{{ user.id }}"
                             data-user-name="{{ (user.first_name ~ ' ' ~ user.last_name).strip() or '(No Name)' }}"
                             data-user-email="{{ user.email }}"
@@ -834,8 +1059,7 @@
                     <button type="button"
                             class="action-btn delete"
                             title="Delete"
-                            data-toggle="modal"
-                            data-target="#deleteUserModal"
+                            onclick="openDeleteModal(this)"
                             data-user-id="{{ user.id }}"
                             data-user-name="{{ (user.first_name ~ ' ' ~ user.last_name).strip() or '(No Name)' }}"
                             data-user-email="{{ user.email }}"
@@ -896,121 +1120,117 @@
 </section>
 
 <!-- View Modal -->
-<div class="modal fade" id="viewUserModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered delete-modal-dialog">
-    <div class="modal-content view-modal">
-      
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="fas fa-user-circle"></i>
-          User Details
-        </h5>
-        <button type="button" class="modal-close" data-dismiss="modal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
+<div class="modal-overlay" id="viewUserModal" style="display: none;">
+  <div class="modal-content-wrapper view-modal">
+    
+    <div class="modal-header">
+      <h5 class="modal-title">
+        <i class="fas fa-user-circle"></i>
+        User Details
+      </h5>
+      <button type="button" class="modal-close" onclick="closeModal('viewUserModal')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
 
-      <div class="modal-body">
-        <div class="user-preview">
-          <div class="preview-item">
-            <span class="preview-label">ID</span>
-            <span id="viewUserId" class="preview-value"><span id="viewUserIdNum"></span></span>
-          </div>
-          <div class="preview-item">
-            <span class="preview-label">Full Name</span>
-            <span id="viewUserFullName" class="preview-value"></span>
-          </div>
-          <div class="preview-item">
-            <span class="preview-label">Email</span>
-            <span id="viewUserEmail" class="preview-value"></span>
-          </div>
-          <div class="preview-item">
-            <span class="preview-label">Role</span>
-            <span id="viewUserRole" class="preview-value"></span>
-          </div>
-          <div class="preview-item">
-            <span class="preview-label">Joined</span>
-            <span id="viewUserCreated" class="preview-value"></span>
-          </div>
+    <div class="modal-body">
+      <div class="user-preview">
+        <div class="preview-item">
+          <span class="preview-label">ID</span>
+          <span id="viewUserId" class="preview-value"><span id="viewUserIdNum"></span></span>
+        </div>
+        <div class="preview-item">
+          <span class="preview-label">Full Name</span>
+          <span id="viewUserFullName" class="preview-value"></span>
+        </div>
+        <div class="preview-item">
+          <span class="preview-label">Email</span>
+          <span id="viewUserEmail" class="preview-value"></span>
+        </div>
+        <div class="preview-item">
+          <span class="preview-label">Role</span>
+          <span id="viewUserRole" class="preview-value"></span>
+        </div>
+        <div class="preview-item">
+          <span class="preview-label">Joined</span>
+          <span id="viewUserCreated" class="preview-value"></span>
         </div>
       </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-cancel" data-dismiss="modal">
-          Close
-        </button>
-        <a id="viewUserEditBtn" href="#" class="btn btn-cancel" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none;">
-          <i class="fas fa-edit"></i>
-          Edit User
-        </a>
-      </div>
-
     </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-cancel" onclick="closeModal('viewUserModal')" data-full-label="Close" data-short-label="Close">
+        <span class="btn-label">Close</span>
+      </button>
+      <a id="viewUserEditBtn" href="#" class="btn btn-cancel" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none;" data-full-label="Edit User" data-short-label="Edit">
+        <i class="fas fa-edit"></i>
+        <span class="btn-label">Edit User</span>
+      </a>
+    </div>
+
   </div>
 </div>
 
 <!-- Delete Modal -->
-<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered delete-modal-dialog">
-    <div class="modal-content delete-modal">
-      
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="fas fa-exclamation-triangle"></i>
-          Delete User
-        </h5>
-        <button type="button" class="modal-close" data-dismiss="modal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <div class="modal-body">
-        <p class="modal-description">
-          You are about to permanently delete this user:
-        </p>
-
-        <div class="user-preview">
-          <div class="preview-item">
-            <span class="preview-label">ID</span>
-            <span id="delUserId" class="preview-value">USER-2026-<span id="delUserIdNum"></span></span>
-          </div>
-          <div class="preview-item">
-            <span class="preview-label">Name</span>
-            <span id="delUserName" class="preview-value"></span>
-          </div>
-          <div class="preview-item">
-            <span class="preview-label">Email</span>
-            <span id="delUserEmail" class="preview-value"></span>
-          </div>
-          <div class="preview-item">
-            <span class="preview-label">Role</span>
-            <span id="delUserRole" class="preview-value"></span>
-          </div>
-        </div>
-
-        <div class="alert-warning">
-          <i class="fas fa-shield-alt"></i>
-          <span>This action cannot be undone</span>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <form id="deleteUserForm" method="POST">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-          <button type="button" class="btn btn-cancel" data-dismiss="modal">
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-delete" id="deleteSubmitBtn">
-            <span id="deleteButtonContent" style="display: inline-flex; align-items: center; gap: 0.5rem;">
-              <i class="fas fa-trash-alt"></i>
-              Delete User
-            </span>
-            <span id="deleteSpinner" class="spinner" style="display: none; width: 16px; height: 16px;"></span>
-          </button>
-        </form>
-      </div>
-
+<div class="modal-overlay" id="deleteUserModal" style="display: none;">
+  <div class="modal-content-wrapper delete-modal">
+    
+    <div class="modal-header">
+      <h5 class="modal-title">
+        <i class="fas fa-exclamation-triangle"></i>
+        Delete User
+      </h5>
+      <button type="button" class="modal-close" onclick="closeModal('deleteUserModal')">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
+
+    <div class="modal-body">
+      <p class="modal-description">
+        You are about to permanently delete this user:
+      </p>
+
+      <div class="user-preview">
+        <div class="preview-item">
+          <span class="preview-label">ID</span>
+          <span id="delUserId" class="preview-value">USER-2026-<span id="delUserIdNum"></span></span>
+        </div>
+        <div class="preview-item">
+          <span class="preview-label">Name</span>
+          <span id="delUserName" class="preview-value"></span>
+        </div>
+        <div class="preview-item">
+          <span class="preview-label">Email</span>
+          <span id="delUserEmail" class="preview-value"></span>
+        </div>
+        <div class="preview-item">
+          <span class="preview-label">Role</span>
+          <span id="delUserRole" class="preview-value"></span>
+        </div>
+      </div>
+
+      <div class="alert-warning">
+        <i class="fas fa-shield-alt"></i>
+        <span>This action cannot be undone</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <form id="deleteUserForm" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <button type="button" class="btn btn-cancel" onclick="closeModal('deleteUserModal')" data-full-label="Cancel" data-short-label="Cancel">
+          <span class="btn-label">Cancel</span>
+        </button>
+        <button type="submit" class="btn btn-delete" id="deleteSubmitBtn" data-full-label="Delete User" data-short-label="Delete">
+          <span id="deleteButtonContent" class="btn-label" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-trash-alt"></i>
+            Delete User
+          </span>
+          <span id="deleteSpinner" class="spinner" style="display: none; width: 16px; height: 16px;"></span>
+        </button>
+      </form>
+    </div>
+
   </div>
 </div>
 
@@ -1058,51 +1278,90 @@
 </script>
 
 <script>
-  // View Modal Handler
-  $('#viewUserModal').on('show.bs.modal', function (event) {
-    const button = $(event.relatedTarget);
-    const id = button.data('user-id');
-    const firstName = button.data('user-first-name');
-    const lastName = button.data('user-last-name');
-    const email = button.data('user-email');
-    const role = button.data('user-role');
-    const phone = button.data('user-phone');
-    const created = button.data('user-created');
+  // Modal Functions
+  function openViewModal(button) {
+    const id = button.getAttribute('data-user-id');
+    const firstName = button.getAttribute('data-user-first-name');
+    const lastName = button.getAttribute('data-user-last-name');
+    const email = button.getAttribute('data-user-email');
+    const role = button.getAttribute('data-user-role');
+    const created = button.getAttribute('data-user-created');
 
-    $('#viewUserIdNum').text(id);
-    $('#viewUserFullName').text((firstName + ' ' + lastName).trim() || '(No Name)');
-    $('#viewUserEmail').text(email);
-    $('#viewUserRole').text(role);
-    $('#viewUserPhone').text(phone);
-    $('#viewUserCreated').text(created);
-    $('#viewUserEditBtn').attr('href', '/admin/users/edit/' + id);
-  });
+    document.getElementById('viewUserIdNum').textContent = id;
+    document.getElementById('viewUserFullName').textContent = (firstName + ' ' + lastName).trim() || '(No Name)';
+    document.getElementById('viewUserEmail').textContent = email;
+    document.getElementById('viewUserRole').textContent = role;
+    document.getElementById('viewUserCreated').textContent = created;
+    document.getElementById('viewUserEditBtn').href = '/admin/users/edit/' + id.split('-').pop();
 
-  // Delete Modal Handler
-  $('#deleteUserModal').on('show.bs.modal', function (event) {
-    const button = $(event.relatedTarget);
-    const id = button.data('user-id');
-    const name = button.data('user-name');
-    const email = button.data('user-email');
-    const role = button.data('user-role');
+    document.getElementById('viewUserModal').style.display = 'flex';
+    updateModalButtonLabels('viewUserModal');
+  }
 
-    $('#delUserIdNum').text(id);
-    $('#delUserName').text(name);
-    $('#delUserEmail').text(email);
-    $('#delUserRole').text(role);
-    $('#deleteUserForm').attr('action', '/admin/users/delete/' + id);
+  function openDeleteModal(button) {
+    const id = button.getAttribute('data-user-id');
+    const name = button.getAttribute('data-user-name');
+    const email = button.getAttribute('data-user-email');
+    const role = button.getAttribute('data-user-role');
+
+    document.getElementById('delUserIdNum').textContent = id;
+    document.getElementById('delUserName').textContent = name;
+    document.getElementById('delUserEmail').textContent = email;
+    document.getElementById('delUserRole').textContent = role;
+    document.getElementById('deleteUserForm').action = '/admin/users/delete/' + id;
 
     // Reset button state
-    $('#deleteSubmitBtn').prop('disabled', false);
-    $('#deleteButtonContent').show();
-    $('#deleteSpinner').hide();
+    document.getElementById('deleteSubmitBtn').disabled = false;
+    document.getElementById('deleteButtonContent').style.display = 'inline-flex';
+    document.getElementById('deleteSpinner').style.display = 'none';
+
+    document.getElementById('deleteUserModal').style.display = 'flex';
+    updateModalButtonLabels('deleteUserModal');
+  }
+
+  function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+  }
+
+  function updateModalButtonLabels(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    modal.querySelectorAll('.modal-footer .btn[data-full-label]').forEach(button => {
+      const labelSpan = button.querySelector('.btn-label');
+      if (!labelSpan) return;
+
+      const fullLabel = button.dataset.fullLabel || labelSpan.textContent.trim();
+      const shortLabel = button.dataset.shortLabel || fullLabel;
+      labelSpan.textContent = fullLabel;
+      button.classList.remove('btn--compact');
+
+      const needsShort = labelSpan.scrollWidth > button.clientWidth - 24;
+      if (needsShort) {
+        labelSpan.textContent = shortLabel;
+      }
+
+      const stillOverflowing = labelSpan.scrollWidth > button.clientWidth - 16 || button.scrollWidth > button.clientWidth;
+      if (stillOverflowing) {
+        button.classList.add('btn--compact');
+      }
+    });
+  }
+
+  window.addEventListener('resize', function() {
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      if (modal.style.display === 'flex') {
+        updateModalButtonLabels(modal.id);
+      }
+    });
   });
 
-  $('#deleteUserForm').on('submit', function (e) {
-    const submitBtn = $('#deleteSubmitBtn');
-    submitBtn.prop('disabled', true);
-    $('#deleteButtonContent').hide();
-    $('#deleteSpinner').show();
+  // Form submit handler
+  document.getElementById('deleteUserForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('deleteSubmitBtn');
+    submitBtn.disabled = true;
+    document.getElementById('deleteButtonContent').style.display = 'none';
+    document.getElementById('deleteSpinner').style.display = 'inline-block';
   });
 </script>
 {% endblock %}
