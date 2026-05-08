@@ -505,6 +505,9 @@
         <label for="showPassword">Show password</label>
       </div>
 
+      <!-- Hidden reCAPTCHA token field -->
+      {{ form.recaptcha_token() }}
+
       <button class="btn-primary" type="submit" disabled>
         <span class="btn-text">Login</span>
       </button>
@@ -534,10 +537,14 @@
   </div>
 </div>
 
+<!-- Load reCAPTCHA v3 script -->
+<script src="https://www.google.com/recaptcha/api.js?render=6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('.auth-form');
   const submitBtn = document.querySelector('.btn-primary');
+  const recaptchaTokenField = document.querySelector('[name="recaptcha_token"]');
   const showPasswordCheckbox = document.getElementById('showPassword');
   
   // Try multiple ways to find password input
@@ -587,7 +594,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Loading spinner on submit
+  // Execute reCAPTCHA and populate token on form submit
   if (form) {
     form.addEventListener('submit', function(e) {
       // Only submit if button is enabled
@@ -595,10 +602,37 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         return;
       }
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<div class="spinner"></div><span>Logging in...</span>';
-      }
+      
+      // Execute reCAPTCHA v3
+      grecaptcha.ready(function() {
+        grecaptcha.execute('6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT', { action: 'login' }).then(function(token) {
+          // Set the token in the hidden field
+          if (recaptchaTokenField) {
+            recaptchaTokenField.value = token;
+          }
+          
+          // Disable button and show loading spinner
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<div class="spinner"></div><span>Logging in...</span>';
+          }
+          
+          // Submit the form after a brief delay to ensure token is set
+          setTimeout(function() {
+            form.submit();
+          }, 100);
+        }).catch(function(error) {
+          console.error('reCAPTCHA error:', error);
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span class="btn-text">Login</span>';
+          }
+          alert('reCAPTCHA verification failed. Please try again.');
+        });
+      });
+      
+      // Prevent immediate form submission
+      e.preventDefault();
     });
   }
 

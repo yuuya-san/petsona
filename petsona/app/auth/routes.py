@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from ..extensions import limiter
 from .emails import send_password_reset_email, send_backup_codes_email, send_registration_otp_email, send_email
 from app.utils.audit import log_event, user_snapshot
+from app.utils.security import verify_recaptcha
 from sqlalchemy import func # pyright: ignore[reportMissingImports]
 import pyotp # pyright: ignore[reportMissingImports]
 import secrets
@@ -126,6 +127,15 @@ def contact():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
+        # Verify reCAPTCHA token
+        recaptcha_token = form.recaptcha_token.data
+        is_recaptcha_valid, recaptcha_score = verify_recaptcha(recaptcha_token)
+        
+        if not is_recaptcha_valid:
+            log_event('user.register_failed', details={'reason': 'recaptcha_failed'})
+            flash('reCAPTCHA verification failed. Please try again.', 'danger')
+            return redirect(url_for('auth.register'))
+        
         # Check if email already exists
         email = form.email.data.lower()
         existing_user = User.query.filter_by(email=email).first()
@@ -337,9 +347,18 @@ def login():
 
 
     if form.validate_on_submit():
+        # Verify reCAPTCHA token
+        recaptcha_token = form.recaptcha_token.data
+        is_recaptcha_valid, recaptcha_score = verify_recaptcha(recaptcha_token)
+        
+        if not is_recaptcha_valid:
+            log_event('user.login_failed', details={'reason': 'recaptcha_failed'})
+            flash('reCAPTCHA verification failed. Please try again.', 'danger')
+            return redirect(url_for('auth.login'))
+        
         email = form.email.data.lower()
         user = User.query.filter_by(email=email).first()
-        base_meta = {'email': email}
+        base_meta = {'email': email, 'recaptcha_score': recaptcha_score}
 
         # Always log out any existing user before a new login attempt
         if current_user.is_authenticated:
@@ -389,7 +408,7 @@ def login():
             db.session.commit()
             session['session_token'] = session_token
             login_user(user)
-            log_event('user.login_success', details={'user': user_snapshot(user), 'ip': request.remote_addr})
+            log_event('user.login_success', details={'user': user_snapshot(user), 'ip': request.remote_addr, 'recaptcha_score': recaptcha_score})
 
             # Redirect based on role
             if user.role == 'user':
@@ -435,6 +454,15 @@ def admin_login():
     form = AdminLoginForm()
 
     if form.validate_on_submit():
+        # Verify reCAPTCHA token
+        recaptcha_token = form.recaptcha_token.data
+        is_recaptcha_valid, recaptcha_score = verify_recaptcha(recaptcha_token)
+        
+        if not is_recaptcha_valid:
+            log_event('admin.login_failed', details={'reason': 'recaptcha_failed'})
+            flash('reCAPTCHA verification failed. Please try again.', 'danger')
+            return redirect(url_for('auth.admin_login'))
+        
         email = form.email.data.lower()
         user = User.query.filter_by(email=email, role='admin').first()
 
@@ -484,7 +512,7 @@ def admin_login():
             login_user(user)
             log_event(
                 'admin.login_success',
-                details={'user': user_snapshot(user), 'ip': request.remote_addr}
+                details={'user': user_snapshot(user), 'ip': request.remote_addr, 'recaptcha_score': recaptcha_score}
             )
 
             flash('Admin login successful.', 'success')

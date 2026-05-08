@@ -70,12 +70,12 @@
   }
 </style>
 
-<div class="w-full min-h-screen" style="background-color: rgba(249, 250, 251, 0.5);">
-  <div class="max-w-full sm:max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-4 lg:py-6 space-y-6 sm:space-y-8">
+<div class="min-h-screen flex justify-center" style="background-color: rgba(249, 250, 251, 0.5);">
+  <div class="w-[95vw] md:w-[90vw] max-w-[95vw] md:max-w-[90vw] mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-5 lg:py-6 space-y-6 sm:space-y-8">
 
     <!-- Quiz Introduction -->
     <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-3xl p-6 sm:p-8 border border-indigo-100">
-      <div class="flex items-start gap-4">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <div class="flex-shrink-0">
           <i class="fa-solid fa-heart text-2xl text-indigo-600"></i>
         </div>
@@ -113,8 +113,8 @@
           <div class="mb-4">
             <p class="text-xs font-semibold text-indigo-800 uppercase tracking-widest" x-text="quizQuestions[currentIndex]?.section || 'Quiz'"></p>
           </div>
-          <div class="flex items-start justify-between gap-4 mb-3">
-            <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-snug flex-1">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-3">
+            <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-snug">
               <span x-text="quizQuestions[currentIndex]?.question || ''"></span>
             </h2>
             <span x-show="isMultiSelectQuestion(quizQuestions[currentIndex]?.name)" class="inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap flex-shrink-0">
@@ -166,56 +166,36 @@
       </div>
 
       <!-- Navigation Buttons -->
-      <div x-show="!quizComplete" class="flex w-full gap-3 sm:gap-4 justify-end">
+      <div x-show="!quizComplete" class="flex flex-row flex-nowrap w-full gap-3 sm:gap-4 justify-between items-center">
 
         <!-- Back Button -->
         <button
           @click="prevQuestion()"
           :disabled="currentIndex === 0"
-          class="flex-1 h-12 sm:flex-none sm:h-auto sm:px-6 sm:py-3
+          class="flex-1 min-w-[120px] h-12 sm:h-auto px-4 sm:px-6 sm:py-3
                 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed
                 text-gray-800 font-semibold rounded-xl transition
-                flex items-center justify-center gap-2"
+                flex items-center justify-center gap-1 sm:gap-2"
           :class="currentIndex === 0 ? 'opacity-50' : 'opacity-100'"
         >
-          <i class="fa-solid fa-chevron-left text-lg"></i>
-          <span class="hidden sm:inline text-sm">Back</span>
+          <i class="fa-solid fa-chevron-left text-base sm:text-lg"></i>
+          <span class="text-xs sm:text-sm">Back</span>
         </button>
 
         <!-- Next / Submit Button -->
         <button
           @click="currentIndex === (quizQuestions.length - 1) ? submitQuiz() : nextQuestion()"
           :disabled="!isQuestionAnswered(currentIndex) || isLoading"
-          class="flex-1 h-12 sm:flex-none sm:h-auto sm:px-6 sm:py-3
-                flex items-center justify-center gap-2
+          class="flex-1 min-w-[120px] h-12 sm:h-auto px-4 sm:px-6 sm:py-3
+                flex items-center justify-center gap-1 sm:gap-2
                 font-semibold rounded-xl transition
                 disabled:opacity-50 disabled:cursor-not-allowed"
           :class="currentIndex === (quizQuestions.length - 1)
             ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white'
             : 'bg-indigo-800 hover:bg-indigo-900 text-white'"
         >
-          <!-- Mobile (icons only) -->
-          <template x-if="currentIndex < (quizQuestions.length - 1)">
-            <i class="fa-solid fa-chevron-right text-lg sm:hidden"></i>
-          </template>
-
-          <template x-if="currentIndex === (quizQuestions.length - 1) && !isLoading">
-            <i class="fa-solid fa-check text-lg sm:hidden"></i>
-          </template>
-
-          <template x-if="currentIndex === (quizQuestions.length - 1) && isLoading">
-            <i class="fa-solid fa-spinner animate-spin text-lg sm:hidden"></i>
-          </template>
-
-          <!-- Desktop -->
-          <span class="hidden sm:inline text-sm" x-show="currentIndex < (quizQuestions.length - 1)">Next</span>
-          <span class="hidden sm:inline text-sm" x-show="currentIndex === (quizQuestions.length - 1) && !isLoading">
-            See My Matches
-          </span>
-          <span class="hidden sm:inline text-sm" x-show="currentIndex === (quizQuestions.length - 1) && isLoading">
-            <i class="fa-solid fa-spinner animate-spin mr-2"></i>Finding...
-          </span>
-
+          <i :class="isLoading ? 'fa-solid fa-spinner animate-spin' : (currentIndex === (quizQuestions.length - 1) ? 'fa-solid fa-check' : 'fa-solid fa-chevron-right')" class="text-base sm:text-lg"></i>
+          <span class="text-xs sm:text-sm" x-text="isLoading ? 'Finding...' : (currentIndex === (quizQuestions.length - 1) ? 'See My Matches' : 'Next')"></span>
         </button>
 
       </div>

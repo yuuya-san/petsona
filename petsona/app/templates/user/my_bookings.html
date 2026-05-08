@@ -33,15 +33,24 @@
   }
 
   .bookings-section {
-    background: linear-gradient(135deg, #f8f7ff 0%, #fafbfc 100%);
+    background: transparent;
     min-height: 100vh;
     padding: 2rem 1rem;
   }
 
   .bookings-container {
-    max-width: 1200px;
+    width: 95vw;
+    max-width: 95vw;
     margin: 0 auto;
   }
+
+  @media (min-width: 768px) {
+    .bookings-container {
+      width: 90vw;
+      max-width: 90vw;
+    }
+  }
+
 
   /* ===== HEADER ===== */
   .page-header {
@@ -844,11 +853,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 50;
+    z-index: 9999;
     padding: 1rem;
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    overflow-y: auto;
   }
 
   .modal-overlay.hidden {
@@ -864,8 +872,11 @@
     box-shadow: 0 20px 60px rgba(168, 85, 247, 0.15);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    max-width: 520px;
-    width: 100%;
+    max-width: 480px;
+    width: 95vw;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
     animation: slideUp 0.3s ease-out;
   }
 
@@ -926,8 +937,9 @@
 
   .modal-body {
     padding: 1.5rem;
-    max-height: 60vh;
+    flex: 1;
     overflow-y: auto;
+    max-height: calc(90vh - 140px);
   }
 
   .booking-detail {
@@ -958,16 +970,40 @@
   }
 
   .modal-footer {
-    padding: 1.25rem 1.5rem;
-    border-top: 1px solid rgba(168, 85, 247, 0.15);
-    background: rgba(168, 85, 247, 0.02);
     display: flex;
-    gap: 0.75rem;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid rgba(168, 85, 247, 0.1);
+    background: rgba(249, 250, 251, 0.5);
     justify-content: flex-end;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .modal-footer .btn {
+    flex: 0 1 auto;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .modal-footer {
+      gap: 0.75rem;
+      padding: 1rem;
+    }
+
+    .modal-footer .btn {
+      flex: 0 1 auto;
+      min-width: 100px;
+      font-size: 0.8125rem;
+      padding: 0.65rem 1rem;
+    }
   }
 
   .btn {
-    padding: 0.625rem 1.25rem;
+    padding: 0.75rem 1.5rem;
     border-radius: var(--radius-sm);
     font-size: 0.875rem;
     font-weight: 600;
@@ -976,6 +1012,7 @@
     border: none;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     white-space: nowrap;
   }
@@ -1393,6 +1430,10 @@
     line-height: 1.4;
     font-weight: 600;
     word-wrap: break-word;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
   }
 
   .receipt-footer-text i {
@@ -1493,15 +1534,15 @@
     width: 48px;
     height: 48px;
     margin: 0 auto 0.15rem;
-    background: rgba(255, 255, 255, 0.25);
+    background: transparent;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-size: 1.5rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+    border: none;
   }
 
   .digital-receipt-title {
@@ -1658,31 +1699,31 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(168, 85, 247, 0.15);
+    background: transparent;
     color: #a855f7;
-    border: 1px solid rgba(168, 85, 247, 0.25);
-    box-shadow: 0 2px 6px rgba(168, 85, 247, 0.1);
+    border: none;
+    box-shadow: none;
     margin: 0.2rem 0 0 0;
     white-space: nowrap;
     height: 1.5rem;
   }
 
   .digital-status.status-confirmed {
-    background: rgba(16, 185, 129, 0.15);
+    background: transparent;
     color: #10b981;
-    border-color: rgba(16, 185, 129, 0.25);
+    border-color: transparent;
   }
 
   .digital-status.status-completed {
-    background: rgba(59, 130, 246, 0.15);
+    background: transparent;
     color: #3b82f6;
-    border-color: rgba(59, 130, 246, 0.25);
+    border-color: transparent;
   }
 
   .digital-status.status-pending {
-    background: rgba(245, 158, 11, 0.15);
+    background: transparent;
     color: #f59e0b;
-    border-color: rgba(245, 158, 11, 0.25);
+    border-color: transparent;
   }
 
   .digital-merchant-name {
@@ -1782,6 +1823,10 @@
     color: #6b7280;
     line-height: 1.4;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
   }
 
   .digital-footer-text i {
@@ -3215,7 +3260,7 @@
     // Update footer status message based on booking status
     const footerStatusElement = document.getElementById('receiptFooterStatus');
     if (status === 'confirmed' || status === 'completed') {
-      footerStatusElement.innerHTML = '<i class="fas fa-check-circle"></i> Booking Confirmed & Secure';
+      footerStatusElement.innerHTML = '<i class="fas fa-check-circle"></i> Booking Confirmed & Secured';
       footerStatusElement.style.color = 'var(--success)';
     } else if (status === 'pending') {
       footerStatusElement.innerHTML = '<i class="fas fa-hourglass-half"></i> Booking Pending Confirmation';
@@ -3450,7 +3495,7 @@
     // Update footer status message for digital receipt
     const digitalFooterStatusElement = document.getElementById('digitalFooterStatus');
     if (status === 'confirmed' || status === 'completed') {
-      digitalFooterStatusElement.innerHTML = '<i class="fas fa-check-circle"></i> Booking Confirmed & Secure';
+      digitalFooterStatusElement.innerHTML = '<i class="fas fa-check-circle"></i> Booking Confirmed & Secured';
       digitalFooterStatusElement.style.color = '#10b981';
     } else {
       digitalFooterStatusElement.innerHTML = '<i class="fas fa-hourglass-half"></i> Booking Status: ' + status.charAt(0).toUpperCase() + status.slice(1);

@@ -45,6 +45,13 @@ class Config:
     # OAuth Settings
     AUTHLIB_INSECURE_TRANSPORT = True  # Allow HTTP for development
 
+    # =========================
+    # RECAPTCHA V3 CONFIG
+    # =========================
+    RECAPTCHA_SITE_KEY = "6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT"
+    RECAPTCHA_SECRET_KEY = "6Le4c94sAAAAAHVDiFrjrGYM6c6bdBs0KhnS72VN"
+    RECAPTCHA_THRESHOLD = 0.5  # Score threshold (0.0 - 1.0). Lower = stricter
+
     # File Upload Configuration
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads', 'messages')
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB max file size

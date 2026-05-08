@@ -520,6 +520,9 @@
     <form method="post" novalidate class="auth-form" id="register-form">
       {{ form.hidden_tag() }}
 
+      <!-- Hidden reCAPTCHA token field -->
+      {{ form.recaptcha_token() }}
+
       <!-- PERSONAL INFO -->
       <div class="form-section personal-info-section" id="personal-info-section">
         <h3 class="section-title themed-title">Personal Info</h3>
@@ -692,18 +695,49 @@
   </div>
 </div>
 
+<!-- Load reCAPTCHA v3 script -->
+<script src="https://www.google.com/recaptcha/api.js?render=6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT"></script>
 
 <script>
 const personalSection = document.getElementById('personal-info-section');
 const passwordSection = document.getElementById('password-section');
+const registerForm = document.getElementById('register-form');
+const recaptchaTokenField = document.querySelector('[name="recaptcha_token"]');
+
 document.getElementById('to-password-section').onclick = () => {
-personalSection.style.display = 'none';
-passwordSection.style.display = '';
+  personalSection.style.display = 'none';
+  passwordSection.style.display = '';
 };
+
 document.getElementById('back-to-personal-info').onclick = () => {
-passwordSection.style.display = 'none';
-personalSection.style.display = '';
+  passwordSection.style.display = 'none';
+  personalSection.style.display = '';
 };
+
+// Override form submission to execute reCAPTCHA
+if (registerForm) {
+  registerForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Execute reCAPTCHA v3
+    grecaptcha.ready(function() {
+      grecaptcha.execute('6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT', { action: 'register' }).then(function(token) {
+        // Set the token in the hidden field
+        if (recaptchaTokenField) {
+          recaptchaTokenField.value = token;
+        }
+        
+        // Submit the form after token is set
+        setTimeout(function() {
+          registerForm.submit();
+        }, 100);
+      }).catch(function(error) {
+        console.error('reCAPTCHA error:', error);
+        alert('reCAPTCHA verification failed. Please try again.');
+      });
+    });
+  });
+}
 </script>
 
 {% endblock %}

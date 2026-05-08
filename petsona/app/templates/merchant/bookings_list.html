@@ -279,6 +279,27 @@
     background: linear-gradient(135deg, rgba(168, 85, 247, 0.05), rgba(147, 51, 234, 0.05));
   }
 
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: 95vh;
+    overflow: hidden;
+  }
+
+  .modal-body {
+    overflow-y: auto;
+    max-height: calc(95vh - 140px);
+    flex: 1 1 auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-dialog {
+    margin: 1.5rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   /* Prevent body scroll when modal is open */
   body.modal-open {
     overflow: hidden !important;
@@ -462,6 +483,80 @@
 
   .bookings-table td.td-actions {
     vertical-align: middle;
+  }
+
+  body {
+    background: transparent !important;
+    overflow-x: hidden;
+  }
+
+  .bookings-section {
+    background: transparent !important;
+    padding: 1rem 0 2rem !important;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .bookings-container {
+    width: 100%;
+    max-width: 95vw;
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .bookings-card,
+  .search-filter-card,
+  .stats-container,
+  .table-container,
+  .modal-content,
+  .modal-dialog {
+    width: 100%;
+    max-width: 95vw;
+    box-sizing: border-box;
+  }
+
+  .modal-dialog {
+    margin: 1.5rem auto;
+    width: min(95vw, 600px);
+    max-width: 600px;
+  }
+
+  .btn-label-full {
+    display: inline;
+  }
+
+  .btn-label-short {
+    display: none;
+  }
+
+  @media (max-width: 576px) {
+    .btn-label-full {
+      display: none !important;
+    }
+
+    .btn-label-short {
+      display: inline !important;
+    }
+
+    .modal-footer {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .modal-footer .btn,
+    .modal-footer button {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .modal-footer .btn i,
+    .modal-footer button i {
+      margin-right: 0;
+    }
   }
 </style>
 
@@ -887,7 +982,9 @@
           </button>
           <button type="submit" class="btn" id="approveSubmitBtn" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;">
             <span id="approveButtonContent" style="display: flex; align-items: center; gap: 0.5rem;">
-              <i class="fas fa-check"></i> Approve Booking
+              <i class="fas fa-check"></i>
+              <span class="btn-label-full">Approve Booking</span>
+              <span class="btn-label-short">Approve</span>
             </span>
             <span id="approveSpinner" class="spinner" style="display: none; border: 2px solid rgba(255, 255, 255, 0.25); border-top: 2px solid white; border-radius: 50%; width: 16px; height: 16px; animation: spin 0.8s linear infinite;"></span>
           </button>
@@ -942,7 +1039,9 @@
           </button>
           <button type="submit" class="btn" id="rejectSubmitBtn" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;">
             <span id="rejectButtonContent" style="display: flex; align-items: center; gap: 0.5rem;">
-              <i class="fas fa-ban"></i> Reject Booking
+              <i class="fas fa-ban"></i>
+              <span class="btn-label-full">Reject Booking</span>
+              <span class="btn-label-short">Reject</span>
             </span>
             <span id="rejectSpinner" class="spinner" style="display: none; border: 2px solid rgba(255, 255, 255, 0.25); border-top: 2px solid white; border-radius: 50%; width: 16px; height: 16px; animation: spin 0.8s linear infinite;"></span>
           </button>
@@ -997,7 +1096,9 @@
           </button>
           <button type="submit" class="btn" id="completedSubmitBtn" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;">
             <span id="completedButtonContent" style="display: flex; align-items: center; gap: 0.5rem;">
-              <i class="fas fa-check-double"></i> Mark Completed
+              <i class="fas fa-check-double"></i>
+              <span class="btn-label-full">Mark Completed</span>
+              <span class="btn-label-short">Complete</span>
             </span>
             <span id="completedSpinner" class="spinner" style="display: none; border: 2px solid rgba(255, 255, 255, 0.25); border-top: 2px solid white; border-radius: 50%; width: 16px; height: 16px; animation: spin 0.8s linear infinite;"></span>
           </button>
@@ -1052,7 +1153,9 @@
           </button>
           <button type="submit" class="btn" id="noShowSubmitBtn" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;">
             <span id="noShowButtonContent" style="display: flex; align-items: center; gap: 0.5rem;">
-              <i class="fas fa-ban"></i> Mark No Show
+              <i class="fas fa-ban"></i>
+              <span class="btn-label-full">Mark No Show</span>
+              <span class="btn-label-short">No Show</span>
             </span>
             <span id="noShowSpinner" class="spinner" style="display: none; border: 2px solid rgba(255, 255, 255, 0.25); border-top: 2px solid white; border-radius: 50%; width: 16px; height: 16px; animation: spin 0.8s linear infinite;"></span>
           </button>
@@ -1198,17 +1301,25 @@
       </div>
 
       <div class="modal-footer" style="border-top: 1px solid rgba(168, 85, 247, 0.15); padding: 1.5rem; background: rgba(168, 85, 247, 0.02); display: flex; gap: 0.75rem; justify-content: flex-end; flex-shrink: 0;">
-        <button type="button" class="action-btn-primary" id="confirmBtn" data-toggle="modal" data-target="#approveBookingModal" style="display: none; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">
-          <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i> Approve Booking
+        <button type="button" class="action-btn-primary" id="confirmBtn" data-toggle="modal" data-target="#approveBookingModal" style="display: none; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i>
+          <span class="btn-label-full">Approve Booking</span>
+          <span class="btn-label-short">Approve</span>
         </button>
-        <button type="button" class="action-btn-secondary" id="rejectBtn" data-toggle="modal" data-target="#rejectBookingModal" style="display: none; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">
-          <i class="fas fa-times-circle" style="margin-right: 0.5rem;"></i> Reject Booking
+        <button type="button" class="action-btn-secondary" id="rejectBtn" data-toggle="modal" data-target="#rejectBookingModal" style="display: none; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-times-circle" style="margin-right: 0.5rem;"></i>
+          <span class="btn-label-full">Reject Booking</span>
+          <span class="btn-label-short">Reject</span>
         </button>
-        <button type="button" class="action-btn-secondary" id="completedBtn" data-toggle="modal" data-target="#markCompletedModal" style="display: none; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">
-          <i class="fas fa-check-double" style="margin-right: 0.5rem;"></i> Mark Completed
+        <button type="button" class="action-btn-secondary" id="completedBtn" data-toggle="modal" data-target="#markCompletedModal" style="display: none; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-check-double" style="margin-right: 0.5rem;"></i>
+          <span class="btn-label-full">Mark Completed</span>
+          <span class="btn-label-short">Complete</span>
         </button>
-        <button type="button" class="action-btn-secondary" id="noShowBtn" data-toggle="modal" data-target="#markNoShowModal" style="display: none; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">
-          <i class="fas fa-ban" style="margin-right: 0.5rem;"></i> Mark No Show
+        <button type="button" class="action-btn-secondary" id="noShowBtn" data-toggle="modal" data-target="#markNoShowModal" style="display: none; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-ban" style="margin-right: 0.5rem;"></i>
+          <span class="btn-label-full">Mark No Show</span>
+          <span class="btn-label-short">No Show</span>
         </button>
       </div>
     </div>
