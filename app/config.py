@@ -26,10 +26,10 @@ class Config:
     # =========================
     # 🟢 RAILWAY MYSQL CONFIG (FIXED & ADDED PROPERLY)
     # =========================
-    DB_HOST = os.getenv("MYSQLHOST")
+    DB_HOST = os.getenv("MYSQLHOST", "mysql.railway.internal")
     DB_NAME = os.getenv("MYSQLDATABASE", "railway")
     DB_USERNAME = os.getenv("MYSQLUSER", "root")
-    DB_PASSWORD = os.getenv("MYSQLPASSWORD")
+    DB_PASSWORD = os.getenv("MYSQLPASSWORD", "parjrgCJmevLFdtYfOnYvEkjIljutGsu")
     DB_PORT = os.getenv("MYSQLPORT", 3306)
 
     SQLALCHEMY_DATABASE_URI = (
