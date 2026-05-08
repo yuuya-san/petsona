@@ -61,7 +61,6 @@
 .notifications-dropdown {
     max-width: 450px !important;
     width: 450px !important;
-    max-height: 650px !important;
     min-width: 400px !important;
     overflow: visible !important;
 }

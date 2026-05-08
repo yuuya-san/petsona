@@ -469,6 +469,98 @@ html, body {
   margin-right: 0;
 }
 
+/* ==================== IMAGE & FILE ATTACHMENTS ==================== */
+
+.media-attachment {
+  display: inline-block;
+  margin: 10px 0;
+  max-width: 100%;
+}
+
+.image-attachment {
+  cursor: pointer;
+}
+
+.image-attachment img {
+  max-width: 100%;
+  max-height: 400px;
+  border-radius: 12px;
+  display: block;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.image-attachment img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.file-attachment {
+  background: rgba(243, 244, 246, 0.9);
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(140, 0, 255, 0.12);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+}
+
+.file-attachment:hover {
+  background: rgba(243, 244, 246, 1);
+  border-color: rgba(140, 0, 255, 0.2);
+  transform: translateX(2px);
+}
+
+.message-bubble.own .file-attachment {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.message-bubble.own .file-attachment:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.file-attachment .file-icon-wrapper {
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.message-bubble.own .file-attachment .file-icon-wrapper {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.message-bubble.other .file-attachment .file-icon-wrapper {
+  color: #666;
+}
+
+.file-attachment .file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-attachment .file-name {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-attachment .file-size {
+  font-size: 12px;
+  margin-top: 2px;
+  opacity: 0.7;
+}
+
+.file-attachment .download-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+  opacity: 0.6;
+}
+
 /* Loading Message State */
 .message-bubble.loading-message {
   opacity: 0.8;

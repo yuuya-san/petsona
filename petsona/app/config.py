@@ -54,7 +54,7 @@ class Config:
 
     # File Upload Configuration
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads', 'messages')
-    MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB max file size
+    MAX_CONTENT_LENGTH = 6 * 1024 * 1024  # 6MB max (includes multipart overhead)
 
     @staticmethod
     def init_app(app):

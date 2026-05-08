@@ -385,7 +385,8 @@ class MessagingApp {
 
 
         if (imageExts.includes(ext)) {
-          newHtml += `<div class="media-attachment image-attachment" style="margin: 8px 0;">
+          newHtml += `<div class="media-attachment image-attachment" style="margin: 8px 0; cursor: pointer;" onclick="openDownloadDialog('${this.escapeHtml(url)}', '${this.escapeHtml(filename)}', 'image')">
+                      <img src="${url}" alt="${this.escapeHtml(filename)}" style="max-width: 100%; max-height: 400px; border-radius: 8px; display: block; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" loading="lazy">
                     </div>`;
           hasChanges = true;
           mediaCount++;
