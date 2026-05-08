@@ -18,7 +18,7 @@ window.LoaderManager = window.LoaderManager || {
         this.interceptXHR();
     },
     
-    hasExistingLoader() {
+    hasExistingLoader(ignoreElement = null) {
         // Check for common loading indicators on the page (but exclude the global loader)
         const selectors = [
             '[class*="loader"]',
@@ -33,16 +33,54 @@ window.LoaderManager = window.LoaderManager || {
             '.preloader',
             '.load'
         ];
-        
+
         for (const selector of selectors) {
-            const element = document.querySelector(selector);
-            // Skip the global loader overlay itself
-            if (element && element.id !== 'loader-overlay' && element.offsetParent !== null) {
+            const elements = document.querySelectorAll(selector);
+
+            for (const element of elements) {
+                if (!element || element.id === 'loader-overlay') continue;
+                if (element.offsetParent === null) continue;
+                if (ignoreElement && ignoreElement.contains(element)) continue;
+                if (this.isButtonSpinnerElement(element)) continue;
+
                 return true;
             }
         }
-        
+
         return false;
+    },
+
+    isButtonSpinnerElement(element) {
+        if (!element) return false;
+
+        if (element.matches('.btn-spinner, .spinner-border, .spinner-spin, .fa-spinner, .fa-spin, [data-loading="true"]')) {
+            return true;
+        }
+
+        return !!element.closest('button.is-loading, .btn.is-loading, button.loading, .btn.loading, [data-loading="true"]');
+    },
+
+    hasActiveLoadingIndicator() {
+        const selectors = [
+            '.btn-spinner',
+            '.spinner',
+            '.spinner-border',
+            '.spinner-spin',
+            '.loading-spinner',
+            '.fa-spinner',
+            '.fa-spin',
+            'button.is-loading',
+            '.btn.is-loading',
+            'button.loading',
+            '.btn.loading',
+            '[data-loading="true"]'
+        ];
+
+        const elements = document.querySelectorAll(selectors.join(','));
+        return Array.from(elements).some(element => {
+            if (!element || element.id === 'loader-overlay') return false;
+            return element.offsetParent !== null;
+        });
     },
     
     attachEventListeners() {
@@ -89,7 +127,7 @@ window.LoaderManager = window.LoaderManager || {
             
             if (isSubmitButton || hasSubmitClass || (isInForm && !button.classList.contains('cancel')) || hasSubmitAction) {
                 // Show loader (respects page's own loader if it exists)
-                if (!this.hasExistingLoader()) {
+                if (!this.hasExistingLoader(button)) {
                     this.incrementRequest('button-click');
                     this.show();
                 }
@@ -128,8 +166,8 @@ window.LoaderManager = window.LoaderManager || {
                 return;
             }
             
-            // Skip if page already has a loader
-            if (this.hasExistingLoader()) return;
+            // Skip if page already has a loader (ignore link-local spinners)
+            if (this.hasExistingLoader(link)) return;
             
             // Show loader for actual navigation
             this.incrementRequest('navigation');
@@ -212,7 +250,11 @@ window.LoaderManager = window.LoaderManager || {
         clearTimeout(this.debounceTimer);
         this.debounceTimer = setTimeout(() => {
             if (this.activeRequests <= 0) {
-                this.hide();
+                if (this.hasActiveLoadingIndicator()) {
+                    this.scheduleHide();
+                } else {
+                    this.hide();
+                }
             }
         }, this.debounceDelay);
     },
@@ -228,8 +270,8 @@ window.LoaderManager = window.LoaderManager || {
     },
     
     hide() {
-        if (!this.overlay || this.activeRequests > 0) {
-            // Don't hide if there are still active requests
+        if (!this.overlay || this.activeRequests > 0 || this.hasActiveLoadingIndicator()) {
+            // Don't hide if there are still active requests or button-level loading indicators are visible
             return;
         }
         

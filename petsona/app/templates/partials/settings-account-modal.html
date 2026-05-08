@@ -1,6 +1,6 @@
 <!-- Account Settings Modal -->
 <div class="modal fade" id="settingsAccountModal" tabindex="-1" role="dialog" aria-labelledby="settingsAccountModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg glass-modal-container" role="document">
+  <div class="modal-dialog modal-dialog-centered modal-lg glass-modal-container" role="document" style="max-width: 580px;">
     <div class="modal-content glass-modal-content">
       <!-- Modal Header -->
       <div class="modal-header glass-modal-header border-0">
@@ -9,8 +9,8 @@
             <i class="fas fa-lock"></i>
           </div>
           <div class="ml-3">
-            <h5 class="modal-title glass-modal-title" id="settingsAccountModalLabel">Password & Security</h5>
-            <p class="glass-modal-subtitle">Update your password to keep your account secure</p>
+            <h5 class="modal-title glass-modal-title text-center" id="settingsAccountModalLabel">Password & Security</h5>
+            <p class="glass-modal-subtitle text-center">Update your password to keep your account secure</p>
           </div>
         </div>
         <button type="button" class="close glass-modal-close" data-dismiss="modal" aria-label="Close">
@@ -91,11 +91,11 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="modal-footer glass-modal-footer border-0">
-        <button type="button" class="btn btn-secondary glass-btn-secondary" data-dismiss="modal">
+      <div class="modal-footer glass-modal-footer border-0 d-flex justify-content-center flex-nowrap">
+        <button type="button" class="btn btn-secondary glass-btn-secondary flex-fill mr-2 text-center" data-dismiss="modal">
           <i class="fas fa-times mr-2"></i>Cancel
         </button>
-        <button type="button" class="btn btn-primary glass-btn-primary" id="savePasswordBtn">
+        <button type="button" class="btn btn-primary glass-btn-primary flex-fill ml-2 text-center" id="savePasswordBtn">
           <i class="fas fa-check mr-2"></i>Save Changes
         </button>
       </div>
@@ -301,6 +301,8 @@
     border-radius: 8px;
     transition: all 0.3s ease;
     border: none;
+    white-space: nowrap;
+    min-width: 120px;
   }
 
   .glass-btn-secondary {
@@ -329,7 +331,12 @@
   }
 
   /* Responsive */
-  @media (max-width: 576px) {
+  @media (max-width: 768px) {
+    .glass-modal-container .modal-content {
+      margin: 10px;
+      max-height: 90vh;
+    }
+
     .glass-modal-body {
       padding: 20px;
     }
@@ -350,6 +357,42 @@
 
     .glass-form-group {
       margin-bottom: 16px;
+    }
+
+    .glass-form-label {
+      font-size: 13px;
+    }
+
+    .glass-modal-footer {
+      padding: 12px 16px;
+    }
+
+    .glass-modal-footer .btn {
+      font-size: 13px;
+      padding: 8px 16px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .glass-modal-body {
+      padding: 16px;
+    }
+
+    .glass-modal-title {
+      font-size: 14px;
+    }
+
+    .glass-form-input {
+      font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    .glass-form-label {
+      font-size: 12px;
+    }
+
+    .glass-modal-footer .btn {
+      font-size: 12px;
+      padding: 6px 12px;
     }
   }
 </style>
@@ -518,6 +561,11 @@
     try {
       this.disabled = true;
       this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+
+      // Trigger global loading
+      if (window.LoaderManager) {
+        window.LoaderManager.show();
+      }
 
       // Get CSRF token from meta tag or form
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';

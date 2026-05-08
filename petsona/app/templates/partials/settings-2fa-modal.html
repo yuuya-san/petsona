@@ -260,6 +260,11 @@
     flex-direction: column;
   }
 
+  #settingsTwoFactorModal .modal-dialog {
+    max-width: 540px;
+    width: 100%;
+  }
+
   /* Confirmation Modal Styles */
   #disable2FAConfirmModal .glass-modal-container .modal-content {
     background: rgba(255, 255, 255, 0.95);
@@ -762,6 +767,10 @@
     .glass-setup-step {
       margin-bottom: 16px;
     }
+
+    #settingsTwoFactorModal .modal-dialog {
+      max-width: 90vw;
+    }
   }
 
   /* Alert animation */
@@ -897,6 +906,12 @@
       this.disabled = true;
       const enableBtn = this; // Store reference
       enableBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generating...';
+      
+      // Show global loader
+      const loader = document.getElementById('loader-overlay');
+      if (loader) {
+        loader.style.display = 'flex';
+      }
 
       // Get CSRF token from meta tag
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -909,6 +924,11 @@
           'X-CSRFToken': csrfToken
         }
       });
+
+      // Hide global loader
+      if (loader) {
+        loader.style.display = 'none';
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -927,6 +947,12 @@
       document.getElementById('defaultFooter').style.display = 'none';
       
     } catch (error) {
+      
+      // Hide global loader on error
+      const loader = document.getElementById('loader-overlay');
+      if (loader) {
+        loader.style.display = 'none';
+      }
       
       showFlashMessage('Error: ' + error.message, 'error');
       this.disabled = false;
@@ -961,6 +987,12 @@
       this.disabled = true;
       const confirmBtn = this; // Store reference
       confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Verifying...';
+      
+      // Show global loader
+      const loader = document.getElementById('loader-overlay');
+      if (loader) {
+        loader.style.display = 'flex';
+      }
 
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
@@ -977,6 +1009,11 @@
       });
 
       const data = await response.json();
+      
+      // Hide global loader
+      if (loader) {
+        loader.style.display = 'none';
+      }
 
       if (response.ok) {
         showFlashMessage('✓ 2FA enabled successfully! Save your backup codes in a secure location.', 'success');
@@ -1001,6 +1038,12 @@
       }
     } catch (error) {
       
+      // Hide global loader on error
+      const loader = document.getElementById('loader-overlay');
+      if (loader) {
+        loader.style.display = 'none';
+      }
+      
       showFlashMessage('Error: ' + error.message, 'error');
       this.disabled = false;
       this.innerHTML = '<i class="fas fa-check mr-2"></i>Verify & Enable';
@@ -1024,6 +1067,12 @@
       const confirmBtn = this; // Store reference
       confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Disabling...';
       
+      // Show global loader
+      const loader = document.getElementById('loader-overlay');
+      if (loader) {
+        loader.style.display = 'flex';
+      }
+      
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
       const response = await fetch('/api/account/disable-2fa', {
@@ -1033,6 +1082,11 @@
           'X-CSRFToken': csrfToken
         }
       });
+      
+      // Hide global loader
+      if (loader) {
+        loader.style.display = 'none';
+      }
       
       const data = await response.json();
 
@@ -1059,6 +1113,12 @@
         confirmBtn.innerHTML = '<i class="fas fa-trash-alt mr-2"></i>Yes, Disable 2FA';
       }
     } catch (error) {
+      
+      // Hide global loader on error
+      const loader = document.getElementById('loader-overlay');
+      if (loader) {
+        loader.style.display = 'none';
+      }
       
       showFlashMessage('Error: ' + error.message, 'error');
       this.disabled = false;

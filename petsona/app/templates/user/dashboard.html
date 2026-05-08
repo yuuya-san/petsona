@@ -82,6 +82,136 @@
     animation: float 3s ease-in-out infinite;
   }
 
+  .top-cards-section {
+    width: min(95vw, 100%);
+    max-width: 95vw;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 768px) {
+    .top-cards-section {
+      max-width: 90vw;
+    }
+  }
+
+  .top-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .top-cards-grid > div {
+    width: 100%;
+    margin: 0;
+    min-width: 0;
+    height: 380px;
+    min-height: 380px;
+    max-height: 380px;
+  }
+
+@media (min-width: 900px) and (max-width: 1200px) {
+  .top-cards-grid {
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+  }
+
+  .top-cards-grid > div:nth-child(4) {
+    display: none;
+  }
+}
+
+  @media (max-width: 900px) {
+    .top-cards-grid {
+      grid-template-columns: repeat(2, minmax(240px, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .top-cards-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .vote-overlay {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0;
+    background: transparent;
+    border: none;
+    width: auto;
+    max-width: none;
+  }
+
+  .vote-button {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-width: 6rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(124, 58, 237, 0.5);
+    background: rgba(124, 58, 237, 0.95);
+    color: #ffffff;
+    box-shadow: 0 12px 28px rgba(99, 102, 241, 0.18);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    cursor: pointer;
+    backdrop-filter: blur(16px);
+  }
+
+  .vote-button:hover {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 18px 35px rgba(99, 102, 241, 0.18);
+  }
+
+  .vote-button.voted {
+    background: rgba(167, 139, 250, 0.95);
+    color: #ffffff;
+    border-color: rgba(167, 139, 250, 0.8);
+  }
+
+  .vote-button.voted lord-icon {
+    filter: drop-shadow(0 0 0.35rem rgba(124, 58, 237, 0.2));
+  }
+
+  .vote-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+  }
+
+  .vote-button:not(.voted) .vote-count {
+    background: rgba(167, 139, 250, 0.9);
+    color: #ffffff;
+  }
+
+  .vote-button.voted .vote-count {
+    background: rgba(255, 255, 255, 0.9);
+    color: #7c3aed;
+  }
+
+  .vote-button:not(.voted) lord-icon {
+    filter: drop-shadow(0 0 0.15rem rgba(124, 58, 237, 0.1));
+  }
+
+  .vote-button.voted lord-icon {
+    filter: drop-shadow(0 0 0.25rem rgba(255, 255, 255, 0.42));
+  }
+
   /* Enhanced Glassmorphism Style */
   .glass {
     background: rgba(255, 255, 255, 0.7);
@@ -344,7 +474,7 @@
 <div class="min-h-screen" x-data="dashboard()">
   
   <!-- Quick Stats Section -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="w-full max-w-[90vw] mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
       <template x-for="(stat, idx) in stats" :key="idx">
         <div 
@@ -377,7 +507,7 @@
   </div>
 
   <!-- Hero Section: Smart Pet Matching -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="w-full max-w-[90vw] mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="glass-hero rounded-3xl overflow-hidden animate-fadeIn">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 p-6 md:p-10 lg:p-14 items-center">
         <!-- Text Content -->
@@ -420,225 +550,263 @@
     </div>
   </div>
 
-  <!-- Top Species Section -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="mb-10">
+  <!-- Top Species and Top Breeds Section -->
+  <div class="top-cards-section mx-auto px-4 sm:px-6 lg:px-8 py-12" style="display: block !important;">
+    <div class="mb-10 ">
       <h2 class="text-3xl md:text-4xl font-bold mb-3">
         <span class="gradient-text">🌟 Top Pet Species</span>
       </h2>
       <p class="text-gray-600 text-lg">Most loved species by our community</p>
     </div>
 
-    {% if top_species %}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-      {% for species in top_species %}
-      <div class="species-glass-card rounded-2xl overflow-hidden group" x-data="{hovered: false}">
-        <!-- Image Section -->
-        <div class="image-wrapper relative">
-          <img src="{{ url_for('static', filename=species.image_url or 'uploads/no-image-attachment.jpg') }}" 
-               alt="{{ species.name }}" 
-               class="w-full h-full object-cover">
-          
-          <!-- Rank Badge -->
-          <div class="absolute top-4 left-4 badge-purple rounded-full px-3 py-1 text-sm font-bold">
-            #{{ loop.index }}  <i class="fa-solid fa-trophy"></i>
+    <!-- TOP SPECIES GRID -->
+    <div id="top-species-grid"
+         class="top-cards-grid gap-4 sm:gap-5 lg:gap-6">
+
+    {% for species in top_species %}
+        {% set image_url = url_for('static', filename=species.image_url or 'uploads/no-image-attachment.jpg') %}
+
+        <div x-data="{ menu: false }"
+            data-species-name="{{ species.name.lower() }}"
+            class="species-item w-full rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col overflow-hidden relative"
+            style="height: 380px; min-height: 380px; max-height: 380px;
+                    background-image: url('{{ image_url }}');
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;">
+
+          <div class="vote-overlay">
+            <button
+              type="button"
+              class="vote-button species-vote-button"
+              data-species-id="{{ species.id }}"
+              data-voted="{{ 'true' if species.id in voted_species_ids else 'false' }}"
+              aria-label="Vote for {{ species.name }}"
+            >
+              <lord-icon
+                src="https://cdn.lordicon.com/qlrjanhh.json"
+                trigger="morph"
+                state="morph-glitter"
+                colors="{{ 'primary:#ffffff,secondary:#ffffff' if species.id in voted_species_ids else 'primary:#d4d1fa,secondary:#c69cf4' }}"
+                style="width:34px;height:25px">
+              </lord-icon>
+              <span class="vote-count" aria-live="polite">{{ species.heart_vote_count or 0 }}</span>
+            </button>
           </div>
 
-          <!-- Vote Badge -->
-          <div class="absolute top-4 right-4 bg-red-500 text-white rounded-full px-3 py-1 text-sm font-bold vote-badge flex items-center gap-1">
-            <i class="fas fa-heart"></i>{{ species.heart_vote_count | default(0) }}
-          </div>
-        </div>
+      <!-- CONTENT -->
+      <div class="p-4 sm:p-5 lg:p-6 flex flex-col flex-1 gap-4">
 
-        <!-- Content Section -->
-          <div class="p-5 md:p-6 flex flex-col flex-1 space-y-6">
-            <div class="flex items-center gap-2">
-            <i class="{{ species.display_icon }} text-purple-600 text-xl"></i>
-            <h3 class="text-lg md:text-xl font-bold text-gray-900 line-clamp-1">{{ species.name }}</h3>
-          </div>
+        <!-- CTA BUTTONS -->
+        <div class="mt-auto flex gap-2 pt-2">
 
-          <!-- Stats -->
-          <div class="grid grid-cols-2 gap-3 p-3 bg-white bg-opacity-50 rounded-xl border border-purple-100">
-            <div class="text-center">
-              <p class="text-xs text-gray-600 font-semibold uppercase mb-1">Votes</p>
-              <p class="text-2xl font-bold gradient-text">{{ species.heart_vote_count | default(0) }}</p>
-            </div>
-            <div class="text-center">
-              <p class="text-xs text-gray-600 font-semibold uppercase mb-1">Breeds</p>
-              <p class="text-2xl font-bold gradient-text">{{ species.active_breed_count | default(0) }}</p>
-            </div>
-          </div>
-
-          <!-- Button -->
-          <a href="{{ url_for('user.view_species', id=species.id) }}" 
-             class="btn-glass rounded-xl px-4 py-3 pt-4 font-semibold text-sm text-center w-full mt-6">
-            <span class="inline-flex items-center justify-center gap-2 w-full">
-              <i class="fas fa-book"></i>Explore
-            </span>
+          <!-- VIEW DETAILS -->
+          <a href="{{ url_for('user.view_species', id=species.id) }}"
+            class="flex-1 text-center
+                    bg-white/30 backdrop-blur-md
+                    border border-indigo-200/40
+                    text-indigo-800
+                    py-2 sm:py-2.5 px-3
+                    rounded-xl text-xs sm:text-sm font-medium
+                    cursor-pointer
+                    transition-all duration-200 ease-out
+                    hover:bg-white/50
+                    hover:border-indigo-400/60
+                    hover:text-indigo-900
+                    hover:shadow-lg
+                    hover:-translate-y-0.5
+                    hover:scale-[1.02]
+                    active:scale-100
+                    focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            Learn More
           </a>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <div class="glass rounded-2xl p-12 text-center">
-      <p class="text-gray-600 text-lg">No species data available</p>
-    </div>
-    {% endif %}
-  </div>
 
-  <!-- Top Breeds Section -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="mb-10">
-      <h2 class="text-3xl md:text-4xl font-bold mb-3">
-        <span class="gradient-text">🏆 Trending Breeds</span>
-      </h2>
-      <p class="text-gray-600 text-lg">Popular picks from our community</p>
+        </div>
+
+      </div>
+
+    </div>
+    {% endfor %}
     </div>
 
     {% if top_breeds %}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+    <div class="mt-16 mb-10">
+      <h2 class="text-3xl md:text-4xl font-bold mb-3 pt-5">
+        <span class="gradient-text">🏆 Top Breeds</span>
+      </h2>
+      <p class="text-gray-600 text-lg">The top voted breeds our community loves most</p>
+    </div>
+
+    <div id="top-breeds-grid"
+         class="top-cards-grid gap-4 sm:gap-5 lg:gap-6">
+
       {% for breed in top_breeds %}
-      <div class="species-glass-card rounded-2xl overflow-hidden">
-        <!-- Image Section -->
-        <div class="image-wrapper relative">
-          <img src="{{ url_for('static', filename=breed.image_url or 'uploads/no-image-attachment.jpg') }}" 
-               alt="{{ breed.name }}" 
-               class="w-full h-full object-cover">
-          
-          <!-- Vote Badge -->
-          <div class="absolute top-4 right-4 bg-red-500 text-white rounded-full px-3 py-1 text-sm font-bold vote-badge flex items-center gap-1">
-            <i class="fas fa-heart"></i>{{ breed.heart_vote_count | default(0) }}
+        {% set image_url = url_for('static', filename=breed.image_url or 'uploads/no-image-attachment.jpg') %}
+
+        <div x-data="{ menu: false }"
+            class="w-full rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col overflow-hidden relative"
+            style="height: 400px; min-height: 400px; max-height: 400px;
+                    background-image: url('{{ image_url }}');
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;">
+
+          <div class="vote-overlay">
+            <button
+              type="button"
+              class="vote-button breed-vote-button"
+              data-breed-id="{{ breed.id }}"
+              data-voted="{{ 'true' if breed.id in voted_breed_ids else 'false' }}"
+              aria-label="Vote for {{ breed.name }}"
+            >
+              <lord-icon
+                src="https://cdn.lordicon.com/qlrjanhh.json"
+                trigger="morph"
+                state="morph-glitter"
+                colors="{{ 'primary:#ffffff,secondary:#ffffff' if breed.id in voted_breed_ids else 'primary:#d4d1fa,secondary:#c69cf4' }}"
+                style="width:34px;height:28px">
+              </lord-icon>
+              <span class="vote-count" aria-live="polite">{{ breed.heart_vote_count or 0 }}</span>
+            </button>
           </div>
+
+        <!-- CONTENT -->
+        <div class="p-4 sm:p-5 lg:p-6 flex flex-col flex-1 gap-4">
+
+          <!-- CTA BUTTONS -->
+          <div class="mt-auto flex gap-2 pt-2">
+
+            <a href="{{ url_for('user.view_species', id=breed.species_id) }}?breed_id={{ breed.id }}"
+              class="flex-1 text-center
+                    bg-white/30 backdrop-blur-md
+                    border border-indigo-200/40
+                    text-indigo-800
+                    py-2 sm:py-2.5 px-3
+                    rounded-xl text-xs sm:text-sm font-medium
+                    cursor-pointer
+                    transition-all duration-200 ease-out
+                    hover:bg-white/50
+                    hover:border-indigo-400/60
+                    hover:text-indigo-900
+                    hover:shadow-lg
+                    hover:-translate-y-0.5
+                    hover:scale-[1.02]
+                    active:scale-100
+                    focus:outline-none focus:ring-2 focus:ring-indigo-300">
+              Learn More
+            </a>
+
+          </div>
+
         </div>
 
-        <!-- Content Section -->
-        <div class="p-5 md:p-6 flex flex-col flex-1 space-y-4">
-          <div>
-            <h3 class="text-lg md:text-xl font-bold text-gray-900 line-clamp-1">{{ breed.name }}</h3>
-            <p class="text-sm text-gray-600">{{ breed.species.name if breed.species else 'Unknown' }}</p>
-          </div>
-
-          <!-- Quick Stats - Level UI with Color Gradient -->
-          <div class="space-y-3 p-4 bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-100">
-            <!-- Energy Level -->
-            <div class="space-y-1.5">
-              <div class="flex items-center justify-between">
-                <span class="text-gray-700 font-semibold flex items-center gap-2 text-xs uppercase">
-                  <i class="fas fa-bolt"></i>Energy
-                </span>
-                <span class="text-xs font-bold text-gray-700">
-                  {{ breed.energy_level or 'Medium' }}
-                </span>
-              </div>
-              <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full rounded-full transition-all duration-500 level-bar"
-                  data-level="{{ breed.energy_level or 'Medium' }}"></div>
-              </div>
-            </div>
-
-            <!-- Exercise Needs -->
-            <div class="space-y-1.5">
-              <div class="flex items-center justify-between">
-                <span class="text-gray-700 font-semibold flex items-center gap-2 text-xs uppercase">
-                  <i class="fas fa-running"></i>Exercise
-                </span>
-                <span class="text-xs font-bold text-gray-700">
-                  {{ breed.exercise_needs or 'Medium' }}
-                </span>
-              </div>
-              <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full rounded-full transition-all duration-500 level-bar"
-                  data-level="{{ breed.exercise_needs or 'Medium' }}"></div>
-              </div>
-            </div>
-
-            <!-- Care Intensity -->
-            <div class="space-y-1.5">
-              <div class="flex items-center justify-between">
-                <span class="text-gray-700 font-semibold flex items-center gap-2 text-xs uppercase">
-                  <i class="fas fa-shield-alt"></i>Care Level
-                </span>
-                <span class="text-xs font-bold text-gray-700">
-                  {{ breed.care_intensity or 'Medium' }}
-                </span>
-              </div>
-              <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full rounded-full transition-all duration-500 level-bar"
-                  data-level="{{ breed.care_intensity or 'Medium' }}"></div>
-              </div>
-            </div>
-
-            <!-- Trainability -->
-            <div class="space-y-1.5">
-              <div class="flex items-center justify-between">
-                <span class="text-gray-700 font-semibold flex items-center gap-2 text-xs uppercase">
-                  <i class="fas fa-brain"></i>Trainability
-                </span>
-                <span class="text-xs font-bold text-gray-700">
-                  {{ breed.trainability or 'Moderate' }}
-                </span>
-              </div>
-              <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
-                <div class="h-full rounded-full transition-all duration-500 level-bar"
-                  data-level="{{ breed.trainability or 'Moderate' }}"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Button -->
-          <a href="{{ url_for('user.view_species', id=breed.species_id) }}" 
-             class="btn-glass rounded-xl px-4 py-3 font-semibold text-sm text-center w-full mt-6">
-            <span class="inline-flex items-center justify-center gap-2 w-full">
-              <i class="fas fa-book"></i>Learn More
-            </span>
-          </a>
-        </div>
       </div>
       {% endfor %}
     </div>
-    {% else %}
-    <div class="glass rounded-2xl p-12 text-center">
-      <p class="text-gray-600 text-lg">No breed data available</p>
-    </div>
     {% endif %}
-  </div>
 
-  <!-- Responsibility Section -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="mb-10">
-      <h2 class="text-3xl md:text-4xl font-bold mb-3">
-        <span class="gradient-text">💚 Pet Owner Responsibilities</span>
-      </h2>
-      <p class="text-gray-600 text-lg">Essential practices for pet care</p>
-    </div>
+    <div class="mt-16">
+      <div class="mb-10">
+        <h2 class="text-3xl md:text-4xl font-bold mb-3 pt-5">
+          <span class="gradient-text">💚 Pet Owner Responsibilities</span>
+        </h2>
+        <p class="text-gray-600 text-lg">Essential practices for pet care</p>
+      </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <template x-for="(item, idx) in responsibilities" :key="idx">
-        <div class="responsibility-glass rounded-2xl p-6 md:p-8 group space-y-4"
-          :style="{ 'animation-delay': (idx * 0.1) + 's' }"
-          x-show="true"
-          x-transition>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="responsibility-glass rounded-2xl p-6 md:p-8 group space-y-4">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform">
-              <i :class="item.icon"></i>
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xl">
+              <i class="fas fa-apple-alt"></i>
             </div>
-            <h3 class="text-lg md:text-xl font-bold text-gray-900" x-text="item.title"></h3>
+            <h3 class="text-lg md:text-xl font-bold text-gray-900">Proper Nutrition</h3>
           </div>
-          <p class="text-gray-700 text-sm md:text-base leading-relaxed" x-text="item.description"></p>
+          <p class="text-gray-700 text-sm md:text-base leading-relaxed">Provide your pet with a well-balanced diet that suits their specific species, age, and health needs.</p>
           <ul class="space-y-2 text-sm text-gray-600">
-            <template x-for="point in item.points">
-              <li class="flex items-start gap-2">
-                <span class="text-emerald-500 font-bold mt-0.5">✓</span>
-                <span x-text="point"></span>
-              </li>
-            </template>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Learn the nutritional requirements unique to your pet’s species</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Seek guidance from a veterinarian for proper portion control</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Ensure clean, fresh water is always accessible</span></li>
           </ul>
         </div>
-      </template>
+
+        <div class="responsibility-glass rounded-2xl p-6 md:p-8 group space-y-4">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xl">
+              <i class="fas fa-heartbeat"></i>
+            </div>
+            <h3 class="text-lg md:text-xl font-bold text-gray-900">Regular Vet Care</h3>
+          </div>
+          <p class="text-gray-700 text-sm md:text-base leading-relaxed">Ensure your pet stays in good health by arranging routine check-ups and keeping vaccinations current.</p>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Schedule yearly health examinations</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Keep vaccinations updated as recommended</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Provide preventive treatments and routine health screenings</span></li>
+          </ul>
+        </div>
+
+        <div class="responsibility-glass rounded-2xl p-6 md:p-8 group space-y-4">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xl">
+              <i class="fas fa-running"></i>
+            </div>
+            <h3 class="text-lg md:text-xl font-bold text-gray-900">Exercise & Enrichment</h3>
+          </div>
+          <p class="text-gray-700 text-sm md:text-base leading-relaxed">Support your pet’s overall well-being with regular physical activity and engaging mental stimulation.</p>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Include daily walks or active play sessions</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Offer toys and interactive games to keep them engaged</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Create a stimulating environment that encourages natural behaviors</span></li>
+          </ul>
+        </div>
+
+        <div class="responsibility-glass rounded-2xl p-6 md:p-8 group space-y-4">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xl">
+              <i class="fas fa-bath"></i>
+            </div>
+            <h3 class="text-lg md:text-xl font-bold text-gray-900">Grooming & Hygiene</h3>
+          </div>
+          <p class="text-gray-700 text-sm md:text-base leading-relaxed">Keep your pet clean and comfortable with regular grooming and hygienic care.</p>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Bathe and brush your pet on a consistent schedule</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Trim nails regularly and support proper dental care</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Keep their living area clean and well-maintained</span></li>
+          </ul>
+        </div>
+
+        <div class="responsibility-glass rounded-2xl p-6 md:p-8 group space-y-4">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xl">
+              <i class="fas fa-users"></i>
+            </div>
+            <h3 class="text-lg md:text-xl font-bold text-gray-900">Socialization & Training</h3>
+          </div>
+          <p class="text-gray-700 text-sm md:text-base leading-relaxed">Help your pet build positive behavior and confidence through socialization and training.</p>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Introduce them early to people, animals, and environments</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Use reward-based methods to reinforce good behavior</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Teach essential commands and establish household rules</span></li>
+          </ul>
+        </div>
+
+        <div class="responsibility-glass rounded-2xl p-6 md:p-8 group space-y-4">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white text-xl">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3 class="text-lg md:text-xl font-bold text-gray-900">Safety & Comfort</h3>
+          </div>
+          <p class="text-gray-700 text-sm md:text-base leading-relaxed">Provide a secure, relaxing environment where your pet can feel protected and at ease.</p>
+          <ul class="space-y-2 text-sm text-gray-600">
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Make your home pet-safe by removing hazards</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Ensure proper identification and consider microchipping</span></li>
+            <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Provide a cozy resting area with suitable bedding</span></li>
+          </ul>
+        </div>
+      </div>
     </div>
+
   </div>
-</div>
 
 <script>
   function dashboard() {

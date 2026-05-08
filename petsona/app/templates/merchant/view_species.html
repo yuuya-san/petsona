@@ -726,7 +726,7 @@
         editingBreed: null,
         imagePreview: null
       }"
-     class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10">
+     class="w-[95vw] mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10">
 
   <!-- 🔷 BREEDS SECTION -->
   <div>
@@ -753,7 +753,7 @@
 
 
     {% if breeds %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 3xl:grid-cols-5 gap-4 sm:gap-5 lg:gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 3xl:grid-cols-5 4xl:grid-cols-6 gap-4 sm:gap-5 lg:gap-6">
 
 
        {% for breed in breeds %}
@@ -762,7 +762,7 @@
 
         <div x-data="{ menu: false, confirm: false }"
             class="w-full rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col overflow-hidden relative"
-            style="height: 380px; min-height: 380px; max-height: 380px;
+            style="height: 400px; min-height: 400px; max-height: 400px;
                     background-image: url('{{ image_url }}');
                     background-size: cover;
                     background-position: center;

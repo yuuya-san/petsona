@@ -112,17 +112,35 @@ def dashboard():
     match_count = MatchHistory.query.count()
     
     # ======================== TOP SPECIES SECTION ========================
-    # Get top 3 species by vote count
+    # Get top 4 species by vote count
     top_species = Species.query.filter(
         Species.deleted_at.is_(None)
-    ).order_by(Species.heart_vote_count.desc()).limit(3).all()
+    ).order_by(Species.heart_vote_count.desc()).limit(4).all()
     
     # ======================== TOP BREEDS SECTION ========================
-    # Get top 3 breeds by vote count
+    # Get top 4 breeds by vote count
     top_breeds = Breed.query.filter(
         Breed.deleted_at.is_(None)
-    ).order_by(Breed.heart_vote_count.desc()).limit(3).all()
-    
+    ).order_by(Breed.heart_vote_count.desc()).limit(4).all()
+
+    species_ids = [species.id for species in top_species]
+    voted_species_ids = set()
+    if species_ids:
+        user_votes = Vote.query.filter(
+            Vote.user_id == current_user.id,
+            Vote.species_id.in_(species_ids)
+        ).all()
+        voted_species_ids = {vote.species_id for vote in user_votes}
+
+    breed_ids = [breed.id for breed in top_breeds]
+    voted_breed_ids = set()
+    if breed_ids:
+        user_votes = Vote.query.filter(
+            Vote.user_id == current_user.id,
+            Vote.breed_id.in_(breed_ids)
+        ).all()
+        voted_breed_ids = {vote.breed_id for vote in user_votes}
+
     # ======================== RECENTLY ADDED/UPDATED ========================
     # Get recently added species (last 7 days)
     week_ago = get_ph_datetime() - timedelta(days=7)
@@ -148,6 +166,8 @@ def dashboard():
         # Top sections
         top_species=top_species,
         top_breeds=top_breeds,
+        voted_species_ids=voted_species_ids,
+        voted_breed_ids=voted_breed_ids,
         # Recent sections
         recent_species=recent_species,
         updated_species=updated_species

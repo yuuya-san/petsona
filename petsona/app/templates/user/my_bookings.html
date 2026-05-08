@@ -2535,6 +2535,7 @@
                           data-status="{{ booking.status }}"
                           data-confirmation-code="{{ booking.confirmation_code }}"
                           data-qr-code-url="{{ booking.qr_code_url or '' }}"
+                          data-updated-at="{{ booking.updated_at.strftime('%B %d, %Y at %I:%M:%S %p') if booking.updated_at else '' }}"
                           onclick="showDetailsModal(this)">
                     <i class="fas fa-eye"></i>
                   </button>
@@ -2555,6 +2556,7 @@
                           data-status="{{ booking.status }}"
                           data-confirmation-code="{{ booking.confirmation_code }}"
                           data-qr-code-url="{{ booking.qr_code_url or '' }}"
+                          data-updated-at="{{ booking.updated_at.strftime('%B %d, %Y at %I:%M:%S %p') if booking.updated_at else '' }}"
                           onclick="downloadReceiptDirectly(this)">
                     <i class="fas fa-download"></i>
                   </button>
@@ -3238,6 +3240,7 @@
     const status = button.dataset.status;
     const confirmationCode = button.dataset.confirmationCode;
     const qrCodeUrl = button.dataset.qrCodeUrl;
+    const updatedAt = button.dataset.updatedAt;
 
     // Populate receipt data
     document.getElementById('receiptBookingNumber').textContent = bookingNumber;
@@ -3260,21 +3263,28 @@
     // Update footer status message based on booking status
     const footerStatusElement = document.getElementById('receiptFooterStatus');
     if (status === 'confirmed' || status === 'completed') {
-      footerStatusElement.innerHTML = '<i class="fas fa-check-circle"></i> Booking Confirmed & Secured';
+      footerStatusElement.innerHTML = '<i class="fas fa-check-circle"></i>Booking Confirmed & Secured';
       footerStatusElement.style.color = 'var(--success)';
     } else if (status === 'pending') {
-      footerStatusElement.innerHTML = '<i class="fas fa-hourglass-half"></i> Booking Pending Confirmation';
+      footerStatusElement.innerHTML = '<i class="fas fa-hourglass-half"></i>Booking Pending for Confirmation';
       footerStatusElement.style.color = 'var(--warning)';
     } else if (status === 'cancelled') {
-      footerStatusElement.innerHTML = '<i class="fas fa-circle-xmark"></i> Booking Cancelled';
+      footerStatusElement.innerHTML = '<i class="fas fa-circle-xmark"></i>Booking Cancelled';
+      footerStatusElement.style.color = 'var(--danger)';
+    } else if (status === 'rejected') {
+      footerStatusElement.innerHTML = '<i class="fas fa-circle-xmark"></i>Booking Rejected';
       footerStatusElement.style.color = 'var(--danger)';
     }
 
-    // Set generated date
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    document.getElementById('receiptGeneratedDate').textContent = `${dateStr} at ${timeStr}`;
+    // Set generated date from booking updated timestamp
+    if (updatedAt) {
+      document.getElementById('receiptGeneratedDate').textContent = updatedAt;
+    } else {
+      const fallbackDate = new Date();
+      const dateStr = fallbackDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const timeStr = fallbackDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('receiptGeneratedDate').textContent = `${dateStr} at ${timeStr}`;
+    }
 
     // Display server-generated QR Code
     const qrContainer = document.getElementById('receiptQR');
@@ -3468,6 +3478,7 @@
     const status = button.dataset.status;
     const confirmationCode = button.dataset.confirmationCode;
     const qrCodeUrl = button.dataset.qrCodeUrl;
+    const updatedAt = button.dataset.updatedAt;
 
     // Show loading state
     const originalHTML = button.innerHTML;
@@ -3502,11 +3513,15 @@
       digitalFooterStatusElement.style.color = '#6b7280';
     }
 
-    // Set generated date for digital receipt
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    document.getElementById('digitalGeneratedDate').textContent = `${dateStr} at ${timeStr}`;
+    // Set generated date from booking updated timestamp for digital receipt
+    if (updatedAt) {
+      document.getElementById('digitalGeneratedDate').textContent = updatedAt;
+    } else {
+      const fallbackDate = new Date();
+      const dateStr = fallbackDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const timeStr = fallbackDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('digitalGeneratedDate').textContent = `${dateStr} at ${timeStr}`;
+    }
 
     // Display QR Code in digital receipt
     const digitalQRContainer = document.getElementById('digitalQR');
