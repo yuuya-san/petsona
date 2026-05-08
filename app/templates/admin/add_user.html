@@ -1,0 +1,12 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="admin-center-wrapper">
+  <div class="admin-card fade-in">
+    {% set button_text = button_text %}
+    {% set is_edit = False %}
+    {% include "admin/_user_form.html" %}
+  </div>
+</div>
+{% endblock %}

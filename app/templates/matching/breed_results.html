@@ -1,0 +1,968 @@
+{% if current_user.is_authenticated %}
+{% extends current_user.role ~ "/base.html" %}
+{% else %}
+{% extends "auth/base.html" %}
+{% endif %}
+
+{% block content %}
+
+<!-- Fonts + Icons -->
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+  --purple: #7c3aed;
+  --purple-dark: #6d28d9;
+  --purple-light: #f5f3ff;
+  --bg: #f8fafc;
+  --glass: rgba(255, 255, 255, 0.85);
+  --border: rgba(139, 92, 246, 0.15);
+  --text: #1e293b;
+  --text-light: #475569;
+  --muted: #78716c;
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* RESET */
+* {
+  box-sizing: border-box;
+}
+
+/* BASE */
+body {
+  background: linear-gradient(135deg, var(--bg) 0%, #f1f5f9 100%);
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* CONTAINER */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+/* GLASS */
+.glass {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.glass:hover {
+  border-color: rgba(139, 92, 246, 0.25);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+/* TYPOGRAPHY */
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--text-light);
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* MAIN CARD */
+.main-card {
+  padding: 28px;
+  margin-top: 28px;
+}
+
+/* GRID */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+}
+
+/* GRID 3 COLUMNS - Responsive with auto-fit */
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 640px) {
+  .grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+}
+
+/* IMAGE */
+.breed-img {
+  width: 100%;
+  height: 420px;
+  max-width: 320px;
+  margin: 0 auto;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease;
+  aspect-ratio: 3/4;
+}
+
+.breed-img:hover {
+  transform: scale(1.03);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+}
+
+.main-card h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: var(--text);
+}
+
+/* SCORE */
+.score-circle {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Circular background */
+.score-circle-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--score-color, var(--purple)) 0deg,
+    var(--score-color, var(--purple)) calc(var(--score-percent, 75) * 3.6deg),
+    #e2e8f0 calc(var(--score-percent, 75) * 3.6deg),
+    #e2e8f0 360deg
+  );
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 50%;
+  transition: all 0.4s ease;
+}
+
+/* Inner circle (white center) */
+.score-circle-inner {
+  position: absolute;
+  width: 88%;
+  height: 88%;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.score-circle-value {
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--score-color, var(--purple));
+  line-height: 1;
+}
+
+.score-circle-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+/* STATUS LABEL */
+.score-label {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-top: 16px;
+}
+
+.score-label.excellent {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.score-label.good {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.score-label.fair {
+  background: #fed7aa;
+  color: #9a3412;
+}
+
+.score-label.poor {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+/* ABOUT SECTION */
+.breed-about {
+  margin-top: 16px;
+  padding-top: 16px;
+  padding: 16px;
+  border-top: 2px solid #e2e8f0;
+  width: 100%;
+  text-align: center;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.breed-about p {
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.score-progress-label-text {
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* BADGES */
+.badge {
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-sm);
+}
+
+.badge.good { background: #dbeafe; color: #1e40af; }
+.badge.excellent { background: #dcfce7; color: #15803d; }
+.badge.fair { background: #fed7aa; color: #9a3412; }
+.badge.poor { background: #fecaca; color: #991b1b; }
+
+/* BUTTONS */
+.btn {
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-outline {
+  border: 2px solid var(--purple);
+  color: var(--purple);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: var(--purple-light);
+  transform: translateY(-2px);
+}
+
+.btn-outline:active {
+  transform: translateY(0);
+}
+
+/* SECTION */
+.section {
+  margin-top: 40px;
+}
+
+.section-title {
+  font-weight: 800;
+  font-size: 20px;
+  margin: 0 0 8px 0;
+  color: var(--text);
+}
+
+.section-sub {
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+/* CARD */
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.card > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.card > div:first-child span:last-child {
+  color: var(--purple);
+  font-weight: 700;
+}
+
+/* PROGRESS */
+.progress {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple) 0%, #c084fc 100%);
+  transition: width 0.4s ease;
+  border-radius: 999px;
+}
+
+/* INSIGHTS */
+.insight {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border-left: 4px solid;
+  background: white;
+  font-size: 14px;
+  line-height: 1.6;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.insight i {
+  margin-top: 2px;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.insight:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.insight.good {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.insight.bad {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.insight.neutral {
+  border-color: #8b5cf6;
+  background: var(--purple-light);
+}
+
+/* INSIGHT CARD */
+.insight-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.insight-card:hover {
+  border-color: var(--border);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+.insight-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.insight-card-header-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.insight-card-header-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  flex: 1;
+}
+
+.insight-card.good .insight-card-header {
+  border-bottom-color: #d1fae5;
+}
+
+.insight-card.good .insight-card-header-icon {
+  color: #10b981;
+}
+
+.insight-card.bad .insight-card-header {
+  border-bottom-color: #fee2e2;
+}
+
+.insight-card.bad .insight-card-header-icon {
+  color: #ef4444;
+}
+
+.insight-card.neutral .insight-card-header {
+  border-bottom-color: #ede9fe;
+}
+
+.insight-card.neutral .insight-card-header-icon {
+  color: #8b5cf6;
+}
+
+.insight-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.insight-card-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.insight-card-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.insight-card-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.insight-card-content::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.insight-card-item {
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition: all 0.2s ease;
+  border-left: 2px solid transparent;
+}
+
+.insight-card-item i {
+  margin-top: 3px;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.insight-card-item:hover {
+  transform: translateX(4px);
+  border-left-color: currentColor;
+}
+
+.insight-card.good .insight-card-item {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.insight-card.bad .insight-card-item {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.insight-card.neutral .insight-card-item {
+  background: var(--purple-light);
+  color: #5b21b6;
+}
+
+/* FOOTER */
+.footer-actions {
+  margin-top: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+/* BREAKDOWN CARD */
+.breakdown-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.breakdown-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.breakdown-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.breakdown-card-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  text-transform: capitalize;
+  margin: 0;
+}
+
+.breakdown-card-percentage {
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--purple);
+}
+
+.breakdown-card-label {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.breakdown-card-label.excellent {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.breakdown-card-label.good {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.breakdown-card-label.fair {
+  background: #fed7aa;
+  color: #9a3412;
+}
+
+.breakdown-card-label.needs-improvement {
+  background: #fce7f3;
+  color: #831843;
+}
+
+.breakdown-card-label.critical {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.breakdown-card-description {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.breakdown-progress {
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.breakdown-progress-fill {
+  height: 100%;
+  transition: width 0.4s ease;
+  border-radius: 999px;
+}
+
+.breakdown-progress-fill.excellent {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.breakdown-progress-fill.good {
+  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.breakdown-progress-fill.fair {
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+}
+
+.breakdown-progress-fill.needs-improvement {
+  background: linear-gradient(90deg, #ec4899 0%, #db2777 100%);
+}
+
+.breakdown-progress-fill.critical {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+}
+</style>
+
+<div class="page-container">
+
+  <!-- HEADER -->
+
+  <div>
+    <div class="title">Compatibility Result</div>
+    <div class="subtitle">
+      Based on your lifestyle for <strong>{{ breed.name }}</strong>
+    </div>
+  </div>
+
+  <!-- MAIN CARD -->
+
+  <div class="glass main-card">
+
+    <div class="grid-2">
+
+      <!-- LEFT -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+        <h2>{{ breed.name }}</h2>
+
+        {% if breed.species %}
+        <p class="subtitle">{{ breed.species.name }}</p>
+        {% endif %}
+
+        {% if breed.image_url %}
+        <img src="{{ url_for('static', filename=breed.image_url) }}" class="breed-img">
+        {% endif %}
+
+        <!-- ABOUT BREED -->
+        {% if breed.summary %}
+        <div class="breed-about">
+          <p>{{ breed.summary }}</p>
+        </div>
+        {% else %}
+        <div class="breed-about">
+          <p>No description available for this breed.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- RIGHT -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+
+        {% if score >= 80 %}
+          {% set status_class = "excellent" %}
+          {% set status_label = "Excellent Match" %}
+          {% set score_color = "#10b981" %}
+        {% elif score >= 60 %}
+          {% set status_class = "good" %}
+          {% set status_label = "Good Match" %}
+          {% set score_color = "#3b82f6" %}
+        {% elif score >= 40 %}
+          {% set status_class = "fair" %}
+          {% set status_label = "Fair Match" %}
+          {% set score_color = "#f59e0b" %}
+        {% else %}
+          {% set status_class = "poor" %}
+          {% set status_label = "Challenging" %}
+          {% set score_color = "#ef4444" %}
+        {% endif %}
+
+        <div class="score-circle" style="--score-percent: {{ score }}; --score-color: {{ score_color }};">
+          <div class="score-circle-bg"></div>
+          <div class="score-circle-inner">
+            <div class="score-circle-value">{{ score|round|int }}</div>
+            <div class="score-circle-text">%</div>
+          </div>
+        </div>
+
+        <div class="score-label {{ status_class }}">{{ status_label }}</div>
+
+        <div class="flex flex-wrap justify-center gap-3">
+
+          <!-- Retake -->
+          <a href="{{ url_for('matching.quiz_specific', breed_id=breed.id) }}"
+            class="flex items-center justify-center gap-2
+                    h-12 px-6 min-w-[220px] max-w-[320px] w-full sm:w-auto
+                    rounded-2xl
+                    border border-indigo-500 text-indigo-600 bg-white/70 backdrop-blur
+                    text-sm font-semibold
+                    shadow-sm hover:shadow-md
+                    transition-all duration-200
+                    hover:-translate-y-[1px] active:scale-95">
+            <i class="fas fa-redo text-indigo-500"></i>
+            <span class="w-full text-center">Retake Matching</span>
+          </a>
+
+          {% if request.args.get('from_results') %}
+            <!-- Back to Results -->
+            <a href="{{ url_for('matching.general_results') }}"
+              class="flex items-center justify-center gap-2
+                      h-12 px-6 min-w-[220px] max-w-[320px] w-full sm:w-auto
+                      rounded-2xl
+                      bg-indigo-600 text-white
+                      text-sm font-semibold
+                      shadow-sm hover:shadow-lg
+                      transition-all duration-200
+                      hover:bg-indigo-700 hover:-translate-y-[1px] active:scale-95">
+              <i class="fa-solid fa-arrow-left"></i>
+              <span class="w-full text-center">Back to Results</span>
+            </a>
+          {% elif current_user.is_authenticated %}
+            {% if current_user.role == "admin" and breed.species_id %}
+              <a href="{{ url_for('pets.view_species', id=breed.species_id) }}"
+                class="flex items-center justify-center gap-2
+                        h-12 px-6 min-w-[220px] max-w-[320px] w-full sm:w-auto
+                        rounded-2xl
+                        bg-indigo-600 text-white
+                        text-sm font-semibold
+                        shadow-sm hover:shadow-lg
+                        transition-all duration-200
+                        hover:bg-indigo-700 hover:-translate-y-[1px] active:scale-95">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span class="w-full text-center">Back to Breed Management</span>
+              </a>
+
+            {% elif current_user.role == "merchant" and breed.species_id %}
+              <a href="{{ url_for('merchant.view_species', id=breed.species_id) }}"
+                class="flex items-center justify-center gap-2
+                        h-12 px-6 min-w-[220px] max-w-[320px] w-full sm:w-auto
+                        rounded-2xl
+                        bg-indigo-600 text-white
+                        text-sm font-semibold
+                        shadow-sm hover:shadow-lg
+                        transition-all duration-200
+                        hover:bg-indigo-700 hover:-translate-y-[1px] active:scale-95">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span class="w-full text-center">Back to Breeds</span>
+              </a>
+
+            {% elif current_user.role == "user" and breed.species_id %}
+              <a href="{{ url_for('user.view_species', id=breed.species_id) }}"
+                class="flex items-center justify-center gap-2
+                        h-12 px-6 min-w-[220px] max-w-[320px] w-full sm:w-auto
+                        rounded-2xl
+                        bg-indigo-600 text-white
+                        text-sm font-semibold
+                        shadow-sm hover:shadow-lg
+                        transition-all duration-200
+                        hover:bg-indigo-700 hover:-translate-y-[1px] active:scale-95">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span class="w-full text-center">Back to Breeds</span>
+              </a>
+
+            {% else %}
+              <a href="{{ url_for('auth.home') }}"
+                class="flex items-center justify-center gap-2
+                        h-12 px-6 min-w-[220px] max-w-[320px] w-full sm:w-auto
+                        rounded-2xl
+                        bg-indigo-600 text-white
+                        text-sm font-semibold
+                        shadow-sm hover:shadow-lg
+                        transition-all duration-200
+                        hover:bg-indigo-700 hover:-translate-y-[1px] active:scale-95">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span class="w-full text-center">Back to Home</span>
+              </a>
+            {% endif %}
+          {% endif %}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- BREAKDOWN -->
+
+  <div class="section">
+    <div class="section-title">Breakdown</div>
+    <div class="section-sub">Category compatibility analysis</div>
+
+    <div class="grid-3" style="margin-top: 20px;">
+      {% for category, data in category_scores.items() %}
+        {% set percentage = data.percentage %}
+        {% if percentage >= 80 %}
+          {% set label = "Excellent" %}
+          {% set label_class = "excellent" %}
+          {% set description = "Perfect match for this category" %}
+        {% elif percentage >= 60 %}
+          {% set label = "Good" %}
+          {% set label_class = "good" %}
+          {% set description = "Well-suited for this category" %}
+        {% elif percentage >= 40 %}
+          {% set label = "Fair" %}
+          {% set label_class = "fair" %}
+          {% set description = "Acceptable but has some concerns" %}
+        {% elif percentage >= 20 %}
+          {% set label = "Needs Improvement" %}
+          {% set label_class = "needs-improvement" %}
+          {% set description = "Should consider improvements" %}
+        {% else %}
+          {% set label = "Critical" %}
+          {% set label_class = "critical" %}
+          {% set description = "Major concerns in this area" %}
+        {% endif %}
+
+        <div class="breakdown-card">
+          <div class="breakdown-card-header">
+            <h4 class="breakdown-card-title">{{ category|replace('_', ' ') }}</h4>
+            <span class="breakdown-card-percentage">{{ percentage|int }}%</span>
+          </div>
+
+          <div class="breakdown-card-label {{ label_class }}">{{ label }}</div>
+          <p class="breakdown-card-description">{{ description }}</p>
+
+          <div class="breakdown-progress">
+            <div class="breakdown-progress-fill {{ label_class }}" style="width: {{ percentage }}%"></div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <!-- INSIGHTS GRID -->
+
+  <div style="margin-top: 40px;">
+    <div class="section-title" style="margin-bottom: 12px;">Detailed Insights</div>
+    <div class="grid-3">
+
+      <!-- MATCH CARD -->
+      {% if matched_reasons %}
+      <div class="insight-card good">
+        <div class="insight-card-header">
+          <i class="fas fa-check-circle insight-card-header-icon"></i>
+          <h3 class="insight-card-header-title">Why You Match</h3>
+        </div>
+        <div class="insight-card-content">
+          {% for r in matched_reasons %}
+          <div class="insight-card-item">
+            <i class="fas fa-check"></i>
+            <span>{{ r }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- MISMATCH CARD -->
+      {% if mismatch_reasons %}
+      <div class="insight-card bad">
+        <div class="insight-card-header">
+          <i class="fas fa-exclamation-circle insight-card-header-icon"></i>
+          <h3 class="insight-card-header-title">Concerns</h3>
+        </div>
+        <div class="insight-card-content">
+          {% for r in mismatch_reasons %}
+          <div class="insight-card-item">
+            <i class="fas fa-warning"></i>
+            <span>{{ r }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- SUGGESTIONS CARD -->
+      {% if suggestions %}
+      <div class="insight-card neutral">
+        <div class="insight-card-header">
+          <i class="fas fa-lightbulb insight-card-header-icon"></i>
+          <h3 class="insight-card-header-title">Suggestions</h3>
+        </div>
+        <div class="insight-card-content">
+          {% if suggestions is mapping %}
+            <!-- If suggestions is a dict with all_suggestions -->
+            {% for s in suggestions.get('all_suggestions', suggestions.get('suggestions', [])) %}
+            <div class="insight-card-item">
+              <i class="fas fa-arrow-right"></i>
+              <span>{{ s }}</span>
+            </div>
+            {% endfor %}
+          {% else %}
+            <!-- If suggestions is a list -->
+            {% for s in suggestions %}
+            <div class="insight-card-item">
+              <i class="fas fa-arrow-right"></i>
+              <span>{{ s }}</span>
+            </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
