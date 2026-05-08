@@ -1,3 +1,5 @@
+import os
+
 from app import create_app, db
 from app.models import *
 
@@ -32,4 +34,4 @@ with app.app_context():
 
 if __name__ == '__main__':
     # Dev server — in production, use Gunicorn/uWSGI behind Nginx with python-socketio
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
