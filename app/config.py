@@ -98,9 +98,10 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SESSION_COOKIE_SECURE = False
 
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        "DATABASE_URI",
-        "mysql+pymysql://root:12345@localhost/petsona"
+    # Use Railway MySQL for development
+    SQLALCHEMY_DATABASE_URI = (
+        "mysql+pymysql://root:parjrgCJmevLFdtYfOnYvEkjIljutGsu"
+        "@turntable.proxy.rlwy.net:41200/railway"
     )
 
     RESET_TOKEN_EXPIRY = int(os.getenv("RESET_TOKEN_EXPIRY", 3600))
