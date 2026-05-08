@@ -32,9 +32,8 @@ class Config:
     DB_PASSWORD = os.getenv("MYSQLPASSWORD", "parjrgCJmevLFdtYfOnYvEkjIljutGsu")
     DB_PORT = os.getenv("MYSQLPORT", 3306)
 
-    SQLALCHEMY_DATABASE_URI = (
-        f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}"
-        f"@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    SQLALCHEMY_DATABASE_URI = os.getenv("MYSQL_URL").replace(
+        "mysql://", "mysql+pymysql://"
     )
 
     # =========================
