@@ -696,7 +696,7 @@
 </div>
 
 <!-- Load reCAPTCHA v3 script -->
-<script src="https://www.google.com/recaptcha/api.js?render=6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT"></script>
+<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
 
 <script>
 const personalSection = document.getElementById('personal-info-section');
@@ -721,7 +721,7 @@ if (registerForm) {
     
     // Execute reCAPTCHA v3
     grecaptcha.ready(function() {
-      grecaptcha.execute('6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT', { action: 'register' }).then(function(token) {
+      grecaptcha.execute('{{ recaptcha_site_key }}', { action: 'register' }).then(function(token) {
         // Set the token in the hidden field
         if (recaptchaTokenField) {
           recaptchaTokenField.value = token;

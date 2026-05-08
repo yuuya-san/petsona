@@ -162,7 +162,7 @@ def register():
     for field, errors in form.errors.items():
         for error in errors:
             flash(error, 'danger')
-    return render_template('auth/register.html', form=form)
+    return render_template('auth/register.html', form=form, recaptcha_site_key=current_app.config.get('RECAPTCHA_SITE_KEY'))
 
 # OTP Verification Form
 from flask_wtf import FlaskForm # pyright: ignore[reportMissingImports]
@@ -443,7 +443,7 @@ def login():
         for error in errors:
             flash(error, 'danger')
 
-    return render_template('auth/login.html', form=form)
+    return render_template('auth/login.html', form=form, recaptcha_site_key=current_app.config.get('RECAPTCHA_SITE_KEY'))
 
         
 @bp.route('/admin-login', methods=['GET', 'POST'])
@@ -552,7 +552,7 @@ def admin_login():
         for error in errors:
             flash(error, 'danger')
 
-    return render_template('auth/admin_login.html', form=form)
+    return render_template('auth/admin_login.html', form=form, recaptcha_site_key=current_app.config.get('RECAPTCHA_SITE_KEY'))
 
 
 @bp.route('/verify-2fa', methods=['GET', 'POST'])
