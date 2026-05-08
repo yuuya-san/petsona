@@ -120,6 +120,9 @@ class ProductionConfig(Config):
     SESSION_COOKIE_SAMESITE = 'Lax'
     REMEMBER_COOKIE_DURATION = timedelta(days=7)
 
+    # Disable insecure transport in production (enforce HTTPS for OAuth)
+    AUTHLIB_INSECURE_TRANSPORT = False
+
     RESET_TOKEN_EXPIRY = int(os.getenv("RESET_TOKEN_EXPIRY", 3600))
 
     RATELIMIT_DEFAULT = "200 per day"
@@ -130,10 +133,12 @@ class ProductionConfig(Config):
 
     CSP = {
         "default-src": ["'self'"],
-        "script-src": ["'self'"],
-        "style-src": ["'self'", "https://fonts.googleapis.com"],
-        "font-src": ["'self'", "https://fonts.gstatic.com"],
-        "img-src": ["'self'", "data:"],
+        "script-src": ["'self'", "https://www.google.com/recaptcha/", "https://www.gstatic.com/recaptcha/", "https://unpkg.com/alpinejs@3.x.x/", "https://cdnjs.cloudflare.com/"],
+        "style-src": ["'self'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com/"],
+        "font-src": ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com/"],
+        "img-src": ["'self'", "data:", "https://www.google.com/recaptcha/", "https://www.gstatic.com/recaptcha/"],
+        "connect-src": ["'self'", "https://www.google.com/recaptcha/"],
+        "frame-src": ["https://www.google.com/recaptcha/"],
     }
 
     FRONTEND_URL = os.getenv("FRONTEND_URL", None)
