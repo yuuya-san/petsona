@@ -1,11 +1,16 @@
 import os
 from datetime import timedelta
-from dotenv import load_dotenv # pyright: ignore[reportMissingImports]
+from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
 
 load_dotenv()
 
+
 class Config:
     """Base config - safe defaults"""
+
+    # =========================
+    # CORE SECURITY
+    # =========================
     SECRET_KEY = os.getenv("SECRET_KEY") or "fallback-very-strong-key"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
@@ -15,25 +20,32 @@ class Config:
     SESSION_COOKIE_SAMESITE = "Lax"
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
 
+    # duplicate safe fallback (kept your original logic)
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
-    DB_HOST = "switchyard.proxy.rlwy.net"
-    DB_NAME = "railway"
-    DB_USERNAME = "root"
-    DB_PASSWORD = "XlRpAtwFOLztqnYRWAISFMXeuqFoPrqv"
-    DB_PORT = 31309
 
-    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:XlRpAtwFOLztqnYRWAISFMXeuqFoPrqv@switchyard.proxy.rlwy.net:31309/railway"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ECHO = False
-    
-    # Mail
+    # =========================
+    # 🟢 RAILWAY MYSQL CONFIG (FIXED & ADDED PROPERLY)
+    # =========================
+    DB_HOST = os.getenv("MYSQLHOST")
+    DB_NAME = os.getenv("MYSQLDATABASE", "railway")
+    DB_USERNAME = os.getenv("MYSQLUSER", "root")
+    DB_PASSWORD = os.getenv("MYSQLPASSWORD")
+    DB_PORT = os.getenv("MYSQLPORT", 3306)
+
+    SQLALCHEMY_DATABASE_URI = (
+        f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}"
+        f"@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    )
+
+    # =========================
+    # MAIL
+    # =========================
     MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USE_SSL = False  # TLS is enough
+    MAIL_USE_SSL = False
     MAIL_USERNAME = "petsona.helpcare@gmail.com"
-    MAIL_PASSWORD = "fvgj yfgi aulq squa"  # your Gmail app password
+    MAIL_PASSWORD = "fvgj yfgi aulq squa"
     MAIL_DEFAULT_SENDER = "petsona.helpcare@gmail.com"
 
     # =========================
@@ -41,27 +53,33 @@ class Config:
     # =========================
     GOOGLE_CLIENT_ID = "246292318836-fh4abergpjnerh6nj55plpr0lusrqu0q.apps.googleusercontent.com"
     GOOGLE_CLIENT_SECRET = "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"
-    
-    # OAuth Settings
-    AUTHLIB_INSECURE_TRANSPORT = True  # Allow HTTP for development
+
+    AUTHLIB_INSECURE_TRANSPORT = True
 
     # =========================
     # RECAPTCHA V3 CONFIG
     # =========================
     RECAPTCHA_SITE_KEY = "6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT"
     RECAPTCHA_SECRET_KEY = "6Le4c94sAAAAAHVDiFrjrGYM6c6bdBs0KhnS72VN"
-    RECAPTCHA_THRESHOLD = 0.5  # Score threshold (0.0 - 1.0). Lower = stricter
+    RECAPTCHA_THRESHOLD = 0.5
 
-    # File Upload Configuration
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'uploads', 'messages')
-    MAX_CONTENT_LENGTH = 6 * 1024 * 1024  # 6MB max (includes multipart overhead)
+    # =========================
+    # FILE UPLOAD
+    # =========================
+    UPLOAD_FOLDER = os.path.join(
+        os.path.dirname(__file__),
+        'static',
+        'uploads',
+        'messages'
+    )
+    MAX_CONTENT_LENGTH = 6 * 1024 * 1024
+
 
     @staticmethod
     def init_app(app):
         """Initialize extensions with the app"""
         from app.extensions import oauth
-        
-        # Register Google OAuth
+
         oauth.register(
             name="google",
             client_id=app.config.get("GOOGLE_CLIENT_ID"),
@@ -72,43 +90,43 @@ class Config:
             }
         )
 
-    
+
+# =========================
+# DEVELOPMENT CONFIG
+# =========================
 class DevelopmentConfig(Config):
-    """Development config - allow insecure cookies on HTTP dev"""
     DEBUG = True
-    SESSION_COOKIE_SECURE = False  # safe for localhost dev
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI", "mysql+pymysql://root:12345@localhost/petsona")
-    #SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI", "mysql+pymysql://root:XlRpAtwFOLztqnYRWAISFMXeuqFoPrqv@switchyard.proxy.rlwy.net:31309/railway")
+    SESSION_COOKIE_SECURE = False
 
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        "DATABASE_URI",
+        "mysql+pymysql://root:12345@localhost/petsona"
+    )
 
-    # Password reset token expiry (seconds)
     RESET_TOKEN_EXPIRY = int(os.getenv("RESET_TOKEN_EXPIRY", 3600))
 
 
+# =========================
+# PRODUCTION CONFIG
+# =========================
 class ProductionConfig(Config):
-    """Production config - secure defaults"""
     DEBUG = False
-    SESSION_COOKIE_SECURE = True  # must use HTTPS
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI", "mysql+pymysql://root:XlRpAtwFOLztqnYRWAISFMXeuqFoPrqv@switchyard.proxy.rlwy.net:31309/railway")
-
-    # Session & cookies
     SESSION_COOKIE_SECURE = True
+
+    SQLALCHEMY_DATABASE_URI = Config.SQLALCHEMY_DATABASE_URI
+
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
     REMEMBER_COOKIE_DURATION = timedelta(days=7)
 
-    # Password reset token expiry (seconds)
     RESET_TOKEN_EXPIRY = int(os.getenv("RESET_TOKEN_EXPIRY", 3600))
 
-    # Rate limiting defaults
     RATELIMIT_DEFAULT = "200 per day"
     RATELIMIT_STRATEGY = "fixed-window"
 
-    # Account lockout policy
     MAX_FAILED_LOGIN = int(os.getenv("MAX_FAILED_LOGIN", 5))
-    LOCKOUT_TIME = int(os.getenv("LOCKOUT_TIME", 300))  # seconds
+    LOCKOUT_TIME = int(os.getenv("LOCKOUT_TIME", 300))
 
-    # CSP (restrictive - adjust if you load external assets)
     CSP = {
         "default-src": ["'self'"],
         "script-src": ["'self'"],
@@ -117,5 +135,4 @@ class ProductionConfig(Config):
         "img-src": ["'self'", "data:"],
     }
 
-    # Optional frontend base used for reset links (if you want frontend separate)
     FRONTEND_URL = os.getenv("FRONTEND_URL", None)
