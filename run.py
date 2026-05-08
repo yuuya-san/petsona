@@ -4,6 +4,7 @@ from app import create_app, db
 # Create Flask app + SocketIO
 app, socketio = create_app()
 
+
 # -----------------------------
 # SAFE DB INITIALIZATION ONLY
 # -----------------------------

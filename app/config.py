@@ -20,21 +20,23 @@ class Config:
     SESSION_COOKIE_SAMESITE = "Lax"
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
 
-    # duplicate safe fallback (kept your original logic)
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
 
     # =========================
-    # 🟢 RAILWAY MYSQL CONFIG (FIXED & ADDED PROPERLY)
+    # 🟢 RAILWAY MYSQL CONFIG (FIXED ONLY)
     # =========================
-    DB_HOST = os.getenv("MYSQLHOST", "mysql.railway.internal")
-    DB_NAME = os.getenv("MYSQLDATABASE", "railway")
-    DB_USERNAME = os.getenv("MYSQLUSER", "root")
-    DB_PASSWORD = os.getenv("MYSQLPASSWORD", "parjrgCJmevLFdtYfOnYvEkjIljutGsu")
-    DB_PORT = os.getenv("MYSQLPORT", 3306)
+    MYSQL_URL = os.getenv("MYSQL_URL")
 
-    SQLALCHEMY_DATABASE_URI = os.getenv("MYSQL_URL").replace(
-        "mysql://", "mysql+pymysql://"
-    )
+    if MYSQL_URL:
+        SQLALCHEMY_DATABASE_URI = MYSQL_URL.replace(
+            "mysql://", "mysql+pymysql://"
+        )
+    else:
+        # fallback (kept your credentials as requested)
+        SQLALCHEMY_DATABASE_URI = (
+            "mysql+pymysql://root:parjrgCJmevLFdtYfOnYvEkjIljutGsu"
+            "@mysql.railway.internal:3306/railway"
+        )
 
     # =========================
     # MAIL
@@ -72,7 +74,6 @@ class Config:
         'messages'
     )
     MAX_CONTENT_LENGTH = 6 * 1024 * 1024
-
 
     @staticmethod
     def init_app(app):
