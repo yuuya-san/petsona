@@ -23,7 +23,7 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
 
     # =========================
-    # 🟢 RAILWAY MYSQL CONFIG (FIXED ONLY)
+    # 🟢 RAILWAY MYSQL CONFIG (PUBLIC - FOR SQLYOG)
     # =========================
     MYSQL_URL = os.getenv("MYSQL_URL")
 
@@ -32,10 +32,10 @@ class Config:
             "mysql://", "mysql+pymysql://"
         )
     else:
-        # fallback (kept your credentials as requested)
+        # 🔥 your SQLyog / public connection (as requested)
         SQLALCHEMY_DATABASE_URI = (
             "mysql+pymysql://root:parjrgCJmevLFdtYfOnYvEkjIljutGsu"
-            "@mysql.railway.internal:3306/railway"
+            "@turntable.proxy.rlwy.net:41200/railway"
         )
 
     # =========================
