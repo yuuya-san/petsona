@@ -206,6 +206,11 @@ def create_app(config_class: type = Config):
     # Root route
     @app.route("/")
     def index():
-        return redirect(url_for("auth.home"))
+        from app.auth.routes import home as auth_home
+        return auth_home()
+
+    @app.route("/healthz")
+    def healthz():
+        return {"status": "ok"}, 200
 
     return app, socketio
