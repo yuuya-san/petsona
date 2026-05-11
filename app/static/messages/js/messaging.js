@@ -107,33 +107,36 @@ class MessagingApp {
   // ==================== SOCKET.IO SETUP ====================
 
   connectSocket() {
-    // Wait for shared socket to be available
     const waitForSocket = setInterval(() => {
-      if (window.sharedSocket) {
-        clearInterval(waitForSocket);
-        this.socket = window.sharedSocket;
-        this.isSocketConnected = true;
-        this.setupSocketEvents();
-        
-        // Join conversation room immediately
-        const convId = this.getCurrentConversationId();
-        if (convId && this.socket && this.socket.connected) {
-          this.socket.emit('join_conversation', { conversation_id: convId });
+      if (window.getSharedSocket) {
+        const shared = window.getSharedSocket();
+        if (shared) {
+          clearInterval(waitForSocket);
+          this.socket = shared;
+          this.isSocketConnected = true;
+          this.setupSocketEvents();
+
+          const convId = this.getCurrentConversationId();
+          if (convId && this.socket && this.socket.connected) {
+            this.socket.emit('join_conversation', { conversation_id: convId });
+          }
         }
       }
     }, 50);
 
-    // Fallback: create new socket after 2 seconds if shared socket doesn't exist
     setTimeout(() => {
-      if (!window.sharedSocket && !this.socket) {
+      if (!window.sharedSocket && !this.socket && typeof io !== 'undefined') {
         clearInterval(waitForSocket);
-        this.socket = io({
+        this.socket = window.getSharedSocket ? window.getSharedSocket() : io({
           upgrade: false,
           reconnection: true,
           reconnectionDelay: 1000,
           reconnectionDelayMax: 5000,
           reconnectionAttempts: 5,
         });
+        if (!window.sharedSocket) {
+          window.sharedSocket = this.socket;
+        }
         this.setupSocketEvents();
       }
     }, 2000);
@@ -142,9 +145,19 @@ class MessagingApp {
   setupSocketEvents() {
     if (!this.socket) return;
 
+    this.socket.off('connect');
+    this.socket.off('new_message');
+    this.socket.off('navbar_message_update');
+    this.socket.off('message_read');
+    this.socket.off('user_typing');
+    this.socket.off('user_stopped_typing');
+    this.socket.off('user_status_changed');
+    this.socket.off('user_status');
+    this.socket.off('disconnect');
+    this.socket.off('connect_error');
+
     this.socket.on('connect', () => {
       this.isSocketConnected = true;
-      // Join conversation room after socket connects - use fresh conversation ID from DOM
       const convId = this.getCurrentConversationId();
       if (convId) {
         this.socket.emit('join_conversation', { conversation_id: convId });

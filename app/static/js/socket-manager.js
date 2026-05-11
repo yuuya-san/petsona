@@ -3,6 +3,50 @@
  * Handles WebSocket connections and vote count synchronization
  */
 
+function createSharedSocket() {
+  if (window.sharedSocket) {
+    return window.sharedSocket;
+  }
+
+  if (typeof io === 'undefined') {
+    return null;
+  }
+
+  const socketUrl = window.socketIoUrl || window.location.origin;
+  const opts = {
+    path: '/socket.io',
+    transports: ['websocket', 'polling'],
+    reconnection: true,
+    reconnectionAttempts: 8,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 15000,
+    randomizationFactor: 0.5,
+    timeout: 20000,
+    autoConnect: true,
+    upgrade: true,
+    secure: window.location.protocol === 'https:',
+  };
+
+  const socket = io(socketUrl, opts);
+  window.sharedSocket = socket;
+
+  socket.on('connect_error', (error) => {
+    console.warn('Socket.IO connect error:', error);
+  });
+
+  socket.on('reconnect_error', (error) => {
+    console.warn('Socket.IO reconnect error:', error);
+  });
+
+  socket.on('reconnect_failed', () => {
+    console.warn('Socket.IO reconnection failed. No further reconnect attempts.');
+  });
+
+  return socket;
+}
+
+window.getSharedSocket = window.getSharedSocket || createSharedSocket;
+
 class SocketManager {
   constructor() {
     this.socket = null;
@@ -27,32 +71,19 @@ class SocketManager {
    */
   init() {
     try {
-      // Check if Socket.IO library is available
       if (typeof io === 'undefined') {
         return;
       }
 
-      // Reuse existing global socket connection if available
-      if (window.sharedSocket && window.sharedSocket.connected) {
-        this.socket = window.sharedSocket;
-        this.connected = true;
-      } else if (!window.sharedSocket) {
-        // Create shared socket instance for all modules
-        window.sharedSocket = io(window.socketIoUrl || window.location.origin, {
-          reconnection: true,
-          reconnectionDelay: 500,
-          reconnectionDelayMax: 2000,
-          reconnectionAttempts: this.maxReconnectAttempts,
-          transports: ['websocket', 'polling'],
-          upgrade: true,
-        });
-        this.socket = window.sharedSocket;
-      } else {
-        this.socket = window.sharedSocket;
+      this.socket = window.getSharedSocket();
+      if (!this.socket) {
+        return;
       }
 
+      this.connected = this.socket.connected;
       this.setupEventHandlers();
     } catch (error) {
+      console.warn('SocketManager init error:', error);
     }
   }
 
@@ -61,6 +92,16 @@ class SocketManager {
    */
   setupEventHandlers() {
     if (!this.socket) return;
+
+    this.socket.off('connect');
+    this.socket.off('disconnect');
+    this.socket.off('error');
+    this.socket.off('connection_response');
+    this.socket.off('vote_update');
+    this.socket.off('breed_vote_update');
+    this.socket.off('watch_confirmed');
+    this.socket.off('reconnect_attempt');
+    this.socket.off('reconnect');
 
     // Connection established
     this.socket.on('connect', () => {

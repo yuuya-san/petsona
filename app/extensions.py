@@ -41,14 +41,28 @@ csrf = CSRFProtect()
 
 # Socket.IO for real-time updates - WebSocket with polling fallback
 import os
-async_mode = 'eventlet' if os.getenv('FLASK_ENV') == 'production' else 'threading'
+async_mode = None
+if os.getenv('FLASK_ENV') == 'production':
+    try:
+        import eventlet  # pyright: ignore[reportMissingImports]
+        async_mode = 'eventlet'
+    except ImportError:
+        try:
+            import gevent  # pyright: ignore[reportMissingImports]
+            async_mode = 'gevent'
+        except ImportError:
+            async_mode = 'threading'
+else:
+    async_mode = 'threading'
+
 socketio = SocketIO(
     cors_allowed_origins="*",
-    ping_timeout=60,  # Increased timeout to prevent disconnects
-    ping_interval=25,
-    transports=['websocket', 'polling'],  # WebSocket first, fallback to polling if needed
+    ping_timeout=90,
+    ping_interval=30,
+    transports=['websocket', 'polling'],
     async_mode=async_mode,
-    engineio_logger=False,  # Disable debug logging
+    manage_session=False,
+    engineio_logger=False,
     logger=False,
 )
 

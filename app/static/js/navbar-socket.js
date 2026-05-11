@@ -3,6 +3,50 @@
  * Handles real-time updates to message badges and indicators without page refresh
  */
 
+function getNavbarSharedSocket() {
+  if (window.sharedSocket) {
+    return window.sharedSocket;
+  }
+
+  if (typeof io === 'undefined') {
+    return null;
+  }
+
+  const socketUrl = window.socketIoUrl || window.location.origin;
+  const opts = {
+    path: '/socket.io',
+    transports: ['websocket', 'polling'],
+    reconnection: true,
+    reconnectionAttempts: 8,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 15000,
+    randomizationFactor: 0.5,
+    timeout: 20000,
+    autoConnect: true,
+    upgrade: true,
+    secure: window.location.protocol === 'https:',
+  };
+
+  const socket = io(socketUrl, opts);
+  window.sharedSocket = socket;
+
+  socket.on('connect_error', (error) => {
+    console.warn('Navbar socket connect error:', error);
+  });
+
+  socket.on('reconnect_error', (error) => {
+    console.warn('Navbar socket reconnect error:', error);
+  });
+
+  socket.on('reconnect_failed', () => {
+    console.warn('Navbar socket reconnect failed');
+  });
+
+  return socket;
+}
+
+window.getSharedSocket = window.getSharedSocket || getNavbarSharedSocket;
+
 class NavbarSocketManager {
   constructor() {
     this.socket = null;
@@ -18,7 +62,6 @@ class NavbarSocketManager {
    */
   init() {
     try {
-      // Check if Socket.IO library is available
       if (typeof io === 'undefined') {
         if (this.ioRetryCount < this.maxIoRetryAttempts) {
           this.ioRetryCount += 1;
@@ -27,26 +70,16 @@ class NavbarSocketManager {
         return;
       }
 
-      // Reuse shared socket if already available, otherwise create a dedicated navbar socket
-      if (window.sharedSocket) {
-        this.socket = window.sharedSocket;
-        window.navbarSocket = this.socket;
-      } else if (window.navbarSocket) {
-        this.socket = window.navbarSocket;
-      } else {
-        this.socket = io({
-          reconnection: true,
-          reconnectionDelay: 1000,
-          reconnectionDelayMax: 5000,
-          reconnectionAttempts: 5
-        });
-        window.navbarSocket = this.socket;
+      this.socket = window.getSharedSocket();
+      if (!this.socket) {
+        return;
       }
 
       this.setupEventHandlers();
       this.initializeMessageItems();
       this.initialized = true;
     } catch (error) {
+      console.warn('NavbarSocketManager init error:', error);
     }
   }
 
@@ -80,6 +113,14 @@ class NavbarSocketManager {
    */
   setupEventHandlers() {
     if (!this.socket) return;
+
+    this.socket.off('message_unread_count_update');
+    this.socket.off('navbar_message_update');
+    this.socket.off('message_read');
+    this.socket.off('connect');
+    this.socket.off('disconnect');
+    this.socket.off('reconnect');
+    this.socket.off('error');
 
     // Listen for unread message count updates
     this.socket.on('message_unread_count_update', (data) => {

@@ -48,20 +48,38 @@ def handle_disconnect():
     """Handle client disconnections"""
     sid = request.sid
     logger.info(f"❌ Client disconnected: {sid}")
-    
-    # Clean up any watchers for this client
-    if sid in active_watchers:
-        del active_watchers[sid]
-    
-    # Clean up active users and update last_seen
-    if current_user.is_authenticated:
-        if current_user.id in active_users:
-            if sid in active_users[current_user.id]:
-                active_users[current_user.id].remove(sid)
-        
-        # Update last_seen when user disconnects
-        current_user.update_last_seen()
-        logger.info(f"👤 User {current_user.id} last_seen updated on disconnect")
+
+    try:
+        # Clean up any watchers for this client
+        if sid in active_watchers:
+            del active_watchers[sid]
+
+        user_id = getattr(current_user, 'id', None)
+        if user_id and user_id in active_users:
+            active_watchers_for_user = active_users[user_id]
+            if sid in active_watchers_for_user:
+                active_watchers_for_user.remove(sid)
+            if not active_watchers_for_user:
+                del active_users[user_id]
+
+        if current_user.is_authenticated:
+            try:
+                current_user.update_last_seen()
+                logger.info(f"👤 User {user_id} last_seen updated on disconnect")
+            except Exception as e:
+                logger.warning(f"Unable to update last_seen for user {user_id}: {e}")
+    except Exception as e:
+        logger.exception(f"Error during disconnect cleanup for {sid}: {e}")
+
+
+@socketio.on_error_default
+def default_socket_error_handler(e):
+    """Catch unhandled Socket.IO errors without crashing the worker."""
+    logger.exception("Unhandled Socket.IO error", exc_info=e)
+    try:
+        emit('error', {'message': 'Internal server error'})
+    except Exception:
+        pass
 
 
 @socketio.on('watch_species')

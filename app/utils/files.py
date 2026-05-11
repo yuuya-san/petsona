@@ -11,21 +11,22 @@ def allowed_file(filename):
 
 def save_file(file):
     if file and allowed_file(file.filename):
-        # Secure the filename
         filename = secure_filename(file.filename)
-        
-        # Generate a unique filename
         unique_filename = f"{random_string(10)}_{filename}"
 
-        # Set the path to save the file (adjust `UPLOAD_FOLDER` path as needed)
-        upload_folder = current_app.config['UPLOAD_FOLDER']
-        filepath = os.path.join(upload_folder, unique_filename)
+        upload_folder = current_app.config.get('UPLOAD_FOLDER')
+        if not upload_folder:
+            current_app.logger.error('UPLOAD_FOLDER is not configured.')
+            return None
 
-        # Save the file
-        file.save(filepath)
-
-        # Return the file URL or path
-        return f'uploads/{unique_filename}'
+        try:
+            os.makedirs(upload_folder, exist_ok=True)
+            filepath = os.path.join(upload_folder, unique_filename)
+            file.save(filepath)
+            return f'uploads/{unique_filename}'
+        except Exception as e:
+            current_app.logger.error(f"Failed to save uploaded file: {e}", exc_info=True)
+            return None
 
     return None
 

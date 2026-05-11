@@ -29,17 +29,37 @@ class MessagingApp {
   // ==================== SOCKET.IO SETUP ====================
 
   connectSocket() {
-    if (window.sharedSocket && window.sharedSocket.connected) {
-      this.socket = window.sharedSocket;
-    } else {
-      this.socket = io({
+    if (window.getSharedSocket) {
+      const shared = window.getSharedSocket();
+      if (shared && shared.connected) {
+        this.socket = shared;
+      }
+    }
+
+    if (!this.socket && typeof io !== 'undefined') {
+      this.socket = window.getSharedSocket ? window.getSharedSocket() : io({
         upgrade: false,
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
         reconnectionAttempts: 5,
       });
+      if (!window.sharedSocket) {
+        window.sharedSocket = this.socket;
+      }
     }
+
+    if (!this.socket) {
+      return;
+    }
+
+    this.socket.off('connect');
+    this.socket.off('new_message');
+    this.socket.off('message_read');
+    this.socket.off('user_typing');
+    this.socket.off('user_stopped_typing');
+    this.socket.off('disconnect');
+    this.socket.off('connect_error');
 
     this.socket.on('connect', () => {
       this.isSocketConnected = true;

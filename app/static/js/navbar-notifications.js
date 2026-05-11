@@ -74,14 +74,54 @@ function injectNotificationCSS() {
     document.head.appendChild(style);
 }
 
-// Initialize Socket.IO connection for notifications (wait for Socket.IO to load)
-// Use window namespace to avoid double-declaration errors if script loads twice
-if (typeof notificationSocket === 'undefined') {
-    var notificationSocket = null;  // Use var for function-scope level declaration
-    var isSocketConnected = false;
-    var allNotifications = []; // Store all notifications for modal navigation
-    var currentNotificationIndex = -1; // Track current notification being viewed in modal
+function getNotificationSharedSocket() {
+    if (window.sharedSocket) {
+        return window.sharedSocket;
+    }
+
+    if (typeof io === 'undefined') {
+        return null;
+    }
+
+    const socketUrl = window.socketIoUrl || window.location.origin;
+    const opts = {
+        path: '/socket.io',
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionAttempts: 8,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 15000,
+        randomizationFactor: 0.5,
+        timeout: 20000,
+        autoConnect: true,
+        upgrade: true,
+        secure: window.location.protocol === 'https:',
+    };
+
+    const socket = io(socketUrl, opts);
+    window.sharedSocket = socket;
+
+    socket.on('connect_error', (error) => {
+        console.warn('Notification socket connect error:', error);
+    });
+
+    socket.on('reconnect_error', (error) => {
+        console.warn('Notification socket reconnect error:', error);
+    });
+
+    socket.on('reconnect_failed', () => {
+        console.warn('Notification socket reconnect failed');
+    });
+
+    return socket;
 }
+
+window.getSharedSocket = window.getSharedSocket || getNotificationSharedSocket;
+
+var notificationSocket = null;
+var isSocketConnected = false;
+var allNotifications = []; // Store all notifications for modal navigation
+var currentNotificationIndex = -1; // Track current notification being viewed in modal
 
 // ===== FORMAT DATE TIME TO 12-HOUR FORMAT WITH AM/PM =====
 function format12HourTime(dateString) {
@@ -149,25 +189,28 @@ function getNotificationRedirectUrl(notificationData) {
 
 // Function to initialize Socket.IO when ready
 function initializeNotificationSocket() {
-    // Check if io is available (Socket.IO loaded)
     if (typeof io === 'undefined') {
         setTimeout(initializeNotificationSocket, 500);
         return;
     }
 
-    if (window.sharedSocket) {
-        notificationSocket = window.sharedSocket;
-    } else if (notificationSocket) {
-        // reuse existing notification socket if already created
-    } else {
-        notificationSocket = window.sharedSocket = io({
-            transports: ['websocket', 'polling'],
-            reconnection: true,
-            reconnection_delay: 1000,
-            reconnection_delay_max: 5000,
-            reconnection_attempts: 999
-        });
+    notificationSocket = window.getSharedSocket();
+    if (!notificationSocket) {
+        // Try again after the client is ready
+        setTimeout(initializeNotificationSocket, 500);
+        return;
     }
+
+    notificationSocket.off('connect');
+    notificationSocket.off('disconnect');
+    notificationSocket.off('error');
+    notificationSocket.off('new_notification_received');
+    notificationSocket.off('unread_count');
+    notificationSocket.off('unread_count_update');
+    notificationSocket.off('notifications_list');
+    notificationSocket.off('notification_marked_read');
+    notificationSocket.off('all_notifications_marked_read');
+    notificationSocket.off('notification_detail');
 
     // === SOCKET CONNECTION EVENTS ===
     notificationSocket.on('connect', function() {
