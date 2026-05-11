@@ -38,7 +38,7 @@ class SocketManager {
         this.connected = true;
       } else if (!window.sharedSocket) {
         // Create shared socket instance for all modules
-        window.sharedSocket = io(window.socketIoUrl || window.location.origin, {
+        window.sharedSocket = io({
           reconnection: true,
           reconnectionDelay: 500,
           reconnectionDelayMax: 2000,

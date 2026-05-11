@@ -1,6 +1,6 @@
 """Application factory. Initializes extensions, registers blueprints."""
-from flask import Flask, redirect, url_for, request, flash # pyright: ignore[reportMissingImports]
-from werkzeug.exceptions import RequestEntityTooLarge # pyright: ignore[reportMissingImports]
+from flask import Flask, redirect, url_for, request, flash, jsonify # pyright: ignore[reportMissingImports]
+from werkzeug.exceptions import HTTPException, RequestEntityTooLarge # pyright: ignore[reportMissingImports]
 from .config import Config
 from app.extensions import db, migrate, login_manager, mail, bcrypt, limiter, talisman, socketio, oauth
 from app.utils.db_init import ensure_database_exists, create_tables
@@ -200,11 +200,22 @@ def create_app(config_class: type = Config):
     # Global error handler for oversized multipart uploads
     @app.errorhandler(RequestEntityTooLarge)
     def handle_request_entity_too_large(error):
+        if request.is_json:
+            return jsonify({'error': 'Uploaded files exceed the maximum allowed upload size.'}), 413
         flash('Uploaded files exceed the maximum allowed upload size. Reduce attachments and try again.', 'danger')
         return redirect(request.referrer or url_for('merchant.apply'))
 
+    @app.errorhandler(Exception)
+    def handle_uncaught_exception(error):
+        if isinstance(error, HTTPException):
+            return error
+        app.logger.exception('Unhandled exception during request: %s', error)
+        if request.is_json or request.path.startswith('/api') or request.path.startswith('/messages'):
+            return jsonify({'error': 'An internal server error occurred. Please try again later.'}), 500
+        flash('An internal error occurred. Please try again later.', 'danger')
+        return redirect(request.referrer or url_for('auth.home'))
+
     # Root route
-    @app.route("/")
     def index():
         return redirect(url_for("auth.home"))
 

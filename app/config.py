@@ -1,5 +1,8 @@
 import os
 from datetime import timedelta
+from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
+
+load_dotenv()
 
 
 class Config:
@@ -8,34 +11,58 @@ class Config:
     # =========================
     # CORE SECURITY
     # =========================
-    SECRET_KEY = os.getenv("SECRET_KEY", "fallback-very-strong-key")
+    SECRET_KEY = os.getenv("SECRET_KEY") or "fallback-very-strong-key"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
-    SQLALCHEMY_POOL_PRE_PING = True
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_recycle": 280,
-        "pool_pre_ping": True,
-    }
 
     # Session & cookies - safest defaults
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
 
-    FRONTEND_URL = os.getenv("FRONTEND_URL", None)
+    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
 
     # =========================
-    # 🟢 RAILWAY MYSQL CONFIG (PUBLIC - FOR SQLYOG)
+    # DATABASE CONFIG
     # =========================
     MYSQL_URL = os.getenv("MYSQL_URL")
+    DB_USERNAME = os.getenv("DB_USERNAME", "petsona_user")
+    DB_PASSWORD = os.getenv("DB_PASSWORD", "Petsona-0717")
+    DB_HOST = os.getenv("DB_HOST", "localhost")
+    _db_port = os.getenv("DB_PORT", "3306")
+    try:
+        DB_PORT = int(_db_port)
+    except (TypeError, ValueError):
+        DB_PORT = 3306
+    DB_NAME = os.getenv("DB_NAME", "petsona_db")
 
     if MYSQL_URL:
-        SQLALCHEMY_DATABASE_URI = MYSQL_URL.replace(
-            "mysql://", "mysql+pymysql://"
-        )
+        if MYSQL_URL.startswith("mysql://"):
+            SQLALCHEMY_DATABASE_URI = MYSQL_URL.replace("mysql://", "mysql+pymysql://", 1)
+        else:
+            SQLALCHEMY_DATABASE_URI = MYSQL_URL
     else:
-        # Localhost MySQL on port 3307, no password
-        SQLALCHEMY_DATABASE_URI = "mysql+pymysql://petsona_user:Petsona-0717@localhost/petsona_db"
+        SQLALCHEMY_DATABASE_URI = (
+            f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+        )
+
+    _pool_size = os.getenv("SQLALCHEMY_POOL_SIZE", "10")
+    _max_overflow = os.getenv("SQLALCHEMY_MAX_OVERFLOW", "20")
+    try:
+        pool_size = int(_pool_size)
+    except (TypeError, ValueError):
+        pool_size = 10
+    try:
+        max_overflow = int(_max_overflow)
+    except (TypeError, ValueError):
+        max_overflow = 20
+
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 280,
+        "pool_size": pool_size,
+        "max_overflow": max_overflow,
+    }
 
     # =========================
     # MAIL
@@ -57,10 +84,11 @@ class Config:
     AUTHLIB_INSECURE_TRANSPORT = True
 
     # =========================
-    # SOCKET.IO CONFIG
+    # RECAPTCHA V3 CONFIG
     # =========================
-    # Socket.IO will connect to the current origin by default.
-    # No special socket host is required unless configured via FRONTEND_URL.
+    # RECAPTCHA_SITE_KEY = os.getenv("RECAPTCHA_SITE_KEY", "6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT")
+    # RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY", "6Le4c94sAAAAAHVDiFrjrGYM6c6bdBs0KhnS72VN")
+    # RECAPTCHA_THRESHOLD = float(os.getenv("RECAPTCHA_THRESHOLD", 0.5))
 
     # =========================
     # FILE UPLOAD
@@ -68,10 +96,10 @@ class Config:
     UPLOAD_FOLDER = os.path.join(
         os.path.dirname(__file__),
         'static',
-        'uploads',
-        'messages'
+        'uploads'
     )
-    MAX_CONTENT_LENGTH = 6 * 1024 * 1024
+    MESSAGE_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, 'messages')
+    MAX_CONTENT_LENGTH = 50 * 1024 * 1024
 
     @staticmethod
     def init_app(app):
