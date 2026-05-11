@@ -4,6 +4,7 @@ from flask_socketio import emit, join_room, leave_room # pyright: ignore[reportM
 from app.extensions import socketio
 from app.models import Species
 from flask_login import current_user
+from app.utils.socket_rate_limit import socket_rate_limit, check_socket_event_limit, clear_socket_limits_for_user
 import logging
 from datetime import datetime
 import pytz
@@ -61,6 +62,9 @@ def handle_disconnect():
                 active_watchers_for_user.remove(sid)
             if not active_watchers_for_user:
                 del active_users[user_id]
+            # Clear rate limits for this user when all connections close
+            if not active_users[user_id]:
+                clear_socket_limits_for_user(user_id)
 
         if current_user.is_authenticated:
             try:
@@ -83,6 +87,7 @@ def default_socket_error_handler(e):
 
 
 @socketio.on('watch_species')
+@socket_rate_limit('watch_species')
 def handle_watch_species(data):
     """Register client to watch species vote updates"""
     try:
@@ -178,6 +183,7 @@ def handle_leave_conversation(data):
 
 
 @socketio.on('typing')
+@socket_rate_limit('typing')
 def handle_typing(data):
     """Broadcast typing indicator."""
     try:
@@ -196,6 +202,7 @@ def handle_typing(data):
 
 
 @socketio.on('stop_typing')
+@socket_rate_limit('stop_typing')
 def handle_stop_typing(data):
     """Stop typing indicator."""
     try:
@@ -213,6 +220,7 @@ def handle_stop_typing(data):
 
 
 @socketio.on('user_online')
+@socket_rate_limit('user_online')
 def handle_user_online(data):
     """Handle user coming online."""
     try:
@@ -247,6 +255,7 @@ def handle_user_online(data):
 
 
 @socketio.on('user_inactive')
+@socket_rate_limit('user_inactive')
 def handle_user_inactive(data):
     """Handle user becoming inactive."""
     try:

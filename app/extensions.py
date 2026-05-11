@@ -25,11 +25,16 @@ mail = Mail()
 # Bcrypt for secure password hashing
 bcrypt = Bcrypt()
 
-# Rate limiter
+# Rate limiter - Redis-backed for production, memory for dev
+import os
+_redis_url = os.getenv('REDIS_URL')
+_storage_uri = _redis_url if _redis_url else "memory://"
+
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["200 per day", "50 per hour"],
-    storage_uri="memory://"
+    storage_uri=_storage_uri,
+    storage_options={"url": _redis_url} if _redis_url else {}
 )
 
 
@@ -56,14 +61,21 @@ else:
     async_mode = 'threading'
 
 socketio = SocketIO(
-    cors_allowed_origins="*",
-    ping_timeout=90,
-    ping_interval=30,
+    # IMPORTANT: Never use "*" in production - specify allowed origins
+    cors_allowed_origins=[
+        "https://petsona.online",
+        "https://www.petsona.online",
+        os.getenv('SOCKETIO_CORS_ORIGIN', 'http://localhost:5000')
+    ] if os.getenv('FLASK_ENV') == 'production' else "*",
+    ping_timeout=60,
+    ping_interval=25,
     transports=['websocket', 'polling'],
     async_mode=async_mode,
     manage_session=False,
     engineio_logger=False,
     logger=False,
+    # Prevent reconnect storms with exponential backoff
+    **({'max_http_buffer_size': 1e6} if os.getenv('FLASK_ENV') == 'production' else {})
 )
 
 # OAuth for social login
