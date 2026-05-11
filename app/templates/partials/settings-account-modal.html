@@ -425,22 +425,11 @@
     document.body.appendChild(alertDiv);
     
     // Bootstrap alert dismiss functionality
-    let alertInstance = null;
-    if (window.bootstrap && typeof bootstrap.Alert === 'function') {
-      alertInstance = new bootstrap.Alert(alertDiv);
-    } else if (typeof $ !== 'undefined' && typeof $(alertDiv).alert === 'function') {
-      $(alertDiv).alert();
-    }
+    $(alertDiv).alert();
     
     // Auto-remove after 5 seconds
     setTimeout(() => {
-      if (alertInstance && typeof alertInstance.close === 'function') {
-        alertInstance.close();
-      } else if (typeof $ !== 'undefined' && typeof $(alertDiv).alert === 'function') {
-        $(alertDiv).alert('close');
-      } else {
-        alertDiv.remove();
-      }
+      $(alertDiv).alert('close');
     }, 5000);
   }
   

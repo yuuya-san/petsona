@@ -212,30 +212,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const notificationModal = document.getElementById('notificationModal');
 
     if (notificationModal) {
-        const closeModal = () => {
-            if (window.bootstrap && typeof bootstrap.Modal === 'function') {
-                const modalInstance = bootstrap.Modal.getInstance(notificationModal) || new bootstrap.Modal(notificationModal);
-                modalInstance.hide();
-            } else if (typeof $ !== 'undefined' && typeof $(notificationModal).modal === 'function') {
-                $(notificationModal).modal('hide');
-            } else {
-                notificationModal.classList.remove('show');
-                notificationModal.style.display = 'none';
-                document.body.classList.remove('modal-open');
-                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-            }
-        };
-
         closeNotifButtons.forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
-                closeModal();
+                $(notificationModal).modal('hide');
             });
         });
         // Close on ESC key
         notificationModal.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                closeModal();
+                $(notificationModal).modal('hide');
             }
         });
     }
