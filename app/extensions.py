@@ -40,28 +40,14 @@ talisman = Talisman()
 csrf = CSRFProtect()
 
 # Socket.IO for real-time updates - WebSocket with polling fallback
-# Allow Flask-SocketIO to select the best async mode available.
-# For production, eventlet is preferred when installed.
-
-def _select_socketio_async_mode():
-    try:
-        import eventlet  # pyright: ignore[reportMissingImports, reportMissingModuleSource]
-        return 'eventlet'
-    except ImportError:
-        pass
-    try:
-        import gevent  # pyright: ignore[reportMissingModuleSource]
-        return 'gevent'
-    except ImportError:
-        pass
-    return None
-
+import os
+async_mode = 'eventlet' if os.getenv('FLASK_ENV') == 'production' else 'threading'
 socketio = SocketIO(
     cors_allowed_origins="*",
     ping_timeout=60,  # Increased timeout to prevent disconnects
     ping_interval=25,
     transports=['websocket', 'polling'],  # WebSocket first, fallback to polling if needed
-    async_mode=_select_socketio_async_mode(),
+    async_mode=async_mode,
     engineio_logger=False,  # Disable debug logging
     logger=False,
 )
