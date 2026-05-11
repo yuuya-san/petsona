@@ -521,7 +521,7 @@
       {{ form.hidden_tag() }}
 
       <!-- Hidden reCAPTCHA token field -->
-      <!-- DISABLED: Removed due to loading loop issues -->
+      {{ form.recaptcha_token() }}
 
       <!-- PERSONAL INFO -->
       <div class="form-section personal-info-section" id="personal-info-section">
@@ -695,8 +695,8 @@
   </div>
 </div>
 
-<!-- Load reCAPTCHA v3 script (DISABLED) -->
-<!-- Removed due to loading loop issues -->
+<!-- Load reCAPTCHA v3 script -->
+<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
 
 <script>
 const personalSection = document.getElementById('personal-info-section');

@@ -561,7 +561,7 @@
       </div>
 
       <!-- Hidden reCAPTCHA token field -->
-      <!-- DISABLED: Removed due to loading loop issues -->
+      {{ form.recaptcha_token() }}
 
       <button class="btn-primary loading-btn" type="submit" aria-label="Login button" disabled>
         <span class="btn-text">Login</span>
@@ -590,8 +590,8 @@
   </div>
 </div>
 
-<!-- Load reCAPTCHA v3 script (DISABLED) -->
-<!-- Removed due to loading loop issues -->
+<!-- Load reCAPTCHA v3 script -->
+<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -639,7 +639,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Handle form submission (reCAPTCHA disabled)
+  // Execute reCAPTCHA and populate token on form submit
   if (form) {
     form.addEventListener('submit', function(e) {
       // Only submit if button is enabled
@@ -648,11 +648,36 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      // Disable button and show loading spinner
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.classList.add('loading');
-      }
+      // Execute reCAPTCHA v3
+      grecaptcha.ready(function() {
+        grecaptcha.execute('{{ recaptcha_site_key }}', { action: 'admin_login' }).then(function(token) {
+          // Set the token in the hidden field
+          if (recaptchaTokenField) {
+            recaptchaTokenField.value = token;
+          }
+          
+          // Disable button and show loading spinner
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('loading');
+          }
+          
+          // Submit the form after a brief delay to ensure token is set
+          setTimeout(function() {
+            form.submit();
+          }, 100);
+        }).catch(function(error) {
+          console.error('reCAPTCHA error:', error);
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('loading');
+          }
+          alert('reCAPTCHA verification failed. Please try again.');
+        });
+      });
+      
+      // Prevent immediate form submission
+      e.preventDefault();
     });
   }
 
