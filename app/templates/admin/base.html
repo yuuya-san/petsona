@@ -30,6 +30,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/flash-messages.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
 
+    <!-- jQuery (required by Bootstrap & dashboard scripts) -->
+    <script src="{{ url_for('static', filename='admin/plugins/jquery/jquery.min.js') }}"></script>
+
     <!-- Alpine -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
@@ -115,7 +118,6 @@
   window.socketIoUrl = 'https://petsona.online';
 </script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-<script src="{{ url_for('static', filename='admin/plugins/jquery/jquery.min.js') }}"></script>
 <script>
 if (typeof window.jQuery === 'undefined') {
   var fallbackScript = document.createElement('script');

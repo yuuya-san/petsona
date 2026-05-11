@@ -25,7 +25,6 @@ class RegisterForm(FlaskForm):
         'Repeat Password',
         validators=[DataRequired(), EqualTo('password', message='Passwords must match')]
     )
-    recaptcha_token = HiddenField('recaptcha_token')
     submit = SubmitField('Register')
 
     def validate_first_name(self, field):
@@ -67,7 +66,6 @@ class LoginForm(FlaskForm):
         '2FA Code (if enabled)',
         validators=[]
     )
-    recaptcha_token = HiddenField('recaptcha_token')
     submit = SubmitField('Login')
 
 
@@ -85,7 +83,6 @@ class AdminLoginForm(FlaskForm):
         '2FA Code (if enabled)',
         validators=[]
     )
-    recaptcha_token = HiddenField('recaptcha_token')
     submit = SubmitField('Admin Login')
 
 # 2FA setup form (for enabling/disabling 2FA)

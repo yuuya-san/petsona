@@ -5,7 +5,7 @@ from app import create_app, db
 app, socketio = create_app()
 
 # Expose WSGI application for gunicorn (production)
-application = socketio.WSGIApp()
+application = socketio.WSGIApp(app)
 
 # -----------------------------
 # SAFE DB INITIALIZATION ONLY

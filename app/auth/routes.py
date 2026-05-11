@@ -15,7 +15,6 @@ from datetime import datetime, timedelta
 from ..extensions import limiter
 from .emails import send_password_reset_email, send_backup_codes_email, send_registration_otp_email, send_email
 from app.utils.audit import log_event, user_snapshot
-from app.utils.security import verify_recaptcha
 from sqlalchemy import func # pyright: ignore[reportMissingImports]
 import pyotp # pyright: ignore[reportMissingImports]
 import secrets
@@ -127,15 +126,6 @@ def contact():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        # Verify reCAPTCHA token
-        recaptcha_token = form.recaptcha_token.data
-        is_recaptcha_valid, recaptcha_score = verify_recaptcha(recaptcha_token)
-        
-        if not is_recaptcha_valid:
-            log_event('user.register_failed', details={'reason': 'recaptcha_failed'})
-            flash('reCAPTCHA verification failed. Please try again.', 'danger')
-            return redirect(url_for('auth.register'))
-        
         # Check if email already exists
         email = form.email.data.lower()
         existing_user = User.query.filter_by(email=email).first()
@@ -162,7 +152,7 @@ def register():
     for field, errors in form.errors.items():
         for error in errors:
             flash(error, 'danger')
-    return render_template('auth/register.html', form=form, recaptcha_site_key=current_app.config.get('RECAPTCHA_SITE_KEY'))
+    return render_template('auth/register.html', form=form)
 
 # OTP Verification Form
 from flask_wtf import FlaskForm # pyright: ignore[reportMissingImports]
@@ -443,7 +433,7 @@ def login():
         for error in errors:
             flash(error, 'danger')
 
-    return render_template('auth/login.html', form=form, recaptcha_site_key=current_app.config.get('RECAPTCHA_SITE_KEY'))
+    return render_template('auth/login.html', form=form)
 
         
 @bp.route('/admin-login', methods=['GET', 'POST'])
@@ -454,15 +444,6 @@ def admin_login():
     form = AdminLoginForm()
 
     if form.validate_on_submit():
-        # Verify reCAPTCHA token
-        recaptcha_token = form.recaptcha_token.data
-        is_recaptcha_valid, recaptcha_score = verify_recaptcha(recaptcha_token)
-        
-        if not is_recaptcha_valid:
-            log_event('admin.login_failed', details={'reason': 'recaptcha_failed'})
-            flash('reCAPTCHA verification failed. Please try again.', 'danger')
-            return redirect(url_for('auth.admin_login'))
-        
         email = form.email.data.lower()
         user = User.query.filter_by(email=email, role='admin').first()
 
@@ -552,7 +533,7 @@ def admin_login():
         for error in errors:
             flash(error, 'danger')
 
-    return render_template('auth/admin_login.html', form=form, recaptcha_site_key=current_app.config.get('RECAPTCHA_SITE_KEY'))
+    return render_template('auth/admin_login.html', form=form)
 
 
 @bp.route('/verify-2fa', methods=['GET', 'POST'])
