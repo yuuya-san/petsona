@@ -154,15 +154,20 @@ function initializeNotificationSocket() {
         setTimeout(initializeNotificationSocket, 500);
         return;
     }
-    
-    
-    notificationSocket = io({
-        transports: ['websocket', 'polling'],
-        reconnection: true,
-        reconnection_delay: 1000,
-        reconnection_delay_max: 5000,
-        reconnection_attempts: 999
-    });
+
+    if (window.sharedSocket) {
+        notificationSocket = window.sharedSocket;
+    } else if (notificationSocket) {
+        // reuse existing notification socket if already created
+    } else {
+        notificationSocket = window.sharedSocket = io({
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnection_delay: 1000,
+            reconnection_delay_max: 5000,
+            reconnection_attempts: 999
+        });
+    }
 
     // === SOCKET CONNECTION EVENTS ===
     notificationSocket.on('connect', function() {

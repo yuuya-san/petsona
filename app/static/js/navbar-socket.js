@@ -27,8 +27,11 @@ class NavbarSocketManager {
         return;
       }
 
-      // Reuse existing socket or create new one
-      if (window.navbarSocket) {
+      // Reuse shared socket if already available, otherwise create a dedicated navbar socket
+      if (window.sharedSocket) {
+        this.socket = window.sharedSocket;
+        window.navbarSocket = this.socket;
+      } else if (window.navbarSocket) {
         this.socket = window.navbarSocket;
       } else {
         this.socket = io({

@@ -560,9 +560,6 @@
         <label for="showPassword">Show password</label>
       </div>
 
-      <!-- Hidden reCAPTCHA token field -->
-      {{ form.recaptcha_token() }}
-
       <button class="btn-primary loading-btn" type="submit" aria-label="Login button" disabled>
         <span class="btn-text">Login</span>
         <span class="loader"></span>
@@ -590,35 +587,26 @@
   </div>
 </div>
 
-<!-- Load reCAPTCHA v3 script -->
-<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('.auth-form');
   const submitBtn = document.querySelector('.btn-primary');
-  const recaptchaTokenField = document.querySelector('[name="recaptcha_token"]');
   const showPasswordCheckbox = document.getElementById('showPassword');
-  
-  let passwordInput = document.getElementById('password');
-  let emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const emailInput = document.getElementById('email');
 
-  // Function to check if form is valid
   function validateForm() {
     const emailValid = emailInput && emailInput.value.trim().length > 0;
     const passwordValid = passwordInput && passwordInput.value.trim().length > 0;
     return emailValid && passwordValid;
   }
 
-  // Enable/disable submit button based on form validity
   function updateSubmitButton() {
-    const isValid = validateForm();
     if (submitBtn) {
-      submitBtn.disabled = !isValid;
+      submitBtn.disabled = !validateForm();
     }
   }
 
-  // Listen for input changes on email and password fields
   if (emailInput) {
     emailInput.addEventListener('input', updateSubmitButton);
     emailInput.addEventListener('change', updateSubmitButton);
@@ -628,60 +616,12 @@ document.addEventListener('DOMContentLoaded', function() {
     passwordInput.addEventListener('change', updateSubmitButton);
   }
 
-  // Toggle password visibility with checkbox
   if (showPasswordCheckbox && passwordInput) {
     showPasswordCheckbox.addEventListener('change', function() {
-      if (this.checked) {
-        passwordInput.type = 'text';
-      } else {
-        passwordInput.type = 'password';
-      }
+      passwordInput.type = this.checked ? 'text' : 'password';
     });
   }
 
-  // Execute reCAPTCHA and populate token on form submit
-  if (form) {
-    form.addEventListener('submit', function(e) {
-      // Only submit if button is enabled
-      if (submitBtn && submitBtn.disabled) {
-        e.preventDefault();
-        return;
-      }
-      
-      // Execute reCAPTCHA v3
-      grecaptcha.ready(function() {
-        grecaptcha.execute('{{ recaptcha_site_key }}', { action: 'admin_login' }).then(function(token) {
-          // Set the token in the hidden field
-          if (recaptchaTokenField) {
-            recaptchaTokenField.value = token;
-          }
-          
-          // Disable button and show loading spinner
-          if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.classList.add('loading');
-          }
-          
-          // Submit the form after a brief delay to ensure token is set
-          setTimeout(function() {
-            form.submit();
-          }, 100);
-        }).catch(function(error) {
-          console.error('reCAPTCHA error:', error);
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('loading');
-          }
-          alert('reCAPTCHA verification failed. Please try again.');
-        });
-      });
-      
-      // Prevent immediate form submission
-      e.preventDefault();
-    });
-  }
-
-  // Initialize button state
   updateSubmitButton();
 });
 </script>

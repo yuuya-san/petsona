@@ -38,7 +38,7 @@ class SocketManager {
         this.connected = true;
       } else if (!window.sharedSocket) {
         // Create shared socket instance for all modules
-        window.sharedSocket = io(window.socketIoUrl || 'https://petsona.online', {
+        window.sharedSocket = io(window.socketIoUrl || window.location.origin, {
           reconnection: true,
           reconnectionDelay: 500,
           reconnectionDelayMax: 2000,
