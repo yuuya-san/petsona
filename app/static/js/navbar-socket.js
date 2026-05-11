@@ -3,18 +3,6 @@
  * Handles real-time updates to message badges and indicators without page refresh
  */
 
-function getSharedSocket() {
-  if (typeof window.getSharedSocket === 'function') {
-    return window.getSharedSocket();
-  }
-
-  if (typeof io === 'undefined') {
-    return null;
-  }
-
-  return null;
-}
-
 class NavbarSocketManager {
   constructor() {
     this.socket = null;
@@ -38,8 +26,8 @@ class NavbarSocketManager {
         return;
       }
 
-      const getSocket = typeof window.getSharedSocket === 'function' ? window.getSharedSocket : getSharedSocket;
-      this.socket = getSocket();
+      // Get the shared socket instance from the global getter
+      this.socket = window.getSharedSocket ? window.getSharedSocket() : null;
       if (!this.socket) {
         return;
       }

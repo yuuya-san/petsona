@@ -74,18 +74,6 @@ function injectNotificationCSS() {
     document.head.appendChild(style);
 }
 
-function getSharedSocket() {
-    if (typeof window.getSharedSocket === 'function') {
-        return window.getSharedSocket();
-    }
-
-    if (typeof io === 'undefined') {
-        return null;
-    }
-
-    return null;
-}
-
 var notificationSocket = null;
 var isSocketConnected = false;
 var allNotifications = []; // Store all notifications for modal navigation
@@ -162,8 +150,8 @@ function initializeNotificationSocket() {
         return;
     }
 
-    const getSocket = typeof window.getSharedSocket === 'function' ? window.getSharedSocket : getSharedSocket;
-    notificationSocket = getSocket();
+    // Get the shared socket instance from the global getter
+    notificationSocket = window.getSharedSocket ? window.getSharedSocket() : null;
     if (!notificationSocket) {
         // Try again after the client is ready
         setTimeout(initializeNotificationSocket, 500);
