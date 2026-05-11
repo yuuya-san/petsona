@@ -33,19 +33,35 @@ function waitForSocketIO(maxAttempts = 100) {
 window._socketConnectionAttempts = 0;
 window._socketMaxAttempts = 3;
 window._socketLastError = null;
+window._socketCreationInProgress = false;
 
 function createSharedSocket(forcePolling = false) {
-  // Return existing socket if already connected
-  if (window.sharedSocket && window.sharedSocket.connected) {
-    return window.sharedSocket;
+  // Prevent multiple simultaneous socket creation attempts
+  if (window._socketCreationInProgress) {
+    console.log('[Socket.IO] Socket creation already in progress, returning existing socket');
+    return window.sharedSocket || null;
+  }
+
+  // Return existing socket if already connected or connecting
+  if (window.sharedSocket) {
+    if (window.sharedSocket.connected) {
+      console.log('[Socket.IO] Returning existing connected socket');
+      return window.sharedSocket;
+    }
+    if (window.sharedSocket.connecting) {
+      console.log('[Socket.IO] Socket still connecting, returning existing instance');
+      return window.sharedSocket;
+    }
   }
 
   // Ensure Socket.IO is loaded
   if (typeof io === 'undefined') {
-    console.warn('Socket.IO library not loaded yet');
+    console.warn('[Socket.IO] Library not loaded yet');
     return null;
   }
 
+  window._socketCreationInProgress = true;
+  
   // Build proper socket URL
   const socketUrl = window.socketIoUrl || window.location.origin;
   
@@ -62,12 +78,8 @@ function createSharedSocket(forcePolling = false) {
     autoConnect: true,
     upgrade: !forcePolling,
     secure: window.location.protocol === 'https:',
-    // Nginx compatibility: ensure proper headers
-    extraHeaders: {
-      'Connection': 'upgrade'
-    },
-    // Force polling for testing if websocket fails
     rememberUpgrade: true,
+    // Note: Don't add custom headers for polling - browsers block unsafe headers in XHR
   };
 
   console.log('[Socket.IO] Creating socket', {
@@ -82,14 +94,15 @@ function createSharedSocket(forcePolling = false) {
 
   // Track connection state
   socket.on('connect', () => {
-    console.log('[Socket.IO] ✓ Connected');
+    console.log('[Socket.IO] ✓ Connected via', socket.io.engine.transport.name || 'unknown transport');
     window._socketConnectionAttempts = 0;
     window._socketLastError = null;
+    window._socketCreationInProgress = false;
   });
 
   socket.on('connect_error', (error) => {
     window._socketLastError = error;
-    console.warn('[Socket.IO] Connection error:', error?.message || error);
+    console.warn('[Socket.IO] Connection error:', error?.message || error, 'Transport:', socket.io.engine.transport?.name || 'unknown');
     
     // Only try polling fallback if websocket fails and we haven't tried too many times
     if (!forcePolling && window._socketConnectionAttempts < window._socketMaxAttempts) {
@@ -99,6 +112,7 @@ function createSharedSocket(forcePolling = false) {
       // Clear and retry with polling
       socket.disconnect();
       window.sharedSocket = null;
+      window._socketCreationInProgress = false;
       
       setTimeout(() => {
         console.log('[Socket.IO] Retrying with polling transport only');
@@ -108,6 +122,8 @@ function createSharedSocket(forcePolling = false) {
           window.getSharedSocket = () => pollingSocket;
         }
       }, 1000);
+    } else if (forcePolling) {
+      window._socketCreationInProgress = false;
     }
   });
 
