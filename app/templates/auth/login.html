@@ -628,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Execute reCAPTCHA v3
       grecaptcha.ready(function() {
-        grecaptcha.execute('6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT', { action: 'login' }).then(function(token) {
+        grecaptcha.execute('{{ recaptcha_site_key }}', { action: 'login' }).then(function(token) {
           // Set the token in the hidden field
           if (recaptchaTokenField) {
             recaptchaTokenField.value = token;
