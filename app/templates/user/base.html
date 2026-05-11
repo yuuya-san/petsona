@@ -114,8 +114,7 @@
 <!-- ================= JS ================= -->
 <!-- Socket.IO for Real-time Updates -->
 <script>
-  // Set global Socket.IO URL for client configuration
-  window.socketIoUrl = 'https://petsona.online';
+  window.socketIoUrl = "{{ config.get('FRONTEND_URL') or request.host_url.rstrip('/') }}";
 </script>
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script src="{{ url_for('static', filename='admin/plugins/jquery/jquery.min.js') }}"></script>

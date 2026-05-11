@@ -1,8 +1,5 @@
 import os
 from datetime import timedelta
-from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
-
-load_dotenv()
 
 
 class Config:
@@ -11,16 +8,21 @@ class Config:
     # =========================
     # CORE SECURITY
     # =========================
-    SECRET_KEY = os.getenv("SECRET_KEY") or "fallback-very-strong-key"
+    SECRET_KEY = os.getenv("SECRET_KEY", "fallback-very-strong-key")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
+    SQLALCHEMY_POOL_PRE_PING = True
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_recycle": 280,
+        "pool_pre_ping": True,
+    }
 
     # Session & cookies - safest defaults
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = "Lax"
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
 
-    SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
+    FRONTEND_URL = os.getenv("FRONTEND_URL", None)
 
     # =========================
     # 🟢 RAILWAY MYSQL CONFIG (PUBLIC - FOR SQLYOG)
@@ -58,6 +60,7 @@ class Config:
     # SOCKET.IO CONFIG
     # =========================
     # Socket.IO will connect to the current origin by default.
+    # No special socket host is required unless configured via FRONTEND_URL.
 
     # =========================
     # FILE UPLOAD
