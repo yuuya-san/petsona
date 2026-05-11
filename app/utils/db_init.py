@@ -1,6 +1,8 @@
 import pymysql # pyright: ignore[reportMissingModuleSource]
 from flask import current_app # pyright: ignore[reportMissingImports]
 from sqlalchemy import create_engine # pyright: ignore[reportMissingImports]
+from urllib.parse import urlparse
+
 
 def ensure_database_exists():
     """
@@ -8,16 +10,41 @@ def ensure_database_exists():
     Creates the database if missing.
     """
 
-    db_user = current_app.config["DB_USERNAME"]
-    db_pass = current_app.config["DB_PASSWORD"]
-    db_host = current_app.config["DB_HOST"]
-    db_name = current_app.config["DB_NAME"]
+    db_user = current_app.config.get("DB_USERNAME")
+    db_pass = current_app.config.get("DB_PASSWORD")
+    db_host = current_app.config.get("DB_HOST")
+    db_port = current_app.config.get("DB_PORT")
+    db_name = current_app.config.get("DB_NAME")
 
-    # Connect to MySQL server (NOT to a database)
+    database_uri = current_app.config.get("SQLALCHEMY_DATABASE_URI") or current_app.config.get("MYSQL_URL")
+
+    if database_uri and (not db_user or not db_host or not db_name):
+        parsed = urlparse(database_uri)
+        if parsed.scheme and parsed.scheme.startswith("mysql"):
+            db_user = db_user or parsed.username
+            db_pass = db_pass or parsed.password
+            db_host = db_host or parsed.hostname or "localhost"
+            db_port = db_port or parsed.port
+            if not db_name and parsed.path:
+                db_name = parsed.path.lstrip("/")
+
+    if not db_name:
+        raise RuntimeError("Database name is not configured for initialization")
+    if not db_user:
+        raise RuntimeError("Database username is not configured for initialization")
+    if not db_host:
+        db_host = "localhost"
+
+    if db_port is None:
+        db_port = int(current_app.config.get("DB_PORT", 3306))
+    else:
+        db_port = int(db_port)
+
     connection = pymysql.connect(
         host=db_host,
         user=db_user,
-        password=db_pass,
+        password=db_pass or "",
+        port=db_port,
         autocommit=True
     )
 
