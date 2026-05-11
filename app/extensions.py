@@ -40,12 +40,14 @@ talisman = Talisman()
 csrf = CSRFProtect()
 
 # Socket.IO for real-time updates - WebSocket with polling fallback
+import os
+async_mode = 'eventlet' if os.getenv('FLASK_ENV') == 'production' else 'threading'
 socketio = SocketIO(
     cors_allowed_origins="*",
     ping_timeout=60,  # Increased timeout to prevent disconnects
     ping_interval=25,
     transports=['websocket', 'polling'],  # WebSocket first, fallback to polling if needed
-    async_mode='threading',
+    async_mode=async_mode,
     engineio_logger=False,  # Disable debug logging
     logger=False,
 )

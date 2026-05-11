@@ -1,9 +1,11 @@
 import os
 from app import create_app, db
 
-# Create Flask app + SocketIO
+# Create Flask app and SocketIO instance
 app, socketio = create_app()
 
+# Expose WSGI application for gunicorn (production)
+application = socketio.WSGIApp()
 
 # -----------------------------
 # SAFE DB INITIALIZATION ONLY
@@ -16,47 +18,26 @@ with app.app_context():
     except Exception as e:
         print("DB init warning:", e)
 
-# -----------------------------
-# OPTIONAL: SAFE ADMIN CHECK (NON-BLOCKING)
-# -----------------------------
-def ensure_admin():
-    try:
-        from app.models import User
-        from app.utils.admin import create_admin  # adjust if your path differs
-
-        ADMIN_EMAIL = "petsona.helpcare@gmail.com"
-        DEFAULT_ADMIN_PHOTO = "images/avatar/dog.png"
-
-        admin_exists = User.query.filter_by(email=ADMIN_EMAIL).first()
-
-        if not admin_exists:
-            create_admin(
-                email=ADMIN_EMAIL,
-                password="Petsona-0717",
-                photo_url=DEFAULT_ADMIN_PHOTO
-            )
-            print("Admin created.")
-    except Exception as e:
-        print("Admin setup skipped:", e)
-
-# Run admin setup safely AFTER app starts
-with app.app_context():
-    ensure_admin()
 
 # -----------------------------
-# ROUTES (HEALTH CHECK)
-# -----------------------------
-@app.route("/")
-def home():
-    return "PetSona is running successfully 🚀"
-
-# -----------------------------
-# ENTRY POINT (RAILWAY SAFE)
+# ENTRY POINT (PRODUCTION SAFE)
 # -----------------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
+    env = os.environ.get("FLASK_ENV", "development")
 
-    try:
-        socketio.run(app, host="0.0.0.0", port=port)
-    except Exception:
-        app.run(host="0.0.0.0", port=port)
+    if env == "production":
+        # Production: Use eventlet for WebSocket support
+        try:
+            import eventlet # pyright: ignore[reportMissingImports]
+            eventlet.monkey_patch()
+        except ImportError:
+            print("WARNING: eventlet not installed. Install with: pip install eventlet")
+
+        # For production, use gunicorn instead:
+        # gunicorn --worker-class eventlet -w 1 run:app
+        print("For production, use: gunicorn --worker-class eventlet -w 1 run:app")
+        socketio.run(app, host="0.0.0.0", port=port, debug=False)
+    else:
+        # Development: Use threading
+        socketio.run(app, host="0.0.0.0", port=port, debug=True)
