@@ -216,6 +216,7 @@ def create_app(config_class: type = Config):
         return redirect(request.referrer or url_for('auth.home'))
 
     # Root route
+    @app.route('/')
     def index():
         return redirect(url_for("auth.home"))
 

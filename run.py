@@ -35,7 +35,7 @@ if __name__ == "__main__":
         # For production, use gunicorn instead:
         # gunicorn --worker-class eventlet -w 1 run:app
         print("For production, use: gunicorn --worker-class eventlet -w 1 run:app")
-        socketio.run(app, host="0.0.0.0", port=port, debug=False)
+        socketio.run(app, host="0.0.0.0", port=port, debug=False, use_reloader=False)
     else:
         # Development: Use threading
         socketio.run(app, host="0.0.0.0", port=port, debug=True)

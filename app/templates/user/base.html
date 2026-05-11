@@ -49,6 +49,21 @@
         crossorigin="anonymous"
         referrerpolicy="no-referrer" />
 
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='admin/plugins/jquery/jquery.min.js') }}"></script>
+    <script>
+    if (typeof window.jQuery === 'undefined') {
+      var fallbackScript = document.createElement('script');
+      fallbackScript.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+      fallbackScript.integrity = 'sha256-/xUj+3OJ+Y3oAKiH6jyCmMJk3Hr6zvN3O82ijvs0yvc=';
+      fallbackScript.crossOrigin = 'anonymous';
+      document.head.appendChild(fallbackScript);
+    }
+    </script>
+    <script>
+      window.socketIoUrl = window.socketIoUrl || location.origin;
+    </script>
+
     {% block styles %}{% endblock %}
 </head>
 
@@ -112,13 +127,6 @@
 {% include 'partials/notification-modal.html' %}
 
 <!-- ================= JS ================= -->
-<!-- Socket.IO for Real-time Updates -->
-<script>
-  // Set global Socket.IO URL for client configuration
-  window.socketIoUrl = 'https://petsona.online';
-</script>
-<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-<script src="{{ url_for('static', filename='admin/plugins/jquery/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='admin/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='admin/dist/js/adminlte.min.js') }}"></script>
