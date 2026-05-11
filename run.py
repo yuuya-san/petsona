@@ -1,5 +1,6 @@
 import os
 from app import create_app, db
+from flask import redirect, url_for, request
 
 # Create Flask app + SocketIO
 app, socketio = create_app()
@@ -22,7 +23,7 @@ with app.app_context():
 # -----------------------------
 @app.route("/")
 def home():
-    return "PetSona is running successfully 🚀"
+    return redirect("/auth/home")
 
 # -----------------------------
 # ENTRY POINT (RAILWAY SAFE)
