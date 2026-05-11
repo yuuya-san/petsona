@@ -3,7 +3,7 @@
  * Handles WebSocket connections and vote count synchronization
  */
 
-function createSharedSocket() {
+function createSharedSocket(forcePolling = false) {
   if (window.sharedSocket) {
     return window.sharedSocket;
   }
@@ -15,7 +15,7 @@ function createSharedSocket() {
   const socketUrl = window.socketIoUrl || window.location.origin;
   const opts = {
     path: '/socket.io',
-    transports: ['websocket', 'polling'],
+    transports: forcePolling ? ['polling'] : ['websocket', 'polling'],
     reconnection: true,
     reconnectionAttempts: 8,
     reconnectionDelay: 1000,
@@ -23,15 +23,27 @@ function createSharedSocket() {
     randomizationFactor: 0.5,
     timeout: 20000,
     autoConnect: true,
-    upgrade: true,
+    upgrade: !forcePolling,
     secure: window.location.protocol === 'https:',
   };
 
   const socket = io(socketUrl, opts);
   window.sharedSocket = socket;
 
+  let pollingFallbackScheduled = false;
+
   socket.on('connect_error', (error) => {
     console.warn('Socket.IO connect error:', error);
+    if (!forcePolling && !pollingFallbackScheduled) {
+      pollingFallbackScheduled = true;
+      console.warn('Socket.IO websocket failed; retrying with polling only.');
+      socket.disconnect();
+      window.sharedSocket = null;
+      setTimeout(() => {
+        window.getSharedSocket = createSharedSocket;
+        window.sharedSocket = createSharedSocket(true);
+      }, 500);
+    }
   });
 
   socket.on('reconnect_error', (error) => {

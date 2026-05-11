@@ -74,49 +74,17 @@ function injectNotificationCSS() {
     document.head.appendChild(style);
 }
 
-function getNotificationSharedSocket() {
-    if (window.sharedSocket) {
-        return window.sharedSocket;
+function getSharedSocket() {
+    if (typeof window.getSharedSocket === 'function') {
+        return window.getSharedSocket();
     }
 
     if (typeof io === 'undefined') {
         return null;
     }
 
-    const socketUrl = window.socketIoUrl || window.location.origin;
-    const opts = {
-        path: '/socket.io',
-        transports: ['websocket', 'polling'],
-        reconnection: true,
-        reconnectionAttempts: 8,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 15000,
-        randomizationFactor: 0.5,
-        timeout: 20000,
-        autoConnect: true,
-        upgrade: true,
-        secure: window.location.protocol === 'https:',
-    };
-
-    const socket = io(socketUrl, opts);
-    window.sharedSocket = socket;
-
-    socket.on('connect_error', (error) => {
-        console.warn('Notification socket connect error:', error);
-    });
-
-    socket.on('reconnect_error', (error) => {
-        console.warn('Notification socket reconnect error:', error);
-    });
-
-    socket.on('reconnect_failed', () => {
-        console.warn('Notification socket reconnect failed');
-    });
-
-    return socket;
+    return null;
 }
-
-window.getSharedSocket = window.getSharedSocket || getNotificationSharedSocket;
 
 var notificationSocket = null;
 var isSocketConnected = false;
@@ -194,7 +162,8 @@ function initializeNotificationSocket() {
         return;
     }
 
-    notificationSocket = window.getSharedSocket();
+    const getSocket = typeof window.getSharedSocket === 'function' ? window.getSharedSocket : getSharedSocket;
+    notificationSocket = getSocket();
     if (!notificationSocket) {
         // Try again after the client is ready
         setTimeout(initializeNotificationSocket, 500);
