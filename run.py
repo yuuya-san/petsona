@@ -4,9 +4,6 @@ from app import create_app, db
 # Create Flask app and SocketIO instance
 app, socketio = create_app()
 
-# Expose WSGI application for gunicorn (production)
-application = socketio.WSGIApp(app)
-
 # -----------------------------
 # SAFE DB INITIALIZATION ONLY
 # -----------------------------

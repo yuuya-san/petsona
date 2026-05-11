@@ -8,6 +8,8 @@ class NavbarSocketManager {
     this.socket = null;
     this.messageCache = new Map(); // conversation_id -> message data
     this.initialized = false;
+    this.ioRetryCount = 0;
+    this.maxIoRetryAttempts = 10;
     this.init();
   }
 
@@ -18,6 +20,10 @@ class NavbarSocketManager {
     try {
       // Check if Socket.IO library is available
       if (typeof io === 'undefined') {
+        if (this.ioRetryCount < this.maxIoRetryAttempts) {
+          this.ioRetryCount += 1;
+          setTimeout(() => this.init(), 300);
+        }
         return;
       }
 

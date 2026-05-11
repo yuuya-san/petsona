@@ -425,11 +425,22 @@
     document.body.appendChild(alertDiv);
     
     // Bootstrap alert dismiss functionality
-    $(alertDiv).alert();
+    let alertInstance = null;
+    if (window.bootstrap && typeof bootstrap.Alert === 'function') {
+      alertInstance = new bootstrap.Alert(alertDiv);
+    } else if (typeof $ !== 'undefined' && typeof $(alertDiv).alert === 'function') {
+      $(alertDiv).alert();
+    }
     
     // Auto-remove after 5 seconds
     setTimeout(() => {
-      $(alertDiv).alert('close');
+      if (alertInstance && typeof alertInstance.close === 'function') {
+        alertInstance.close();
+      } else if (typeof $ !== 'undefined' && typeof $(alertDiv).alert === 'function') {
+        $(alertDiv).alert('close');
+      } else {
+        alertDiv.remove();
+      }
     }, 5000);
   }
   
