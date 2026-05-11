@@ -28,44 +28,30 @@ def ensure_database_exists():
             if not db_name and parsed.path:
                 db_name = parsed.path.lstrip("/")
 
+    if not db_name:
+        raise RuntimeError("Database name is not configured for initialization")
+    if not db_user:
+        raise RuntimeError("Database username is not configured for initialization")
     if not db_host:
         db_host = "localhost"
 
-    if db_port is None or db_port == "":
-        db_port = current_app.config.get("DB_PORT", 3306)
-
-    try:
+    if db_port is None:
+        db_port = int(current_app.config.get("DB_PORT", 3306))
+    else:
         db_port = int(db_port)
-    except (TypeError, ValueError):
-        db_port = 3306
 
-    if not db_user or not db_name:
-        current_app.logger.warning(
-            "Skipping database creation: DB_USERNAME or DB_NAME is not configured."
-        )
-        return
+    connection = pymysql.connect(
+        host=db_host,
+        user=db_user,
+        password=db_pass or "",
+        port=db_port,
+        autocommit=True
+    )
 
-    connection = None
-    try:
-        connection = pymysql.connect(
-            host=db_host,
-            user=db_user,
-            password=db_pass or "",
-            port=db_port,
-            autocommit=True,
-            connect_timeout=10,
-        )
-        cursor = connection.cursor()
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}`;")
-        cursor.close()
-    except Exception as e:
-        current_app.logger.error(f"Database creation failed: {e}", exc_info=True)
-    finally:
-        if connection is not None:
-            try:
-                connection.close()
-            except Exception:
-                pass
+    cursor = connection.cursor()
+    cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}`;")
+    cursor.close()
+    connection.close()
 
 
 def create_tables(db):

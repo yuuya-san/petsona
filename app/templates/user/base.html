@@ -31,62 +31,6 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='admin/plugins/jquery/jquery.min.js') }}"></script>
-    
-    <!-- jQuery Fallback & Global $ Guard -->
-    <script>
-    (function() {
-      // Safe Promise for jQuery readiness - handles both fallback and local jQuery
-      window._jqueryReady = false;
-      window._jqueryReadyPromise = new Promise(function(resolve) {
-        var attempts = 0;
-        var maxAttempts = 100; // 5 seconds (100 * 50ms)
-        
-        function check() {
-          if (typeof jQuery !== 'undefined' && typeof $ !== 'undefined') {
-            window._jqueryReady = true;
-            console.log('[jQuery] ✓ Ready');
-            resolve(true);
-            return;
-          }
-          
-          if (attempts < maxAttempts) {
-            attempts++;
-            setTimeout(check, 50);
-          } else {
-            console.error('[jQuery] Failed to load');
-            resolve(false);
-          }
-        }
-        
-        // Check if fallback is needed
-        if (typeof jQuery === 'undefined') {
-          console.log('[jQuery] Loading fallback');
-          var s = document.createElement('script');
-          s.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
-          s.integrity = 'sha256-/xUj+3OJ+Y3oAKiH6jyCmMJk3Hr6zvN3O82ijvs0yvc=';
-          s.crossOrigin = 'anonymous';
-          s.onload = check;
-          s.onerror = check;
-          document.head.appendChild(s);
-        } else {
-          check();
-        }
-      });
-      
-      // Defensive $ getter - never throws, always returns something jQuery-like
-      Object.defineProperty(window, '$', {
-        get: function() {
-          if (typeof jQuery !== 'undefined') return jQuery;
-          var n = function() { return n; };
-          n.fn = n.prototype = {};
-          return n;
-        },
-        configurable: true,
-        enumerable: false
-      });
-    })();
-    </script>
-    
     <script src="{{ url_for('static', filename='admin/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
     <style>

@@ -74,10 +74,14 @@ function injectNotificationCSS() {
     document.head.appendChild(style);
 }
 
-var notificationSocket = null;
-var isSocketConnected = false;
-var allNotifications = []; // Store all notifications for modal navigation
-var currentNotificationIndex = -1; // Track current notification being viewed in modal
+// Initialize Socket.IO connection for notifications (wait for Socket.IO to load)
+// Use window namespace to avoid double-declaration errors if script loads twice
+if (typeof notificationSocket === 'undefined') {
+    var notificationSocket = null;  // Use var for function-scope level declaration
+    var isSocketConnected = false;
+    var allNotifications = []; // Store all notifications for modal navigation
+    var currentNotificationIndex = -1; // Track current notification being viewed in modal
+}
 
 // ===== FORMAT DATE TIME TO 12-HOUR FORMAT WITH AM/PM =====
 function format12HourTime(dateString) {
@@ -145,29 +149,25 @@ function getNotificationRedirectUrl(notificationData) {
 
 // Function to initialize Socket.IO when ready
 function initializeNotificationSocket() {
+    // Check if io is available (Socket.IO loaded)
     if (typeof io === 'undefined') {
         setTimeout(initializeNotificationSocket, 500);
         return;
     }
 
-    // Get the shared socket instance from the global getter
-    notificationSocket = window.getSharedSocket ? window.getSharedSocket() : null;
-    if (!notificationSocket) {
-        // Try again after the client is ready
-        setTimeout(initializeNotificationSocket, 500);
-        return;
+    if (window.sharedSocket) {
+        notificationSocket = window.sharedSocket;
+    } else if (notificationSocket) {
+        // reuse existing notification socket if already created
+    } else {
+        notificationSocket = window.sharedSocket = io({
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnection_delay: 1000,
+            reconnection_delay_max: 5000,
+            reconnection_attempts: 999
+        });
     }
-
-    notificationSocket.off('connect');
-    notificationSocket.off('disconnect');
-    notificationSocket.off('error');
-    notificationSocket.off('new_notification_received');
-    notificationSocket.off('unread_count');
-    notificationSocket.off('unread_count_update');
-    notificationSocket.off('notifications_list');
-    notificationSocket.off('notification_marked_read');
-    notificationSocket.off('all_notifications_marked_read');
-    notificationSocket.off('notification_detail');
 
     // === SOCKET CONNECTION EVENTS ===
     notificationSocket.on('connect', function() {

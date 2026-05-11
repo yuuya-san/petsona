@@ -4,7 +4,6 @@ from flask_socketio import emit, join_room, leave_room # pyright: ignore[reportM
 from app.extensions import socketio
 from app.models import Species
 from flask_login import current_user
-from app.utils.socket_rate_limit import socket_rate_limit, check_socket_event_limit, clear_socket_limits_for_user
 import logging
 from datetime import datetime
 import pytz
@@ -49,45 +48,23 @@ def handle_disconnect():
     """Handle client disconnections"""
     sid = request.sid
     logger.info(f"❌ Client disconnected: {sid}")
-
-    try:
-        # Clean up any watchers for this client
-        if sid in active_watchers:
-            del active_watchers[sid]
-
-        user_id = getattr(current_user, 'id', None)
-        if user_id and user_id in active_users:
-            active_watchers_for_user = active_users[user_id]
-            if sid in active_watchers_for_user:
-                active_watchers_for_user.remove(sid)
-            if not active_watchers_for_user:
-                del active_users[user_id]
-            # Clear rate limits for this user when all connections close
-            if not active_users[user_id]:
-                clear_socket_limits_for_user(user_id)
-
-        if current_user.is_authenticated:
-            try:
-                current_user.update_last_seen()
-                logger.info(f"👤 User {user_id} last_seen updated on disconnect")
-            except Exception as e:
-                logger.warning(f"Unable to update last_seen for user {user_id}: {e}")
-    except Exception as e:
-        logger.exception(f"Error during disconnect cleanup for {sid}: {e}")
-
-
-@socketio.on_error_default
-def default_socket_error_handler(e):
-    """Catch unhandled Socket.IO errors without crashing the worker."""
-    logger.exception("Unhandled Socket.IO error", exc_info=e)
-    try:
-        emit('error', {'message': 'Internal server error'})
-    except Exception:
-        pass
+    
+    # Clean up any watchers for this client
+    if sid in active_watchers:
+        del active_watchers[sid]
+    
+    # Clean up active users and update last_seen
+    if current_user.is_authenticated:
+        if current_user.id in active_users:
+            if sid in active_users[current_user.id]:
+                active_users[current_user.id].remove(sid)
+        
+        # Update last_seen when user disconnects
+        current_user.update_last_seen()
+        logger.info(f"👤 User {current_user.id} last_seen updated on disconnect")
 
 
 @socketio.on('watch_species')
-@socket_rate_limit('watch_species')
 def handle_watch_species(data):
     """Register client to watch species vote updates"""
     try:
@@ -183,7 +160,6 @@ def handle_leave_conversation(data):
 
 
 @socketio.on('typing')
-@socket_rate_limit('typing')
 def handle_typing(data):
     """Broadcast typing indicator."""
     try:
@@ -202,7 +178,6 @@ def handle_typing(data):
 
 
 @socketio.on('stop_typing')
-@socket_rate_limit('stop_typing')
 def handle_stop_typing(data):
     """Stop typing indicator."""
     try:
@@ -220,7 +195,6 @@ def handle_stop_typing(data):
 
 
 @socketio.on('user_online')
-@socket_rate_limit('user_online')
 def handle_user_online(data):
     """Handle user coming online."""
     try:
@@ -255,7 +229,6 @@ def handle_user_online(data):
 
 
 @socketio.on('user_inactive')
-@socket_rate_limit('user_inactive')
 def handle_user_inactive(data):
     """Handle user becoming inactive."""
     try:

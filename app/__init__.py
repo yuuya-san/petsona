@@ -1,5 +1,5 @@
 """Application factory. Initializes extensions, registers blueprints."""
-from flask import Flask, jsonify, redirect, url_for, request, flash # pyright: ignore[reportMissingImports]
+from flask import Flask, redirect, url_for, request, flash # pyright: ignore[reportMissingImports]
 from werkzeug.exceptions import RequestEntityTooLarge # pyright: ignore[reportMissingImports]
 from .config import Config
 from app.extensions import db, migrate, login_manager, mail, bcrypt, limiter, talisman, socketio, oauth
@@ -44,28 +44,6 @@ def create_app(config_class: type = Config):
     
     # Initialize config (including OAuth registration)
     config_class.init_app(app)
-
-    # Ensure upload directories exist before handling requests
-    def create_upload_directories():
-        upload_root = os.path.join(app.root_path, 'static', 'uploads')
-        upload_dirs = [
-            app.config.get('UPLOAD_FOLDER'),
-            upload_root,
-            os.path.join(upload_root, 'messages'),
-            os.path.join(upload_root, 'merchants'),
-            os.path.join(upload_root, 'qr_codes'),
-            os.path.join(app.root_path, 'static', 'images', 'avatar', 'uploads'),
-        ]
-
-        for directory in upload_dirs:
-            if not directory:
-                continue
-            try:
-                os.makedirs(directory, exist_ok=True)
-            except Exception as e:
-                app.logger.warning(f"Unable to create upload directory '{directory}': {e}")
-
-    create_upload_directories()
 
     # Custom Jinja2 filter for converting operating days from numeric to names
     def convert_operating_days(operating_days_str):
@@ -224,16 +202,6 @@ def create_app(config_class: type = Config):
     def handle_request_entity_too_large(error):
         flash('Uploaded files exceed the maximum allowed upload size. Reduce attachments and try again.', 'danger')
         return redirect(request.referrer or url_for('merchant.apply'))
-
-    @app.errorhandler(Exception)
-    def handle_generic_exception(error):
-        app.logger.exception("Unhandled exception during request", exc_info=error)
-
-        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes.accept_json:
-            return jsonify({'error': 'Internal server error'}), 500
-
-        flash('An unexpected error occurred. Please try again or contact support.', 'danger')
-        return redirect(request.referrer or url_for('auth.home'))
 
     # Root route
     @app.route("/")

@@ -1,153 +1,7 @@
 /**
- * Socket.IO Manager for Real-Time Updates
- * Nginx & Gunicorn Compatible Configuration
- * Handles WebSocket connections with polling fallback
+ * Socket.IO Manager for Real-Time Vote Updates
+ * Handles WebSocket connections and vote count synchronization
  */
-
-// Wait for Socket.IO library to be loaded
-function waitForSocketIO(maxAttempts = 100) {
-  return new Promise((resolve) => {
-    let attempts = 0;
-    
-    function check() {
-      if (typeof io !== 'undefined') {
-        console.log('[Socket.IO] Library loaded');
-        resolve(true);
-        return;
-      }
-      
-      if (attempts < maxAttempts) {
-        attempts++;
-        setTimeout(check, 50); // Check every 50ms
-      } else {
-        console.error('[Socket.IO] Library failed to load after 5 seconds');
-        resolve(false);
-      }
-    }
-    
-    check();
-  });
-}
-
-// Global tracking for connection attempts
-window._socketConnectionAttempts = 0;
-window._socketMaxAttempts = 3;
-window._socketLastError = null;
-window._socketCreationInProgress = false;
-
-function createSharedSocket(forcePolling = false) {
-  // Prevent multiple simultaneous socket creation attempts
-  if (window._socketCreationInProgress) {
-    console.log('[Socket.IO] Socket creation already in progress, returning existing socket');
-    return window.sharedSocket || null;
-  }
-
-  // Return existing socket if already connected or connecting
-  if (window.sharedSocket) {
-    if (window.sharedSocket.connected) {
-      console.log('[Socket.IO] Returning existing connected socket');
-      return window.sharedSocket;
-    }
-    if (window.sharedSocket.connecting) {
-      console.log('[Socket.IO] Socket still connecting, returning existing instance');
-      return window.sharedSocket;
-    }
-  }
-
-  // Ensure Socket.IO is loaded
-  if (typeof io === 'undefined') {
-    console.warn('[Socket.IO] Library not loaded yet');
-    return null;
-  }
-
-  window._socketCreationInProgress = true;
-  
-  // Build proper socket URL
-  const socketUrl = window.socketIoUrl || window.location.origin;
-  
-  // Nginx/Gunicorn compatible configuration
-  const opts = {
-    path: '/socket.io/',
-    transports: forcePolling ? ['polling'] : ['websocket', 'polling'],
-    reconnection: true,
-    reconnectionAttempts: 10,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 30000,
-    randomizationFactor: 0.5,
-    timeout: 30000,
-    autoConnect: true,
-    upgrade: !forcePolling,
-    secure: window.location.protocol === 'https:',
-    rememberUpgrade: true,
-    // Note: Don't add custom headers for polling - browsers block unsafe headers in XHR
-  };
-
-  console.log('[Socket.IO] Creating socket', {
-    url: socketUrl,
-    forcePolling: forcePolling,
-    transports: opts.transports
-  });
-
-  const socket = io(socketUrl, opts);
-  window.sharedSocket = socket;
-  window._socketConnectionAttempts = 0;
-
-  // Track connection state
-  socket.on('connect', () => {
-    console.log('[Socket.IO] ✓ Connected via', socket.io.engine.transport.name || 'unknown transport');
-    window._socketConnectionAttempts = 0;
-    window._socketLastError = null;
-    window._socketCreationInProgress = false;
-  });
-
-  socket.on('connect_error', (error) => {
-    window._socketLastError = error;
-    console.warn('[Socket.IO] Connection error:', error?.message || error, 'Transport:', socket.io.engine.transport?.name || 'unknown');
-    
-    // Only try polling fallback if websocket fails and we haven't tried too many times
-    if (!forcePolling && window._socketConnectionAttempts < window._socketMaxAttempts) {
-      window._socketConnectionAttempts++;
-      console.log('[Socket.IO] Attempting polling fallback (attempt ' + window._socketConnectionAttempts + ')');
-      
-      // Clear and retry with polling
-      socket.disconnect();
-      window.sharedSocket = null;
-      window._socketCreationInProgress = false;
-      
-      setTimeout(() => {
-        console.log('[Socket.IO] Retrying with polling transport only');
-        const pollingSocket = createSharedSocket(true);
-        if (pollingSocket) {
-          window.sharedSocket = pollingSocket;
-          window.getSharedSocket = () => pollingSocket;
-        }
-      }, 1000);
-    } else if (forcePolling) {
-      window._socketCreationInProgress = false;
-    }
-  });
-
-  socket.on('error', (error) => {
-    console.error('[Socket.IO] Socket error:', error);
-  });
-
-  socket.on('disconnect', (reason) => {
-    console.warn('[Socket.IO] Disconnected:', reason);
-  });
-
-  socket.on('reconnect_error', (error) => {
-    console.warn('[Socket.IO] Reconnect error:', error?.message || error);
-  });
-
-  socket.on('reconnect_failed', () => {
-    console.warn('[Socket.IO] Reconnection failed. Max attempts reached.');
-  });
-
-  return socket;
-}
-
-// Initialize getSharedSocket as a global getter
-window.getSharedSocket = window.getSharedSocket || createSharedSocket;
 
 class SocketManager {
   constructor() {
@@ -173,19 +27,32 @@ class SocketManager {
    */
   init() {
     try {
+      // Check if Socket.IO library is available
       if (typeof io === 'undefined') {
         return;
       }
 
-      this.socket = window.getSharedSocket();
-      if (!this.socket) {
-        return;
+      // Reuse existing global socket connection if available
+      if (window.sharedSocket && window.sharedSocket.connected) {
+        this.socket = window.sharedSocket;
+        this.connected = true;
+      } else if (!window.sharedSocket) {
+        // Create shared socket instance for all modules
+        window.sharedSocket = io(window.socketIoUrl || window.location.origin, {
+          reconnection: true,
+          reconnectionDelay: 500,
+          reconnectionDelayMax: 2000,
+          reconnectionAttempts: this.maxReconnectAttempts,
+          transports: ['websocket', 'polling'],
+          upgrade: true,
+        });
+        this.socket = window.sharedSocket;
+      } else {
+        this.socket = window.sharedSocket;
       }
 
-      this.connected = this.socket.connected;
       this.setupEventHandlers();
     } catch (error) {
-      console.warn('SocketManager init error:', error);
     }
   }
 
@@ -194,16 +61,6 @@ class SocketManager {
    */
   setupEventHandlers() {
     if (!this.socket) return;
-
-    this.socket.off('connect');
-    this.socket.off('disconnect');
-    this.socket.off('error');
-    this.socket.off('connection_response');
-    this.socket.off('vote_update');
-    this.socket.off('breed_vote_update');
-    this.socket.off('watch_confirmed');
-    this.socket.off('reconnect_attempt');
-    this.socket.off('reconnect');
 
     // Connection established
     this.socket.on('connect', () => {
@@ -379,36 +236,9 @@ class SocketManager {
   }
 }
 
-// Create global instance with delayed initialization
-let socketManager = null;
+// Create global instance
+const socketManager = new SocketManager();
 
-function initializeSocketManager() {
-  if (socketManager) {
-    return; // Already initialized
-  }
-  
-  if (typeof io === 'undefined') {
-    // Socket.IO not ready yet, retry
-    console.log('[Socket.IO] Waiting for Socket.IO library...');
-    setTimeout(initializeSocketManager, 500);
-    return;
-  }
-  
-  console.log('[Socket.IO] Initializing SocketManager');
-  socketManager = new SocketManager();
-  
-  // Expose manager globally for page scripts and compatibility
-  window.socketManager = socketManager;
-  window.socket = socketManager.socket;
-}
-
-// Start initialization when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeSocketManager);
-} else {
-  // DOM is already loaded
-  initializeSocketManager();
-}
-
-// Also try to initialize after a short delay to catch Socket.IO loading
-setTimeout(initializeSocketManager, 100);
+// Expose manager globally for page scripts and compatibility
+window.socketManager = socketManager;
+window.socket = socketManager.socket;

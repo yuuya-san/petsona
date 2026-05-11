@@ -18,6 +18,7 @@ class NavbarSocketManager {
    */
   init() {
     try {
+      // Check if Socket.IO library is available
       if (typeof io === 'undefined') {
         if (this.ioRetryCount < this.maxIoRetryAttempts) {
           this.ioRetryCount += 1;
@@ -26,17 +27,26 @@ class NavbarSocketManager {
         return;
       }
 
-      // Get the shared socket instance from the global getter
-      this.socket = window.getSharedSocket ? window.getSharedSocket() : null;
-      if (!this.socket) {
-        return;
+      // Reuse shared socket if already available, otherwise create a dedicated navbar socket
+      if (window.sharedSocket) {
+        this.socket = window.sharedSocket;
+        window.navbarSocket = this.socket;
+      } else if (window.navbarSocket) {
+        this.socket = window.navbarSocket;
+      } else {
+        this.socket = io({
+          reconnection: true,
+          reconnectionDelay: 1000,
+          reconnectionDelayMax: 5000,
+          reconnectionAttempts: 5
+        });
+        window.navbarSocket = this.socket;
       }
 
       this.setupEventHandlers();
       this.initializeMessageItems();
       this.initialized = true;
     } catch (error) {
-      console.warn('NavbarSocketManager init error:', error);
     }
   }
 
@@ -70,14 +80,6 @@ class NavbarSocketManager {
    */
   setupEventHandlers() {
     if (!this.socket) return;
-
-    this.socket.off('message_unread_count_update');
-    this.socket.off('navbar_message_update');
-    this.socket.off('message_read');
-    this.socket.off('connect');
-    this.socket.off('disconnect');
-    this.socket.off('reconnect');
-    this.socket.off('error');
 
     // Listen for unread message count updates
     this.socket.on('message_unread_count_update', (data) => {

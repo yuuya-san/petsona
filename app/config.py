@@ -1,6 +1,5 @@
 import os
 from datetime import timedelta
-from urllib.parse import urlparse
 from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
 
 load_dotenv()
@@ -24,37 +23,17 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-me")
 
     # =========================
-    # 🟢 DATABASE CONFIG
+    # 🟢 RAILWAY MYSQL CONFIG (PUBLIC - FOR SQLYOG)
     # =========================
     MYSQL_URL = os.getenv("MYSQL_URL")
-    DB_USERNAME = os.getenv("DB_USERNAME")
-    DB_PASSWORD = os.getenv("DB_PASSWORD")
-    DB_HOST = os.getenv("DB_HOST")
-    DB_PORT = os.getenv("DB_PORT")
-    DB_NAME = os.getenv("DB_NAME")
 
     if MYSQL_URL:
-        parsed_mysql_url = urlparse(MYSQL_URL)
-        DB_USERNAME = DB_USERNAME or parsed_mysql_url.username
-        DB_PASSWORD = DB_PASSWORD or parsed_mysql_url.password
-        DB_HOST = DB_HOST or parsed_mysql_url.hostname or "localhost"
-        DB_PORT = DB_PORT or (parsed_mysql_url.port or 3306)
-        DB_NAME = DB_NAME or (parsed_mysql_url.path.lstrip("/") if parsed_mysql_url.path else None)
-        SQLALCHEMY_DATABASE_URI = MYSQL_URL.replace("mysql://", "mysql+pymysql://")
-    else:
-        DB_HOST = DB_HOST or "localhost"
-        DB_PORT = DB_PORT or 3306
-        DB_USERNAME = DB_USERNAME or "petsona_user"
-        DB_PASSWORD = DB_PASSWORD or "Petsona-0717"
-        DB_NAME = DB_NAME or "petsona_db"
-        SQLALCHEMY_DATABASE_URI = (
-            f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+        SQLALCHEMY_DATABASE_URI = MYSQL_URL.replace(
+            "mysql://", "mysql+pymysql://"
         )
-
-    try:
-        DB_PORT = int(DB_PORT)
-    except (TypeError, ValueError):
-        DB_PORT = 3306
+    else:
+        # Localhost MySQL on port 3307, no password
+        SQLALCHEMY_DATABASE_URI = "mysql+pymysql://petsona_user:Petsona-0717@localhost/petsona_db"
 
     # =========================
     # MAIL

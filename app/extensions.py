@@ -25,16 +25,11 @@ mail = Mail()
 # Bcrypt for secure password hashing
 bcrypt = Bcrypt()
 
-# Rate limiter - Redis-backed for production, memory for dev
-import os
-_redis_url = os.getenv('REDIS_URL')
-_storage_uri = _redis_url if _redis_url else "memory://"
-
+# Rate limiter
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["200 per day", "50 per hour"],
-    storage_uri=_storage_uri,
-    storage_options={"url": _redis_url} if _redis_url else {}
+    storage_uri="memory://"
 )
 
 
@@ -46,36 +41,15 @@ csrf = CSRFProtect()
 
 # Socket.IO for real-time updates - WebSocket with polling fallback
 import os
-async_mode = None
-if os.getenv('FLASK_ENV') == 'production':
-    try:
-        import eventlet  # pyright: ignore[reportMissingImports]
-        async_mode = 'eventlet'
-    except ImportError:
-        try:
-            import gevent  # pyright: ignore[reportMissingImports]
-            async_mode = 'gevent'
-        except ImportError:
-            async_mode = 'threading'
-else:
-    async_mode = 'threading'
-
+async_mode = 'eventlet' if os.getenv('FLASK_ENV') == 'production' else 'threading'
 socketio = SocketIO(
-    # IMPORTANT: Never use "*" in production - specify allowed origins
-    cors_allowed_origins=[
-        "https://petsona.online",
-        "https://www.petsona.online",
-        os.getenv('SOCKETIO_CORS_ORIGIN', 'http://localhost:5000')
-    ] if os.getenv('FLASK_ENV') == 'production' else "*",
-    ping_timeout=60,
+    cors_allowed_origins="*",
+    ping_timeout=60,  # Increased timeout to prevent disconnects
     ping_interval=25,
-    transports=['websocket', 'polling'],
+    transports=['websocket', 'polling'],  # WebSocket first, fallback to polling if needed
     async_mode=async_mode,
-    manage_session=False,
-    engineio_logger=False,
+    engineio_logger=False,  # Disable debug logging
     logger=False,
-    # Prevent reconnect storms with exponential backoff
-    **({'max_http_buffer_size': 1e6} if os.getenv('FLASK_ENV') == 'production' else {})
 )
 
 # OAuth for social login
