@@ -86,6 +86,7 @@ def _fetch_road_distance_async(lat1, lon1, lat2, lon2):
                 # Cache result here if needed
                 return distance_km
     except Exception as e:
+        print(e)
 
 
 @bp.route('/dashboard')
