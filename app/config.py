@@ -32,11 +32,8 @@ class Config:
             "mysql://", "mysql+pymysql://"
         )
     else:
-        # 🔥 your SQLyog / public connection (as requested)
-        SQLALCHEMY_DATABASE_URI = (
-            "mysql+pymysql://root:parjrgCJmevLFdtYfOnYvEkjIljutGsu"
-            "@turntable.proxy.rlwy.net:41200/railway"
-        )
+        # Localhost MySQL on port 3307, no password
+        SQLALCHEMY_DATABASE_URI = "mysql+pymysql://petsona_user:Petsona-0717@localhost/petsona_db"
 
     # =========================
     # MAIL
@@ -60,9 +57,9 @@ class Config:
     # =========================
     # RECAPTCHA V3 CONFIG
     # =========================
-    RECAPTCHA_SITE_KEY = "6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT"
-    RECAPTCHA_SECRET_KEY = "6Le4c94sAAAAAHVDiFrjrGYM6c6bdBs0KhnS72VN"
-    RECAPTCHA_THRESHOLD = 0.5
+    # RECAPTCHA_SITE_KEY = os.getenv("RECAPTCHA_SITE_KEY", "6Le4c94sAAAAADh1YOljhLnxWDxvrMbGCDzSXcWT")
+    # RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY", "6Le4c94sAAAAAHVDiFrjrGYM6c6bdBs0KhnS72VN")
+    # RECAPTCHA_THRESHOLD = float(os.getenv("RECAPTCHA_THRESHOLD", 0.5))
 
     # =========================
     # FILE UPLOAD
@@ -98,11 +95,8 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SESSION_COOKIE_SECURE = False
 
-    # Use Railway MySQL for development
-    SQLALCHEMY_DATABASE_URI = (
-        "mysql+pymysql://root:parjrgCJmevLFdtYfOnYvEkjIljutGsu"
-        "@turntable.proxy.rlwy.net:41200/railway"
-    )
+    # Use local MySQL for development
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://petsona_user:Petsona-0717@localhost/petsona_db"
 
     RESET_TOKEN_EXPIRY = int(os.getenv("RESET_TOKEN_EXPIRY", 3600))
 
@@ -131,14 +125,46 @@ class ProductionConfig(Config):
     MAX_FAILED_LOGIN = int(os.getenv("MAX_FAILED_LOGIN", 5))
     LOCKOUT_TIME = int(os.getenv("LOCKOUT_TIME", 300))
 
-    CSP = {
-        "default-src": ["'self'"],
-        "script-src": ["'self'", "https://www.google.com/recaptcha/", "https://www.gstatic.com/recaptcha/", "https://unpkg.com/alpinejs@3.x.x/", "https://cdnjs.cloudflare.com/"],
-        "style-src": ["'self'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com/"],
-        "font-src": ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com/"],
-        "img-src": ["'self'", "data:", "https://www.google.com/recaptcha/", "https://www.gstatic.com/recaptcha/"],
-        "connect-src": ["'self'", "https://www.google.com/recaptcha/"],
-        "frame-src": ["https://www.google.com/recaptcha/"],
-    }
+    # CSP removed to prevent internal server errors
+    # CSP = {
+    #     "default-src": ["'self'"],
+    #
+    #     "script-src": [
+    #         "'self'",
+    #         "https://www.google.com",
+    #         "https://www.gstatic.com",
+    #         "https://unpkg.com",
+    #         "https://cdnjs.cloudflare.com",
+    #         "lordicon.com"
+    #     ],
+    #
+    #     "style-src": [
+    #         "'self'",
+    #         "https://fonts.googleapis.com",
+    #         "https://cdnjs.cloudflare.com"
+    #     ],
+    #
+    #     "font-src": [
+    #         "'self'",
+    #         "https://fonts.gstatic.com",
+    #         "https://cdnjs.cloudflare.com"
+    #     ],
+    #
+    #     "img-src": [
+    #         "'self'",
+    #         "data:",
+    #         "https://www.google.com",
+    #         "https://www.gstatic.com"
+    #     ],
+    #
+    #     "connect-src": [
+    #         "'self'",
+    #         "https://www.google.com"
+    #     ],
+    #
+    #     "frame-src": [
+    #         "https://www.google.com"
+    #     ],
+    # }
 
     FRONTEND_URL = os.getenv("FRONTEND_URL", None)
