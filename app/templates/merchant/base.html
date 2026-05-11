@@ -114,16 +114,84 @@
 <!-- Socket.IO for Real-time Updates -->
 <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script src="{{ url_for('static', filename='admin/plugins/jquery/jquery.min.js') }}"></script>
+
+<!-- jQuery Fallback & Loader Protection -->
 <script>
-if (typeof window.jQuery === 'undefined') {
-  var fallbackScript = document.createElement('script');
-  fallbackScript.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
-  fallbackScript.integrity = 'sha256-/xUj+3OJ+Y3oAKiH6jyCmMJk3Hr6zvN3O82ijvs0yvc=';
-  fallbackScript.crossOrigin = 'anonymous';
-  document.head.appendChild(fallbackScript);
-}
+(function() {
+  function ensureJQuery() {
+    if (typeof window.jQuery === 'undefined') {
+      console.warn('jQuery not available, loading fallback');
+      var fallbackScript = document.createElement('script');
+      fallbackScript.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+      fallbackScript.integrity = 'sha256-/xUj+3OJ+Y3oAKiH6jyCmMJk3Hr6zvN3O82ijvs0yvc=';
+      fallbackScript.crossOrigin = 'anonymous';
+      fallbackScript.onload = function() {
+        console.log('jQuery fallback loaded successfully');
+        window.jQueryReady = true;
+        document.dispatchEvent(new CustomEvent('jqueryReady'));
+      };
+      fallbackScript.onerror = function() {
+        console.error('jQuery fallback failed to load');
+      };
+      document.head.appendChild(fallbackScript);
+    } else {
+      console.log('jQuery is available');
+      window.jQueryReady = true;
+      document.dispatchEvent(new CustomEvent('jqueryReady'));
+    }
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ensureJQuery);
+  } else {
+    ensureJQuery();
+  }
+})();
 </script>
+
 <script src="{{ url_for('static', filename='admin/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+<!-- Global jQuery Guard - Ensures $ is always available -->
+<script>
+(function() {
+  // Wait for jQuery to be available with timeout
+  var jqueryWaitAttempts = 0;
+  var maxWaitAttempts = 100; // 5 seconds (50ms * 100)
+  
+  function waitForJQuery() {
+    if (typeof $ !== 'undefined' && typeof jQuery !== 'undefined') {
+      console.log('[jQuery Guard] jQuery is now available');
+      window.$ = $;
+      window.jQuery = jQuery;
+      return true;
+    }
+    
+    if (jqueryWaitAttempts < maxWaitAttempts) {
+      jqueryWaitAttempts++;
+      setTimeout(waitForJQuery, 50);
+      return false;
+    }
+    
+    console.error('[jQuery Guard] jQuery failed to load after 5 seconds');
+    return false;
+  }
+  
+  // Start waiting for jQuery
+  waitForJQuery();
+  
+  // Override $ access to ensure jQuery is available
+  Object.defineProperty(window, '$', {
+    get: function() {
+      if (typeof jQuery !== 'undefined') {
+        return jQuery;
+      }
+      console.warn('[jQuery Guard] $ accessed but jQuery is not available');
+      return undefined;
+    },
+    configurable: true
+  });
+})();
+</script>
 <script src="{{ url_for('static', filename='admin/dist/js/adminlte.min.js') }}"></script>
 <script src="{{ url_for('static', filename='shared/loader.js') }}"></script>
 <script src="{{ url_for('static', filename='js/socket-manager.js') }}"></script>

@@ -1,62 +1,136 @@
 /**
- * Socket.IO Manager for Real-Time Vote Updates
- * Handles WebSocket connections and vote count synchronization
+ * Socket.IO Manager for Real-Time Updates
+ * Nginx & Gunicorn Compatible Configuration
+ * Handles WebSocket connections with polling fallback
  */
 
+// Wait for Socket.IO library to be loaded
+function waitForSocketIO(maxAttempts = 100) {
+  return new Promise((resolve) => {
+    let attempts = 0;
+    
+    function check() {
+      if (typeof io !== 'undefined') {
+        console.log('[Socket.IO] Library loaded');
+        resolve(true);
+        return;
+      }
+      
+      if (attempts < maxAttempts) {
+        attempts++;
+        setTimeout(check, 50); // Check every 50ms
+      } else {
+        console.error('[Socket.IO] Library failed to load after 5 seconds');
+        resolve(false);
+      }
+    }
+    
+    check();
+  });
+}
+
+// Global tracking for connection attempts
+window._socketConnectionAttempts = 0;
+window._socketMaxAttempts = 3;
+window._socketLastError = null;
+
 function createSharedSocket(forcePolling = false) {
-  if (window.sharedSocket) {
+  // Return existing socket if already connected
+  if (window.sharedSocket && window.sharedSocket.connected) {
     return window.sharedSocket;
   }
 
+  // Ensure Socket.IO is loaded
   if (typeof io === 'undefined') {
+    console.warn('Socket.IO library not loaded yet');
     return null;
   }
 
+  // Build proper socket URL
   const socketUrl = window.socketIoUrl || window.location.origin;
+  
+  // Nginx/Gunicorn compatible configuration
   const opts = {
-    path: '/socket.io',
+    path: '/socket.io/',
     transports: forcePolling ? ['polling'] : ['websocket', 'polling'],
     reconnection: true,
-    reconnectionAttempts: 8,
+    reconnectionAttempts: 10,
     reconnectionDelay: 1000,
-    reconnectionDelayMax: 15000,
+    reconnectionDelayMax: 30000,
     randomizationFactor: 0.5,
-    timeout: 20000,
+    timeout: 30000,
     autoConnect: true,
     upgrade: !forcePolling,
     secure: window.location.protocol === 'https:',
+    // Nginx compatibility: ensure proper headers
+    extraHeaders: {
+      'Connection': 'upgrade'
+    },
+    // Force polling for testing if websocket fails
+    rememberUpgrade: true,
   };
+
+  console.log('[Socket.IO] Creating socket', {
+    url: socketUrl,
+    forcePolling: forcePolling,
+    transports: opts.transports
+  });
 
   const socket = io(socketUrl, opts);
   window.sharedSocket = socket;
+  window._socketConnectionAttempts = 0;
 
-  let pollingFallbackScheduled = false;
+  // Track connection state
+  socket.on('connect', () => {
+    console.log('[Socket.IO] ✓ Connected');
+    window._socketConnectionAttempts = 0;
+    window._socketLastError = null;
+  });
 
   socket.on('connect_error', (error) => {
-    console.warn('Socket.IO connect error:', error);
-    if (!forcePolling && !pollingFallbackScheduled) {
-      pollingFallbackScheduled = true;
-      console.warn('Socket.IO websocket failed; retrying with polling only.');
+    window._socketLastError = error;
+    console.warn('[Socket.IO] Connection error:', error?.message || error);
+    
+    // Only try polling fallback if websocket fails and we haven't tried too many times
+    if (!forcePolling && window._socketConnectionAttempts < window._socketMaxAttempts) {
+      window._socketConnectionAttempts++;
+      console.log('[Socket.IO] Attempting polling fallback (attempt ' + window._socketConnectionAttempts + ')');
+      
+      // Clear and retry with polling
       socket.disconnect();
       window.sharedSocket = null;
+      
       setTimeout(() => {
-        window.getSharedSocket = createSharedSocket;
-        window.sharedSocket = createSharedSocket(true);
-      }, 500);
+        console.log('[Socket.IO] Retrying with polling transport only');
+        const pollingSocket = createSharedSocket(true);
+        if (pollingSocket) {
+          window.sharedSocket = pollingSocket;
+          window.getSharedSocket = () => pollingSocket;
+        }
+      }, 1000);
     }
   });
 
+  socket.on('error', (error) => {
+    console.error('[Socket.IO] Socket error:', error);
+  });
+
+  socket.on('disconnect', (reason) => {
+    console.warn('[Socket.IO] Disconnected:', reason);
+  });
+
   socket.on('reconnect_error', (error) => {
-    console.warn('Socket.IO reconnect error:', error);
+    console.warn('[Socket.IO] Reconnect error:', error?.message || error);
   });
 
   socket.on('reconnect_failed', () => {
-    console.warn('Socket.IO reconnection failed. No further reconnect attempts.');
+    console.warn('[Socket.IO] Reconnection failed. Max attempts reached.');
   });
 
   return socket;
 }
 
+// Initialize getSharedSocket as a global getter
 window.getSharedSocket = window.getSharedSocket || createSharedSocket;
 
 class SocketManager {
@@ -289,9 +363,36 @@ class SocketManager {
   }
 }
 
-// Create global instance
-const socketManager = new SocketManager();
+// Create global instance with delayed initialization
+let socketManager = null;
 
-// Expose manager globally for page scripts and compatibility
-window.socketManager = socketManager;
-window.socket = socketManager.socket;
+function initializeSocketManager() {
+  if (socketManager) {
+    return; // Already initialized
+  }
+  
+  if (typeof io === 'undefined') {
+    // Socket.IO not ready yet, retry
+    console.log('[Socket.IO] Waiting for Socket.IO library...');
+    setTimeout(initializeSocketManager, 500);
+    return;
+  }
+  
+  console.log('[Socket.IO] Initializing SocketManager');
+  socketManager = new SocketManager();
+  
+  // Expose manager globally for page scripts and compatibility
+  window.socketManager = socketManager;
+  window.socket = socketManager.socket;
+}
+
+// Start initialization when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeSocketManager);
+} else {
+  // DOM is already loaded
+  initializeSocketManager();
+}
+
+// Also try to initialize after a short delay to catch Socket.IO loading
+setTimeout(initializeSocketManager, 100);
