@@ -2,23 +2,33 @@
 module.exports = {
   content: [
     "./app/templates/**/*.html",
+    "./app/**/*.html",
     "./app/static/**/*.js"
   ],
+
+  // IMPORTANT for AdminLTE/Bootstrap compatibility
+  corePlugins: {
+    preflight: false, // ❗ prevents Tailwind reset breaking AdminLTE
+  },
+
   theme: {
     extend: {
       colors: {
         lavender: '#E6E6FA',
       },
+
       gridTemplateColumns: {
         'auto-6': 'repeat(auto-fit, minmax(150px, 1fr))',
       },
+
       animation: {
-        'blob': 'blob 7s infinite',
+        blob: 'blob 7s infinite',
         'fade-in': 'fadeIn 0.3s ease-out',
         'slide-down': 'slideDown 0.4s ease-out',
-        'bounce': 'bounce 1s infinite',
-        'spin': 'spin 1s linear infinite',
+        bounce: 'bounce 1s infinite',
+        spin: 'spin 1s linear infinite',
       },
+
       keyframes: {
         blob: {
           '0%, 100%': {
@@ -31,6 +41,7 @@ module.exports = {
             transform: 'translate(-20px, 20px) scale(0.9)',
           },
         },
+
         fadeIn: {
           '0%': {
             opacity: '0',
@@ -41,6 +52,7 @@ module.exports = {
             transform: 'translateY(0)',
           },
         },
+
         slideDown: {
           '0%': {
             opacity: '0',
@@ -54,5 +66,6 @@ module.exports = {
       },
     },
   },
+
   plugins: [],
-}
+};
